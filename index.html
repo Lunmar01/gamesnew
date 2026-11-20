@@ -1,25 +1,26 @@
+```html
 <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>วิถีสร้างรากฐาน: จิตอมตะ - Web RPG</title>
+  <title>วิถีสร้างรากฐาน: จิตอมตะ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #0b0f17;
-      --bg-card: #141b29;
-      --bg-panel: #1b2436;
-      --border: #2c3852;
+      --bg-dark: #0a0e17;
+      --bg-card: #131b2b;
+      --bg-panel: #1b253b;
+      --border: #2e3c5c;
       --gold: #eab308;
-      --gold-soft: rgba(234, 179, 8, 0.15);
+      --gold-soft: rgba(234, 179, 8, 0.16);
       --jade: #2dd4bf;
       --spirit: #38bdf8;
       --hp: #f43f5e;
       --exp: #a855f7;
-      --text: #f1f5f9;
+      --text: #f8fafc;
       --muted: #94a3b8;
       --radius: 14px;
     }
@@ -29,26 +30,43 @@
       margin: 0;
       padding: 0;
       font-family: 'Prompt', system-ui, -apple-system, sans-serif;
-      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      background: radial-gradient(circle at top, #172033 0%, var(--bg-dark) 65%);
+      background: radial-gradient(circle at top, #172033 0%, var(--bg-dark) 70%);
       color: var(--text);
       min-height: 100vh;
+      padding: 12px;
       display: flex;
       justify-content: center;
-      padding-bottom: 76px;
     }
 
-    .app-container {
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .hidden { display: none !important; }
+
+    .app {
       width: 100%;
-      max-width: 980px;
-      padding: 14px;
+      max-width: 1060px;
     }
 
-    /* Auth Screen */
-    .auth-wrapper {
+    button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 2px;
+    }
+
+    /* Auth */
+    .auth-wrap {
       min-height: 92vh;
       display: flex;
       align-items: center;
@@ -57,899 +75,1235 @@
 
     .auth-card {
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 20px;
-      padding: 28px 22px;
+      padding: 26px 22px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.6);
     }
 
-    .game-logo {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .game-logo .badge {
-      display: inline-block;
-      font-size: 12px;
-      color: var(--gold);
-      background: var(--gold-soft);
-      border: 1px solid rgba(234, 179, 8, 0.35);
-      padding: 4px 12px;
-      border-radius: 999px;
-      margin-bottom: 8px;
-    }
-
-    .game-logo h1 {
+    .logo { text-align: center; margin-bottom: 18px; }
+    .logo h1 {
       font-size: 24px;
       background: linear-gradient(135deg, #fde047, #2dd4bf);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      font-weight: 700;
     }
+    .logo p { font-size: 13px; color: var(--muted); margin-top: 4px; }
 
-    .game-logo p {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .auth-tabs {
+    .tabs-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 6px;
       background: var(--bg-dark);
       padding: 5px;
       border-radius: 12px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
-    .auth-tab {
+    .tab-btn {
       background: transparent;
       border: none;
       color: var(--muted);
       padding: 9px;
-      border-radius: 9px;
+      border-radius: 8px;
       cursor: pointer;
       font-weight: 500;
-      transition: 0.2s;
     }
 
-    .auth-tab.active {
+    .tab-btn.active {
       background: var(--bg-panel);
       color: var(--gold);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
 
-    .form-group {
-      margin-bottom: 14px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 5px; }
     .form-group input {
       width: 100%;
-      padding: 12px 14px;
-      border-radius: 11px;
+      padding: 12px;
+      border-radius: 10px;
       border: 1px solid var(--border);
       background: var(--bg-dark);
       color: var(--text);
       font-size: 15px;
-      outline: none;
-    }
-
-    .form-group input:focus {
-      border-color: var(--jade);
     }
 
     .btn {
       border: none;
-      border-radius: 11px;
-      padding: 11px 16px;
-      font-size: 14px;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13.5px;
       font-weight: 600;
       cursor: pointer;
-      transition: transform 0.1s, opacity 0.2s, background 0.2s;
+      color: var(--text);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      color: var(--text);
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+    }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary { width: 100%; background: linear-gradient(135deg, #0d9488, #0284c7); border: none; padding: 13px; font-size: 15px; }
+    .btn-gold { background: linear-gradient(135deg, #ca8a04, #eab308); color: #0a0e17; border: none; }
+    .btn-jade { background: linear-gradient(135deg, #0f766e, #14b8a6); border: none; }
+    .btn-danger { background: linear-gradient(135deg, #be123c, #f43f5e); border: none; }
+    .btn-spirit { background: linear-gradient(135deg, #0369a1, #38bdf8); border: none; }
+    .btn-sm { padding: 6px 10px; font-size: 12px; }
+
+    .vol-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: var(--bg-dark);
+      padding: 2px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
     }
 
-    .btn:active { transform: scale(0.97); }
-    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-    .btn-primary {
-      background: linear-gradient(135deg, #0d9488, #0284c7);
-      width: 100%;
-      padding: 13px;
-      font-size: 15px;
-    }
-    .btn-gold { background: linear-gradient(135deg, #ca8a04, #eab308); color: #0b0f17; }
-    .btn-danger { background: linear-gradient(135deg, #be123c, #f43f5e); }
-    .btn-spirit { background: linear-gradient(135deg, #0369a1, #38bdf8); }
-    .btn-jade { background: linear-gradient(135deg, #0f766e, #14b8a6); }
-    .btn-dark { background: var(--bg-panel); border: 1px solid var(--border); }
-    .btn-sm { padding: 7px 12px; font-size: 12px; border-radius: 8px; }
-
-    .error-msg {
-      color: #fb7185;
-      font-size: 13px;
-      text-align: center;
+    /* Header & Shortcut Toolbar */
+    .top-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
       margin-bottom: 12px;
-      min-height: 18px;
     }
 
-    /* Main Game Layout */
-    .hidden { display: none !important; }
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
 
-    .top-header {
+    .char-title h2 { font-size: 17px; }
+    .realm-tag {
+      display: inline-block;
+      font-size: 11.5px;
+      color: var(--gold);
+      background: var(--gold-soft);
+      border: 1px solid rgba(234,179,8,0.35);
+      padding: 2px 9px;
+      border-radius: 999px;
+      margin-top: 2px;
+    }
+
+    .bars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .bar-card {
+      background: var(--bg-dark);
+      padding: 7px 10px;
+      border-radius: 9px;
+    }
+    .bar-text { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); margin-bottom: 4px; }
+    .bar-text strong { color: var(--text); }
+    .track { height: 7px; background: #1e293b; border-radius: 999px; overflow: hidden; }
+    .fill { height: 100%; border-radius: 999px; transition: width 0.25s; }
+    .f-hp { background: var(--hp); }
+    .f-sp { background: var(--spirit); }
+    .f-exp { background: var(--exp); }
+
+    .quick-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    /* Main Layout */
+    .game-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 12px;
+    }
+
+    .panel {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 14px;
-      margin-bottom: 14px;
     }
 
-    .header-top-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .char-identity {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .avatar-circle {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--jade), var(--gold));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      color: #0b0f17;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    .char-name-box h2 {
-      font-size: 17px;
-      line-height: 1.2;
-    }
-
-    .realm-badge {
-      display: inline-block;
-      font-size: 11px;
-      color: var(--gold);
-      background: var(--gold-soft);
-      border: 1px solid rgba(234, 179, 8, 0.3);
-      padding: 2px 9px;
-      border-radius: 999px;
-      margin-top: 3px;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .gold-pill {
-      background: var(--bg-dark);
-      border: 1px solid rgba(234, 179, 8, 0.35);
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      color: var(--gold);
+    .panel-title {
+      font-size: 16px;
       font-weight: 600;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-
-    .bar-box {
-      background: var(--bg-dark);
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .bar-label {
+      color: var(--gold);
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
-      font-size: 11px;
-      margin-bottom: 5px;
-      color: var(--muted);
-    }
-
-    .bar-label strong { color: var(--text); }
-
-    .progress-track {
-      height: 8px;
-      background: #1e293b;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      border-radius: 999px;
-      transition: width 0.3s ease;
-    }
-
-    .fill-hp { background: linear-gradient(90deg, #e11d48, #fb7185); }
-    .fill-spirit { background: linear-gradient(90deg, #0284c7, #38bdf8); }
-    .fill-exp { background: linear-gradient(90deg, #7e22ce, #c084fc); }
-
-    .mini-stats-row {
-      display: flex;
+      align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      font-size: 12px;
-      color: var(--muted);
+      gap: 6px;
     }
 
-    .mini-stats-row span strong {
+    /* Square Map Grid */
+    .map-status-line {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 13px;
+      margin-bottom: 10px;
       color: var(--text);
     }
 
-    /* Desktop/Mobile Nav */
-    .main-grid {
+    .square-grid {
       display: grid;
-      grid-template-columns: 220px 1fr;
-      gap: 14px;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      max-width: 440px;
+      aspect-ratio: 1 / 1;
+      margin: 0 auto 12px auto;
+      background: var(--bg-dark);
+      padding: 6px;
+      border-radius: 12px;
+      border: 2px solid var(--border);
     }
 
-    .side-nav {
+    .tile {
+      border-radius: 6px;
+      background: #161f30;
+      border: 1px solid rgba(255,255,255,0.05);
       display: flex;
       flex-direction: column;
-      gap: 8px;
-    }
-
-    .nav-btn {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 12px 14px;
-      border-radius: 12px;
-      text-align: left;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
       align-items: center;
-      gap: 10px;
-      transition: 0.2s;
-    }
-
-    .nav-btn.active {
-      background: var(--bg-panel);
-      border-color: var(--jade);
-      color: var(--jade);
-    }
-
-    .content-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      min-height: 440px;
-    }
-
-    .section-title {
+      justify-content: center;
       font-size: 17px;
-      font-weight: 600;
-      margin-bottom: 12px;
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+      min-height: 40px;
+    }
+
+    .tile.city-ground { background: #1a2438; }
+    .tile.wild-ground { background: #132620; }
+    .tile.shop-tile { background: rgba(234, 179, 8, 0.14); border-color: rgba(234, 179, 8, 0.4); }
+    .tile.gate-tile { background: rgba(56, 189, 248, 0.16); border-color: rgba(56, 189, 248, 0.45); }
+    .tile.inn-tile { background: rgba(45, 212, 191, 0.14); border-color: rgba(45, 212, 191, 0.4); }
+    .tile.foundation-tile { background: rgba(168, 85, 247, 0.16); border-color: rgba(168, 85, 247, 0.45); }
+    .tile.monster-tile { background: rgba(244, 63, 94, 0.18); border-color: rgba(244, 63, 94, 0.5); }
+    .tile.player-here {
+      background: linear-gradient(135deg, #0d9488, #ca8a04) !important;
+      border: 2px solid #ffffff !important;
+      box-shadow: 0 0 12px rgba(234,179,8,0.6);
+      z-index: 2;
+    }
+
+    .tile-sub {
+      font-size: 9px;
+      line-height: 1;
+      color: var(--text);
+      max-width: 96%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-top: 1px;
+    }
+
+    /* Touch D-pad + Interact */
+    .controls-row {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      color: var(--gold);
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
     }
 
-    /* Zones & Combat */
-    .zone-list {
+    .dpad {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 10px;
-      margin-bottom: 14px;
+      grid-template-columns: repeat(3, 52px);
+      grid-template-rows: repeat(3, 44px);
+      gap: 4px;
     }
 
-    .zone-card {
+    .dpad button {
       background: var(--bg-panel);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 13px;
+      color: var(--text);
+      border-radius: 9px;
+      font-size: 16px;
       cursor: pointer;
-      transition: 0.2s;
     }
+    .dpad button:active { background: var(--jade); color: #0a0e17; }
 
-    .zone-card:hover { border-color: var(--jade); }
-    .zone-card.locked { opacity: 0.55; cursor: not-allowed; }
-    .zone-card h4 { font-size: 15px; margin-bottom: 4px; color: var(--text); }
-    .zone-card p { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
-    .zone-req { font-size: 11px; color: var(--gold); }
-
-    .battle-arena {
-      background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
-      border: 1px solid var(--border);
+    /* Combat Arena */
+    .combat-box {
+      background: linear-gradient(180deg, #1a1625 0%, #0f1522 100%);
+      border: 1px solid #4c1d3d;
       border-radius: 14px;
-      padding: 16px;
+      padding: 14px;
     }
 
-    .enemy-box {
+    .enemy-header {
       text-align: center;
       padding: 12px;
-      background: rgba(0,0,0,0.25);
-      border-radius: 12px;
-      margin-bottom: 14px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      margin-bottom: 12px;
     }
 
-    .enemy-emoji {
-      font-size: 48px;
-      display: inline-block;
-      margin-bottom: 4px;
-      transition: transform 0.15s;
-    }
-
-    .shake {
-      animation: shakeAnim 0.3s;
-    }
-
-    @keyframes shakeAnim {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-8px); }
-      75% { transform: translateX(8px); }
-    }
-
-    .enemy-name {
-      font-size: 17px;
-      font-weight: 600;
-      color: #fda4af;
-    }
-
-    .enemy-meta {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .combat-actions {
+    .skill-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 7px;
+      margin-bottom: 10px;
     }
 
-    .combat-potions {
+    .skill-btn {
+      text-align: left;
+      padding: 8px 10px;
+      border-radius: 9px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .skill-btn:hover:not(:disabled) { border-color: var(--spirit); }
+    .skill-btn:disabled { opacity: 0.42; cursor: not-allowed; }
+    .skill-key {
+      display: inline-block;
+      background: var(--gold);
+      color: #0a0e17;
+      font-weight: 700;
+      padding: 0 6px;
+      border-radius: 5px;
+      margin-right: 5px;
+      font-size: 11px;
     }
 
-    .combat-log {
+    /* Info / Log Sidebar */
+    .log-box {
       background: var(--bg-dark);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 10px;
-      height: 150px;
+      height: 230px;
       overflow-y: auto;
       font-size: 12.5px;
       line-height: 1.6;
+      margin-bottom: 10px;
     }
 
-    .log-line { margin-bottom: 3px; }
-    .log-win { color: var(--jade); font-weight: 500; }
-    .log-hit { color: #fbbf24; }
-    .log-enemy { color: #fb7185; }
-    .log-info { color: var(--spirit); }
+    .detail-box {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
 
-    /* Item Lists */
-    .item-grid {
+    /* Overlay Modal for Shop/Bag/Info */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 8, 15, 0.86);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      z-index: 500;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 720px;
+      max-height: 88vh;
+      overflow-y: auto;
+      background: var(--bg-card);
+      border: 2px solid var(--gold);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .item-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 10px;
+      margin-top: 10px;
     }
 
     .item-card {
       background: var(--bg-panel);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
+      border-radius: 10px;
+      padding: 11px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 10px;
-    }
-
-    .item-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
       gap: 8px;
     }
 
-    .item-title {
-      font-size: 14px;
-      font-weight: 600;
-    }
+    .c-win { color: var(--jade); }
+    .c-hit { color: #fbbf24; }
+    .c-bad { color: #fb7185; }
+    .c-info { color: var(--spirit); }
 
-    .item-qty {
-      background: var(--bg-dark);
-      color: var(--jade);
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      border: 1px solid rgba(45, 212, 191, 0.3);
-      white-space: nowrap;
-    }
-
-    .item-desc {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .item-foot {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .filter-tabs {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-
-    .filter-tab {
-      background: var(--bg-dark);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-
-    .filter-tab.active {
-      border-color: var(--gold);
-      color: var(--gold);
-      background: var(--gold-soft);
-    }
-
-    /* Foundation Panel */
-    .foundation-hero {
-      background: linear-gradient(135deg, rgba(45, 212, 191, 0.12), rgba(234, 179, 8, 0.12));
-      border: 1px solid rgba(234, 179, 8, 0.3);
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 14px;
-    }
-
-    .realm-roadmap {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .realm-step {
-      background: var(--bg-dark);
-      border: 1px solid var(--border);
-      padding: 9px 11px;
-      border-radius: 10px;
-      font-size: 12px;
-    }
-
-    .realm-step.reached {
-      border-color: var(--jade);
-      color: var(--jade);
-    }
-
-    .realm-step.current {
-      border-color: var(--gold);
-      background: var(--gold-soft);
-      color: var(--gold);
-      font-weight: 600;
-    }
-
-    /* Toast */
-    .toast {
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      background: #1e293b;
-      border: 1px solid var(--jade);
-      color: var(--text);
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-size: 13px;
-      z-index: 999;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      animation: fadeIn 0.2s;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Bottom Mobile Nav */
-    .bottom-nav {
-      display: none;
-    }
-
-    @media (max-width: 768px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 7px;
-      }
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
-      .side-nav {
-        display: none;
-      }
-      .bottom-nav {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(15, 23, 42, 0.96);
-        backdrop-filter: blur(10px);
-        border-top: 1px solid var(--border);
-        z-index: 100;
-        padding: 6px 4px;
-      }
-      .bottom-nav button {
-        background: transparent;
-        border: none;
-        color: var(--muted);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
-        font-size: 11px;
-        padding: 6px 2px;
-        cursor: pointer;
-      }
-      .bottom-nav button.active {
-        color: var(--jade);
-        font-weight: 600;
-      }
-      .bottom-nav .ico {
-        font-size: 18px;
-      }
+    @media (max-width: 860px) {
+      .game-layout { grid-template-columns: 1fr; }
+      .bars-grid { grid-template-columns: 1fr; }
+      .skill-grid { grid-template-columns: 1fr; }
+      .square-grid { max-width: 100%; }
     }
   </style>
 </head>
 <body>
-  <div class="app-container">
+  <!-- LIVE ANNOUNCER FOR SCREEN READERS -->
+  <div id="srAnnouncer" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+
+  <div class="app">
     <!-- AUTH SCREEN -->
-    <div id="authScreen" class="auth-wrapper">
+    <div id="authScreen" class="auth-wrap">
       <div class="auth-card">
-        <div class="game-logo">
-          <div class="badge">RPG บำเพ็ญเพียร &amp; หาไอเทม</div>
+        <div class="logo">
           <h1>วิถีสร้างรากฐาน: จิตอมตะ</h1>
-          <p>ล่าอสูร สะสมวัตถุดิบวิญญาณ ทะลวงขอบเขตพลังจิต</p>
+          <p>RPG แผนที่สี่เหลี่ยมจัตุรัส • มีระบบเสียงเอฟเฟกต์ &amp; ควบคุมด้วยคีย์บอร์ด</p>
         </div>
-
-        <div class="auth-tabs">
-          <button id="tabLoginBtn" class="auth-tab active" onclick="switchAuthMode('login')">เข้าสู่ระบบ</button>
-          <button id="tabRegBtn" class="auth-tab" onclick="switchAuthMode('register')">สมัครตัวละคร</button>
+        <div class="tabs-2">
+          <button id="tabLogin" class="tab-btn active" onclick="setAuthMode('login')">เข้าสู่ระบบ</button>
+          <button id="tabReg" class="tab-btn" onclick="setAuthMode('register')">สมัครตัวละครใหม่</button>
         </div>
-
-        <div id="authError" class="error-msg"></div>
-
-        <form id="authForm" onsubmit="handleAuth(event)">
+        <div id="authMsg" role="alert" style="color:#fb7185; font-size:13px; text-align:center; min-height:20px; margin-bottom:8px;"></div>
+        <form onsubmit="submitAuth(event)">
           <div class="form-group">
-            <label for="charNameInput">ชื่อตัวละคร</label>
-            <input type="text" id="charNameInput" placeholder="เช่น หลินฟง, จอมยุทธ์ไร้เงา" maxlength="20" required />
+            <label for="inName">ชื่อตัวละคร</label>
+            <input id="inName" type="text" placeholder="ระบุชื่อตัวละคร (อย่างน้อย 2 ตัวอักษร)" maxlength="20" required />
           </div>
           <div class="form-group">
-            <label for="passwordInput">รหัสผ่าน</label>
-            <input type="password" id="passwordInput" placeholder="อย่างน้อย 4 ตัวอักษร" minlength="4" required />
+            <label for="inPass">รหัสผ่าน</label>
+            <input id="inPass" type="password" placeholder="อย่างน้อย 4 ตัวอักษร" minlength="4" required />
           </div>
-          <button type="submit" id="authSubmitBtn" class="btn btn-primary">เข้าสู่ยุทธภพ</button>
+          <button type="submit" id="authBtn" class="btn btn-primary">เข้าสู่ยุทธภพ</button>
         </form>
-        <p style="font-size: 11.5px; color: var(--muted); text-align:center; margin-top:14px;">
-          * ข้อมูลตัวละครและความคืบหน้าจะถูกบันทึกอัตโนมัติในเครื่องนี้
-        </p>
       </div>
     </div>
 
     <!-- GAME SCREEN -->
-    <div id="gameScreen" class="hidden">
-      <header class="top-header">
-        <div class="header-top-row">
-          <div class="char-identity">
-            <div class="avatar-circle" id="avatarInitial">จ</div>
-            <div class="char-name-box">
-              <h2 id="uiCharName">ชื่อตัวละคร</h2>
-              <span class="realm-badge" id="uiRealmName">ขั้นปฐมจิต</span>
+    <div id="gameScreen" class="hidden" role="application" tabindex="0" aria-label="หน้าจอเกม วิถีสร้างรากฐาน ใช้ลูกศรเดิน กด Enter เข้าสถานที่ กด L สแกนรอบตัว กด 1 ถึง 0 ต่อสู้ กด PageUp PageDown ปรับเสียงดนตรี กด Home End ปรับเสียงทั้งหมด กด H ดูคีย์ลัด">
+      <header class="top-bar">
+        <div class="top-row">
+          <div class="char-title">
+            <h2><span id="uiName">จอมยุทธ์</span> (Lv.<span id="uiLv">1</span>)</h2>
+            <span class="realm-tag" id="uiRealm">ขั้นปฐมจิต</span>
+            <span style="font-size:13px; color:var(--gold); margin-left:8px;">🪙 <strong id="uiGold">0</strong> ศิลา</span>
+            <span style="font-size:13px; color:var(--muted); margin-left:8px;">⚔️ โจมตี: <strong id="uiAtk" style="color:var(--text)">14</strong></span>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+            <div class="vol-group">
+              <button class="btn btn-sm" onclick="adjustMasterVolume(-0.1)" aria-label="ลดเสียงทั้งหมดในเกม คีย์ลัด End">➖</button>
+              <button id="btnMasterVolLabel" class="btn btn-sm" onclick="announceMasterVol()" aria-label="ระดับเสียงรวมทั้งหมดในเกม 80 เปอร์เซ็นต์ ปรับด้วย Home และ End">🔊 เสียงรวม 80%</button>
+              <button class="btn btn-sm" onclick="adjustMasterVolume(0.1)" aria-label="เพิ่มเสียงทั้งหมดในเกม คีย์ลัด Home">➕</button>
             </div>
-          </div>
-          <div class="header-actions">
-            <div class="gold-pill">🪙 <span id="uiGold">0</span> ศิลา</div>
-            <button class="btn btn-dark btn-sm" onclick="restAtCamp()" title="พักฟื้นที่ค่าย">⛺ พักฟื้น</button>
-            <button class="btn btn-dark btn-sm" onclick="logout()">ออก</button>
-          </div>
-        </div>
-
-        <div class="stats-grid">
-          <div class="bar-box">
-            <div class="bar-label"><span>❤️ พลังชีวิต (HP)</span><strong id="uiHpText">100/100</strong></div>
-            <div class="progress-track"><div class="progress-fill fill-hp" id="uiHpBar" style="width:100%"></div></div>
-          </div>
-          <div class="bar-box">
-            <div class="bar-label"><span>💠 พลังจิต (Spirit)</span><strong id="uiSpiritText">50/50</strong></div>
-            <div class="progress-track"><div class="progress-fill fill-spirit" id="uiSpiritBar" style="width:100%"></div></div>
-          </div>
-          <div class="bar-box">
-            <div class="bar-label"><span>✨ ประสบการณ์ (Lv.<span id="uiLevel">1</span>)</span><strong id="uiExpText">0/100</strong></div>
-            <div class="progress-track"><div class="progress-fill fill-exp" id="uiExpBar" style="width:0%"></div></div>
+            <div class="vol-group">
+              <button class="btn btn-sm" onclick="adjustBgmVolume(-0.1)" aria-label="ลดเสียงดนตรี คีย์ลัด Page Down">➖</button>
+              <button id="btnBgmVolLabel" class="btn btn-sm" onclick="announceBgmVol()" aria-label="ระดับเสียงดนตรี 50 เปอร์เซ็นต์ ปรับด้วย PageUp และ PageDown">🎵 ดนตรี 50%</button>
+              <button class="btn btn-sm" onclick="adjustBgmVolume(0.1)" aria-label="เพิ่มเสียงดนตรี คีย์ลัด Page Up">➕</button>
+            </div>
+            <button class="btn btn-sm" onclick="manualSave()" aria-label="บันทึกเกม คีย์ลัด S">💾 เซฟ [S]</button>
+            <button class="btn btn-sm" onclick="openHelpModal()" aria-label="ดูคีย์ลัดทั้งหมด คีย์ลัด H">❓ คีย์ลัด [H]</button>
+            <button class="btn btn-sm" onclick="logout()" aria-label="ออกจากตัวละคร">🚪 ออก</button>
           </div>
         </div>
 
-        <div class="mini-stats-row">
-          <span>⚔️ พลังโจมตีรวม: <strong id="uiAtk">15</strong></span>
-          <span>🗡️ อาวุธ: <strong id="uiWeaponName">ไม่มี</strong></span>
-          <span>🪨 ระดับรากฐาน: <strong id="uiFoundationLv">0</strong></span>
-          <span style="margin-left:auto; color:var(--jade);">💾 บันทึกอัตโนมัติ</span>
+        <div class="bars-grid">
+          <div class="bar-card">
+            <div class="bar-text"><span>❤️ HP</span><strong id="uiHp">100/100</strong></div>
+            <div class="track"><div class="fill f-hp" id="barHp" style="width:100%"></div></div>
+          </div>
+          <div class="bar-card">
+            <div class="bar-text"><span>💠 พลังจิต</span><strong id="uiSp">50/50</strong></div>
+            <div class="track"><div class="fill f-sp" id="barSp" style="width:100%"></div></div>
+          </div>
+          <div class="bar-card">
+            <div class="bar-text"><span>✨ EXP</span><strong id="uiExp">0/100</strong></div>
+            <div class="track"><div class="fill f-exp" id="barExp" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <div class="quick-nav">
+          <button class="btn btn-sm" onclick="inspectStatus()" aria-label="เช็กสถานะตัวละคร คีย์ลัด C">👤 สถานะ [C]</button>
+          <button class="btn btn-sm" onclick="scanMap()" aria-label="สแกนรอบตัว คีย์ลัด L">🧭 สแกนรอบตัว [L]</button>
+          <button class="btn btn-sm" onclick="inspectMapInfo()" aria-label="เช็กข้อมูลแผนที่ คีย์ลัด M">🗺️ ข้อมูลแผนที่ [M]</button>
+          <button class="btn btn-sm" onclick="openBagModal()" aria-label="เปิดกระเป๋าไอเทม คีย์ลัด I">🎒 กระเป๋า [I]</button>
+          <button class="btn btn-sm" onclick="openFoundationModal()" aria-label="สร้างรากฐานและขั้นพลังจิต คีย์ลัด F">🪨 รากฐาน [F]</button>
+          <button class="btn btn-sm" onclick="openSkillsModal()" aria-label="ดูสกิล 1 ถึง 0 คีย์ลัด K">📜 สกิล 1-0 [K]</button>
+          <button class="btn btn-sm btn-jade" onclick="quickHealHp()" aria-label="ดื่มยา HP ด่วน คีย์ลัด Q">💊 ยา HP [Q]</button>
+          <button class="btn btn-sm btn-spirit" onclick="quickHealSp()" aria-label="ดื่มยาพลังจิตด่วน คีย์ลัด W">💧 ยาจิต [W]</button>
         </div>
       </header>
 
-      <div class="main-grid">
-        <nav class="side-nav">
-          <button class="nav-btn active" data-tab="hunt" onclick="switchTab('hunt')">⚔️ ล่ามอนสเตอร์</button>
-          <button class="nav-btn" data-tab="foundation" onclick="switchTab('foundation')">🪨 สร้างรากฐาน &amp; ขั้นจิต</button>
-          <button class="nav-btn" data-tab="bag" onclick="switchTab('bag')">🎒 กระเป๋าไอเทม</button>
-          <button class="nav-btn" data-tab="shop" onclick="switchTab('shop')">🏪 ร้านค้าสำนัก</button>
-        </nav>
-
-        <main class="content-card">
-          <!-- TAB: HUNT -->
-          <section id="tab-hunt">
-            <div class="section-title">
-              <span>⚔️ พื้นที่ล่าอสูร &amp; หาไอเทม</span>
-              <span style="font-size:12px; color:var(--muted);">เลือกแดนเพื่อต่อสู้</span>
-            </div>
-            <div id="zoneSelectionView">
-              <div class="zone-list" id="zoneList"></div>
+      <div class="game-layout">
+        <!-- LEFT: MAP OR COMBAT -->
+        <main class="panel">
+          <!-- EXPLORATION VIEW -->
+          <div id="exploreView">
+            <div class="panel-title">
+              <span id="uiMapTitle">🗺️ เมืองปฐมจิต (7×7)</span>
+              <span id="uiCoords" style="font-size:13px; color:var(--jade);">พิกัด (3, 3)</span>
             </div>
 
-            <div id="combatView" class="battle-arena hidden">
-              <div class="enemy-box">
-                <div class="enemy-emoji" id="enemyEmoji">🐺</div>
-                <div class="enemy-name" id="enemyName">หมาป่าเงา</div>
-                <div class="enemy-meta" id="enemyMeta">Lv.1 | โจมตี: 8</div>
-                <div class="bar-box" style="max-width:340px; margin:0 auto;">
-                  <div class="bar-label"><span>HP ศัตรู</span><strong id="enemyHpText">50/50</strong></div>
-                  <div class="progress-track"><div class="progress-fill fill-hp" id="enemyHpBar" style="width:100%"></div></div>
-                </div>
+            <div class="map-status-line" id="uiTileDesc">
+              ยืนอยู่ที่ ลานกลางเมืองปฐมจิต
+            </div>
+
+            <div id="squareGrid" class="square-grid"></div>
+
+            <div class="controls-row">
+              <div class="dpad">
+                <div></div>
+                <button onclick="movePlayer(0, -1)" aria-label="เดินขึ้น ทิศเหนือ">⬆️</button>
+                <div></div>
+                <button onclick="movePlayer(-1, 0)" aria-label="เดินซ้าย ทิศตะวันตก">⬅️</button>
+                <button onclick="interactCurrentTile()" aria-label="โต้ตอบจุดที่ยืนอยู่ Enter" style="background:var(--gold); color:#0a0e17; font-weight:700;">ตกลง</button>
+                <button onclick="movePlayer(1, 0)" aria-label="เดินขวา ทิศตะวันออก">➡️</button>
+                <div></div>
+                <button onclick="movePlayer(0, 1)" aria-label="เดินลง ทิศใต้">⬇️</button>
+                <div></div>
               </div>
 
-              <div class="combat-actions">
-                <button class="btn btn-danger" onclick="playerAction('attack')">⚔️ โจมตีปกติ</button>
-                <button class="btn btn-spirit" onclick="playerAction('skill')">💠 คลื่นพลังจิต (15 จิต)</button>
-                <button class="btn btn-jade" onclick="playerAction('meditate')">🧘 สมาธิฟื้นฟู &amp; ป้องกัน</button>
-                <button class="btn btn-dark" onclick="playerAction('flee')">💨 หลบหนี</button>
+              <div style="display:flex; flex-direction:column; gap:6px; min-width:190px;">
+                <button class="btn btn-gold" onclick="interactCurrentTile()" aria-label="โต้ตอบหรือเข้าสถานที่ กด Enter">🚪 โต้ตอบ / เข้าสถานที่ [Enter]</button>
+                <button class="btn btn-jade" onclick="scanMap()" aria-label="สแกนสถานที่และอสูร คีย์ลัด L">🧭 สแกนสถานที่และอสูร [L]</button>
+                <button id="btnSearchMonster" class="btn btn-danger hidden" onclick="searchNearbyMonster()" aria-label="ค้นหาอสูรในถิ่นนี้ คีย์ลัด A">⚔️ ค้นหาอสูรในถิ่นนี้ [A]</button>
               </div>
-
-              <div class="combat-potions" id="combatPotions"></div>
-
-              <div class="combat-log" id="combatLog"></div>
             </div>
-          </section>
+          </div>
 
-          <!-- TAB: FOUNDATION -->
-          <section id="tab-foundation" class="hidden">
-            <div class="section-title">
-              <span>🪨 หลอมสร้างรากฐาน &amp; ขอบเขตพลังจิต</span>
+          <!-- COMBAT VIEW -->
+          <div id="combatView" class="combat-box hidden">
+            <div class="panel-title">
+              <span>⚔️ กำลังต่อสู้! (กดเลข 1–0 ใช้สกิล)</span>
+              <button class="btn btn-sm btn-danger" onclick="fleeCombat()" aria-label="หลบหนีจากการต่อสู้ คีย์ลัด R">💨 หลบหนี [R]</button>
             </div>
-            <div class="foundation-hero">
-              <h3 style="color:var(--gold); margin-bottom:6px;">ขอบเขตปัจจุบัน: <span id="fCurrentRealm">ขั้นปฐมจิต</span></h3>
-              <p style="font-size:13px; color:var(--muted); margin-bottom:10px;">
-                นำไอเทมรากฐานที่ดรอปจากมอนสเตอร์มาหลอมเพื่อเพิ่มค่าสถานะถาวร (HP สูงสุด, พลังจิตสูงสุด และพลังโจมตี) ยิ่งรากฐานมั่นคง ยิ่งทะลวงด่านโหดได้ง่ายขึ้น!
-              </p>
-              <div style="font-size:13px; color:var(--jade);">
-                โบนัสจากรากฐานปัจจุบัน: +<span id="fBonusHp">0</span> HP | +<span id="fBonusSpirit">0</span> พลังจิต | +<span id="fBonusAtk">0</span> พลังโจมตี
+
+            <div class="enemy-header">
+              <div id="cEnemyEmoji" style="font-size:44px;">🐺</div>
+              <h3 id="cEnemyName" style="color:#fda4af; font-size:18px;">ศัตรู</h3>
+              <div id="cEnemyMeta" style="font-size:12.5px; color:var(--muted); margin-bottom:8px;">Lv.1</div>
+              <div class="bar-card" style="max-width:340px; margin:0 auto;">
+                <div class="bar-text"><span>❤️ HP ศัตรู</span><strong id="cEnemyHp">50/50</strong></div>
+                <div class="track"><div class="fill f-hp" id="cEnemyHpBar" style="width:100%"></div></div>
               </div>
             </div>
 
-            <h4 style="font-size:14px; margin-bottom:10px; color:var(--text);">ไอเทมเสริมสร้างรากฐาน</h4>
-            <div class="item-grid" id="foundationItemsGrid" style="margin-bottom:18px;"></div>
+            <div class="skill-grid" id="combatSkillGrid"></div>
 
-            <h4 style="font-size:14px; margin-bottom:6px; color:var(--text);">เส้นทางขอบเขตพลังจิตทั้ง 8 ขั้น</h4>
-            <div class="realm-roadmap" id="realmRoadmap"></div>
-          </section>
-
-          <!-- TAB: INVENTORY -->
-          <section id="tab-bag" class="hidden">
-            <div class="section-title">
-              <span>🎒 กระเป๋าเก็บไอเทม</span>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn btn-sm btn-jade" onclick="quickHealHp()" aria-label="ดื่มยา HP ด่วน คีย์ลัด Q">💊 ยา HP ด่วน [Q]</button>
+              <button class="btn btn-sm btn-spirit" onclick="quickHealSp()" aria-label="ดื่มยาพลังจิตด่วน คีย์ลัด W">💧 ยาพลังจิตด่วน [W]</button>
+              <button class="btn btn-sm" onclick="fleeCombat()" aria-label="หลบหนี คีย์ลัด R">💨 หลบหนี [R]</button>
             </div>
-            <div class="filter-tabs" id="bagFilterTabs">
-              <button class="filter-tab active" onclick="setBagFilter('all', this)">ทั้งหมด</button>
-              <button class="filter-tab" onclick="setBagFilter('pill', this)">ยาเม็ด</button>
-              <button class="filter-tab" onclick="setBagFilter('weapon', this)">อาวุธ</button>
-              <button class="filter-tab" onclick="setBagFilter('material', this)">ไอเทมรากฐาน</button>
-            </div>
-            <div class="item-grid" id="bagGrid"></div>
-          </section>
-
-          <!-- TAB: SHOP -->
-          <section id="tab-shop" class="hidden">
-            <div class="section-title">
-              <span>🏪 ร้านค้าสำนัก (ซื้อยาเม็ด &amp; อาวุธ)</span>
-            </div>
-            <div class="filter-tabs" id="shopFilterTabs">
-              <button class="filter-tab active" onclick="setShopFilter('all', this)">ทั้งหมด</button>
-              <button class="filter-tab" onclick="setShopFilter('pill', this)">ยาเม็ดโอสถ</button>
-              <button class="filter-tab" onclick="setShopFilter('weapon', this)">ศาสตราวุธ</button>
-            </div>
-            <div class="item-grid" id="shopGrid"></div>
-          </section>
+          </div>
         </main>
+
+        <!-- RIGHT: LOG & INSPECT PANEL -->
+        <aside class="panel">
+          <div class="panel-title">
+            <span>📜 บันทึก &amp; ข้อมูลตรวจสอบ</span>
+            <button class="btn btn-sm" onclick="readRecentLog()" aria-label="อ่านบันทึกล่าสุด คีย์ลัด J">🔊 อ่านบันทึก [J]</button>
+          </div>
+          <div id="gameLog" class="log-box"></div>
+
+          <div class="panel-title" style="font-size:14px;">
+            <span id="inspectTitle">📌 ข้อมูลด่วน</span>
+          </div>
+          <div id="inspectBody" class="detail-box">
+            กด <strong>C</strong> สถานะ, <strong>L</strong> สแกนแผนที่, <strong>PageUp/Down</strong> ปรับเสียงดนตรี, <strong>Home/End</strong> ปรับเสียงรวม, หรือ <strong>H</strong> ดูคีย์ลัดทั้งหมด
+          </div>
+        </aside>
       </div>
     </div>
   </div>
 
-  <!-- MOBILE BOTTOM NAV -->
-  <nav id="mobileNav" class="bottom-nav hidden">
-    <button class="active" data-tab="hunt" onclick="switchTab('hunt')"><span class="ico">⚔️</span><span>ต่อสู้</span></button>
-    <button data-tab="foundation" onclick="switchTab('foundation')"><span class="ico">🪨</span><span>รากฐาน</span></button>
-    <button data-tab="bag" onclick="switchTab('bag')"><span class="ico">🎒</span><span>กระเป๋า</span></button>
-    <button data-tab="shop" onclick="switchTab('shop')"><span class="ico">🏪</span><span>ร้านค้า</span></button>
-  </nav>
+  <!-- MODAL FOR SHOPS / BAG / FOUNDATION / SKILLS / HELP -->
+  <div id="modalBackdrop" class="modal-backdrop hidden" role="application" aria-label="หน้าต่างเมนู กด Tab เลือกรายการ กด Enter เพื่อซื้อหรือใช้งาน กด Esc เพื่อปิดกลับสู่เกม">
+    <div id="modalCard" class="modal-card" tabindex="-1">
+      <div class="panel-title">
+        <span id="modalTitle">หัวข้อ</span>
+        <button id="modalCloseBtn" class="btn btn-sm btn-danger" onclick="closeModal()" aria-label="ปิดหน้าต่าง กลับสู่เกม คีย์ลัด Escape">✖ ปิด [Esc]</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
 
   <script>
-    // ==================== DATA DEFINITIONS ====================
-    const STORAGE_ACCOUNTS_KEY = 'spirit_foundation_rpg_accounts_v1';
-    const STORAGE_SESSION_KEY = 'spirit_foundation_rpg_current_v1';
+    // ==================== WEB AUDIO API SOUND ENGINE ====================
+    const SoundFX = (() => {
+      let ctx = null;
+      let masterGain = null;
+      let bgmGain = null;
+      let sfxGain = null;
+      let noiseBuf = null;
+      let ambSrc = null;
+      let ambFilter = null;
+      let ambGain = null;
+
+      let masterVol = parseFloat(localStorage.getItem('spirit_rpg_master_vol'));
+      if (isNaN(masterVol)) masterVol = 0.8;
+      let bgmVol = parseFloat(localStorage.getItem('spirit_rpg_bgm_vol'));
+      if (isNaN(bgmVol)) bgmVol = 0.5;
+
+      let bgmTimer = null;
+      let bgmStep = 0;
+
+      const CITY_NOTES = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 440.00, 392.00];
+      const WILD_NOTES = [196.00, 220.00, 261.63, 293.66, 329.63, 293.66, 220.00, 196.00];
+      const COMBAT_NOTES = [220.00, 261.63, 293.66, 329.63, 392.00, 329.63, 293.66, 261.63];
+
+      function init() {
+        try {
+          if (!ctx) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return false;
+            ctx = new AC();
+
+            masterGain = ctx.createGain();
+            bgmGain = ctx.createGain();
+            sfxGain = ctx.createGain();
+
+            masterGain.gain.setValueAtTime(masterVol, ctx.currentTime);
+            bgmGain.gain.setValueAtTime(bgmVol, ctx.currentTime);
+            sfxGain.gain.setValueAtTime(1, ctx.currentTime);
+
+            bgmGain.connect(masterGain);
+            sfxGain.connect(masterGain);
+            masterGain.connect(ctx.destination);
+
+            const len = ctx.sampleRate * 3;
+            noiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
+            const data = noiseBuf.getChannelData(0);
+            let lastOut = 0;
+            for (let i = 0; i < len; i++) {
+              const white = Math.random() * 2 - 1;
+              lastOut = (lastOut + (0.04 * white)) / 1.04;
+              data[i] = white * 0.7 + lastOut * 0.6;
+            }
+          }
+          if (ctx.state === 'suspended') ctx.resume();
+          return true;
+        } catch {
+          return false;
+        }
+      }
+
+      function syncGains() {
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        if (masterGain) masterGain.gain.setTargetAtTime(masterVol, now, 0.03);
+        if (bgmGain) bgmGain.gain.setTargetAtTime(bgmVol, now, 0.03);
+      }
+
+      function startAmbience() {
+        if (!init() || !noiseBuf || ambSrc) return;
+        try {
+          ambSrc = ctx.createBufferSource();
+          ambSrc.buffer = noiseBuf;
+          ambSrc.loop = true;
+
+          ambFilter = ctx.createBiquadFilter();
+          ambFilter.type = 'lowpass';
+          ambFilter.frequency.setValueAtTime(320, ctx.currentTime);
+
+          ambGain = ctx.createGain();
+          ambGain.gain.setValueAtTime(0.018, ctx.currentTime);
+
+          ambSrc.connect(ambFilter).connect(ambGain).connect(sfxGain);
+          ambSrc.start();
+          updateAmbienceTone();
+        } catch {}
+      }
+
+      function stopAmbience() {
+        try {
+          if (ambSrc) { ambSrc.stop(); ambSrc.disconnect(); ambSrc = null; }
+        } catch { ambSrc = null; }
+      }
+
+      function updateAmbienceTone() {
+        if (!ctx || !ambFilter || !ambGain || !player) return;
+        const now = ctx.currentTime;
+        const isWild = MAPS[player.mapId]?.type === 'wild';
+        ambFilter.frequency.setTargetAtTime(combat ? 480 : (isWild ? 390 : 250), now, 0.3);
+        ambGain.gain.setTargetAtTime(combat ? 0.024 : (isWild ? 0.020 : 0.012), now, 0.3);
+      }
+
+      function tone(freq, dur, { type = 'sine', gain = 0.16, endFreq = null, delay = 0, pan = 0, bus = 'sfx' } = {}) {
+        if (masterVol <= 0 || !init()) return;
+        if (bus === 'bgm' && bgmVol <= 0) return;
+        const now = ctx.currentTime + delay;
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        if (endFreq) osc.frequency.exponentialRampToValueAtTime(Math.max(20, endFreq), now + dur);
+
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.linearRampToValueAtTime(gain, now + Math.min(0.015, dur * 0.25));
+        g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+        const targetBus = bus === 'bgm' ? bgmGain : sfxGain;
+        if (ctx.createStereoPanner) {
+          const panner = ctx.createStereoPanner();
+          panner.pan.setValueAtTime(Math.max(-1, Math.min(1, pan)), now);
+          osc.connect(g).connect(panner).connect(targetBus);
+        } else {
+          osc.connect(g).connect(targetBus);
+        }
+        osc.start(now);
+        osc.stop(now + dur + 0.02);
+      }
+
+      function noise(dur, { filterType = 'bandpass', freq = 1000, q = 1, gain = 0.15, endFreq = null, delay = 0, pan = 0 } = {}) {
+        if (masterVol <= 0 || !init() || !noiseBuf) return;
+        const now = ctx.currentTime + delay;
+        const src = ctx.createBufferSource();
+        src.buffer = noiseBuf;
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = filterType;
+        filter.frequency.setValueAtTime(freq, now);
+        filter.Q.setValueAtTime(q, now);
+        if (endFreq) filter.frequency.exponentialRampToValueAtTime(Math.max(40, endFreq), now + dur);
+
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.linearRampToValueAtTime(gain, now + Math.min(0.01, dur * 0.2));
+        g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+        if (ctx.createStereoPanner) {
+          const panner = ctx.createStereoPanner();
+          panner.pan.setValueAtTime(Math.max(-1, Math.min(1, pan)), now);
+          src.connect(filter).connect(g).connect(panner).connect(sfxGain);
+        } else {
+          src.connect(filter).connect(g).connect(sfxGain);
+        }
+        src.start(now);
+        src.stop(now + dur + 0.02);
+      }
+
+      function play(name, pan = 0) {
+        if (masterVol <= 0 || !init()) return;
+        switch (name) {
+          case 'start':
+            tone(392, 0.18, { type: 'triangle', gain: 0.15, delay: 0 });
+            tone(523.25, 0.22, { type: 'triangle', gain: 0.15, delay: 0.12 });
+            tone(659.25, 0.38, { type: 'sine', gain: 0.18, delay: 0.24 });
+            break;
+          case 'step_stone':
+            noise(0.055, { filterType: 'bandpass', freq: 750, q: 1.5, gain: 0.14, pan });
+            tone(115, 0.05, { type: 'sine', gain: 0.10, endFreq: 65, pan });
+            break;
+          case 'step_grass':
+            noise(0.085, { filterType: 'highpass', freq: 1800, q: 0.8, gain: 0.12, pan });
+            tone(140, 0.04, { type: 'triangle', gain: 0.06, endFreq: 80, pan });
+            break;
+          case 'bump':
+            tone(95, 0.14, { type: 'sawtooth', gain: 0.13, endFreq: 48, pan });
+            noise(0.09, { filterType: 'lowpass', freq: 350, gain: 0.13, pan });
+            break;
+          case 'poi':
+            tone(784, 0.18, { type: 'sine', gain: 0.12, delay: 0.04 });
+            tone(1046.5, 0.26, { type: 'sine', gain: 0.11, delay: 0.12 });
+            break;
+          case 'gate':
+            noise(0.25, { filterType: 'bandpass', freq: 500, endFreq: 1600, gain: 0.15 });
+            tone(220, 0.28, { type: 'triangle', gain: 0.15, endFreq: 440 });
+            break;
+          case 'open':
+            noise(0.08, { filterType: 'bandpass', freq: 1400, gain: 0.09 });
+            tone(440, 0.10, { type: 'sine', gain: 0.10, endFreq: 587 });
+            break;
+          case 'close':
+            tone(440, 0.09, { type: 'sine', gain: 0.09, endFreq: 293 });
+            break;
+          case 'coin':
+            tone(987.77, 0.09, { type: 'sine', gain: 0.16, delay: 0 });
+            tone(1318.51, 0.22, { type: 'sine', gain: 0.16, delay: 0.07 });
+            break;
+          case 'equip':
+            noise(0.14, { filterType: 'bandpass', freq: 2400, endFreq: 4200, q: 3, gain: 0.15 });
+            tone(880, 0.12, { type: 'triangle', gain: 0.12, endFreq: 1320, delay: 0.03 });
+            break;
+          case 'heal':
+            tone(392, 0.14, { type: 'sine', gain: 0.14, delay: 0 });
+            tone(493.88, 0.14, { type: 'sine', gain: 0.14, delay: 0.09 });
+            tone(587.33, 0.16, { type: 'sine', gain: 0.14, delay: 0.18 });
+            tone(783.99, 0.28, { type: 'sine', gain: 0.15, delay: 0.27 });
+            break;
+          case 'spirit_heal':
+            tone(523.25, 0.15, { type: 'triangle', gain: 0.13, delay: 0 });
+            tone(659.25, 0.15, { type: 'triangle', gain: 0.13, delay: 0.08 });
+            tone(1046.5, 0.30, { type: 'sine', gain: 0.14, delay: 0.16 });
+            break;
+          case 'forge':
+            noise(0.32, { filterType: 'bandpass', freq: 600, endFreq: 1900, gain: 0.16 });
+            tone(146.83, 0.25, { type: 'sawtooth', gain: 0.11, endFreq: 293.66 });
+            tone(587.33, 0.35, { type: 'sine', gain: 0.16, delay: 0.16 });
+            tone(880, 0.42, { type: 'sine', gain: 0.15, delay: 0.26 });
+            break;
+          case 'encounter':
+            tone(164.81, 0.16, { type: 'sawtooth', gain: 0.14, delay: 0 });
+            tone(196.00, 0.16, { type: 'sawtooth', gain: 0.14, delay: 0.12 });
+            tone(246.94, 0.28, { type: 'sawtooth', gain: 0.16, delay: 0.24 });
+            break;
+          case 'slash':
+            noise(0.11, { filterType: 'bandpass', freq: 2200, endFreq: 700, q: 1.4, gain: 0.19 });
+            tone(260, 0.10, { type: 'triangle', gain: 0.16, endFreq: 85 });
+            break;
+          case 'crit_slash':
+            noise(0.16, { filterType: 'bandpass', freq: 3200, endFreq: 900, q: 2, gain: 0.23 });
+            tone(520, 0.12, { type: 'sawtooth', gain: 0.15, endFreq: 110 });
+            tone(1046, 0.18, { type: 'sine', gain: 0.14, delay: 0.06 });
+            break;
+          case 'shield':
+            tone(329.63, 0.28, { type: 'sine', gain: 0.17 });
+            tone(493.88, 0.34, { type: 'triangle', gain: 0.13, delay: 0.05 });
+            break;
+          case 'spirit_wave':
+            noise(0.22, { filterType: 'bandpass', freq: 900, endFreq: 2800, q: 3, gain: 0.16 });
+            tone(330, 0.24, { type: 'sine', gain: 0.17, endFreq: 660 });
+            break;
+          case 'stun':
+            tone(440, 0.12, { type: 'triangle', gain: 0.15, endFreq: 220, delay: 0 });
+            tone(587, 0.18, { type: 'triangle', gain: 0.15, endFreq: 293, delay: 0.1 });
+            break;
+          case 'thunder':
+            noise(0.45, { filterType: 'lowpass', freq: 2600, endFreq: 180, gain: 0.27 });
+            tone(110, 0.38, { type: 'sawtooth', gain: 0.16, endFreq: 38 });
+            tone(920, 0.08, { type: 'square', gain: 0.08, endFreq: 220 });
+            break;
+          case 'ultimate':
+            noise(0.55, { filterType: 'bandpass', freq: 400, endFreq: 3200, gain: 0.23 });
+            tone(130.81, 0.45, { type: 'sawtooth', gain: 0.16, endFreq: 523.25 });
+            tone(523.25, 0.38, { type: 'triangle', gain: 0.17, delay: 0.18 });
+            tone(1046.5, 0.45, { type: 'sine', gain: 0.17, delay: 0.28 });
+            break;
+          case 'hurt':
+            tone(160, 0.16, { type: 'sawtooth', gain: 0.15, endFreq: 65 });
+            noise(0.10, { filterType: 'lowpass', freq: 650, gain: 0.16 });
+            break;
+          case 'victory':
+            tone(523.25, 0.13, { type: 'triangle', gain: 0.15, delay: 0 });
+            tone(659.25, 0.13, { type: 'triangle', gain: 0.15, delay: 0.11 });
+            tone(783.99, 0.14, { type: 'triangle', gain: 0.15, delay: 0.22 });
+            tone(1046.5, 0.36, { type: 'sine', gain: 0.17, delay: 0.34 });
+            break;
+          case 'levelup':
+            [523.25, 587.33, 659.25, 783.99, 1046.5].forEach((f, idx) => {
+              tone(f, 0.28, { type: 'sine', gain: 0.16, delay: idx * 0.09 });
+            });
+            break;
+          case 'flee':
+            noise(0.18, { filterType: 'highpass', freq: 1200, gain: 0.14 });
+            tone(392, 0.16, { type: 'sine', gain: 0.12, endFreq: 220 });
+            break;
+          case 'defeat':
+            tone(293.66, 0.22, { type: 'triangle', gain: 0.15, delay: 0 });
+            tone(246.94, 0.22, { type: 'triangle', gain: 0.15, delay: 0.18 });
+            tone(196.00, 0.40, { type: 'sine', gain: 0.16, delay: 0.36 });
+            break;
+          case 'save':
+            tone(659.25, 0.10, { type: 'sine', gain: 0.12, delay: 0 });
+            tone(880.00, 0.18, { type: 'sine', gain: 0.12, delay: 0.08 });
+            break;
+        }
+      }
+
+      function startBgmLoop() {
+        stopBgmLoop();
+        startAmbience();
+        bgmTimer = setInterval(() => {
+          if (bgmVol <= 0 || masterVol <= 0 || !player || !init()) return;
+          const scale = combat ? COMBAT_NOTES : (MAPS[player.mapId]?.type === 'wild' ? WILD_NOTES : CITY_NOTES);
+          const idx = (bgmStep + (bgmStep % 3 === 0 ? 2 : 0)) % scale.length;
+          const freq = scale[idx];
+          tone(freq, 0.85, {
+            type: 'sine',
+            gain: combat ? 0.065 : 0.052,
+            bus: 'bgm'
+          });
+          bgmStep++;
+        }, 720);
+      }
+
+      function stopBgmLoop() {
+        if (bgmTimer) { clearInterval(bgmTimer); bgmTimer = null; }
+      }
+
+      function setMasterVol(v) {
+        masterVol = Math.max(0, Math.min(1, Math.round(v * 10) / 10));
+        localStorage.setItem('spirit_rpg_master_vol', String(masterVol));
+        init();
+        syncGains();
+        return Math.round(masterVol * 100);
+      }
+
+      function setBgmVol(v) {
+        bgmVol = Math.max(0, Math.min(1, Math.round(v * 10) / 10));
+        localStorage.setItem('spirit_rpg_bgm_vol', String(bgmVol));
+        init();
+        syncGains();
+        return Math.round(bgmVol * 100);
+      }
+
+      return {
+        init, play, startBgmLoop, stopBgmLoop, stopAmbience, updateAmbienceTone,
+        setMasterVol, setBgmVol,
+        getMasterPct: () => Math.round(masterVol * 100),
+        getBgmPct: () => Math.round(bgmVol * 100)
+      };
+    })();
+
+    function announceMasterVol() {
+      announce(`ระดับเสียงรวมทั้งหมดในเกม ${SoundFX.getMasterPct()} เปอร์เซ็นต์ ปรับด้วยปุ่ม Home และ End`);
+    }
+
+    function announceBgmVol() {
+      announce(`ระดับเสียงดนตรี ${SoundFX.getBgmPct()} เปอร์เซ็นต์ ปรับด้วยปุ่ม Page Up และ Page Down`);
+    }
+
+    function adjustBgmVolume(delta) {
+      const pct = SoundFX.setBgmVol(SoundFX.getBgmPct() / 100 + delta);
+      renderSoundButtons();
+      const label = pct === 0 ? 'เสียงดนตรี 0 เปอร์เซ็นต์ เงียบสุด' : pct === 100 ? 'เสียงดนตรี 100 เปอร์เซ็นต์ สูงสุด' : `เสียงดนตรี ${pct} เปอร์เซ็นต์`;
+      announce(label);
+    }
+
+    function adjustMasterVolume(delta) {
+      const pct = SoundFX.setMasterVol(SoundFX.getMasterPct() / 100 + delta);
+      renderSoundButtons();
+      if (pct > 0) SoundFX.play('save');
+      const label = pct === 0 ? 'เสียงทั้งหมดในเกม 0 เปอร์เซ็นต์ เงียบสุด' : pct === 100 ? 'เสียงทั้งหมดในเกม 100 เปอร์เซ็นต์ สูงสุด' : `เสียงทั้งหมดในเกม ${pct} เปอร์เซ็นต์`;
+      announce(label);
+    }
+
+    function renderSoundButtons() {
+      const b1 = document.getElementById('btnMasterVolLabel');
+      const b2 = document.getElementById('btnBgmVolLabel');
+      const mPct = SoundFX.getMasterPct();
+      const bgPct = SoundFX.getBgmPct();
+      if (b1) {
+        b1.textContent = mPct > 0 ? `🔊 เสียงรวม ${mPct}%` : `🔇 เสียงรวม 0%`;
+        b1.setAttribute('aria-label', `ระดับเสียงรวมทั้งหมดในเกม ${mPct} เปอร์เซ็นต์ ปรับเพิ่มลดด้วย Home และ End`);
+      }
+      if (b2) {
+        b2.textContent = `🎵 ดนตรี ${bgPct}%`;
+        b2.setAttribute('aria-label', `ระดับเสียงดนตรี ${bgPct} เปอร์เซ็นต์ ปรับเพิ่มลดด้วย Page Up และ Page Down`);
+      }
+    }
+
+    // ==================== CONSTANTS & DATABASE ====================
+    const STORAGE_ACCOUNTS = 'spirit_rpg_v2_accounts';
+    const STORAGE_CURRENT = 'spirit_rpg_v2_current';
 
     const REALMS = [
-      { minLv: 1, name: 'ขั้นปฐมจิต (จิตเริ่มต้น)', desc: 'เพิ่งปลุกพลังจิตภายในกาย' },
-      { minLv: 5, name: 'ขั้นรวมปราณจิต', desc: 'ชักนำพลังจิตให้ไหลเวียนทั่วร่าง' },
+      { minLv: 1,  name: 'ขั้นปฐมจิต (จิตเริ่มต้น)', desc: 'เพิ่งปลุกพลังจิตภายในกาย' },
+      { minLv: 5,  name: 'ขั้นรวมปราณจิต', desc: 'ชักนำพลังจิตให้ไหลเวียนทั่วร่าง' },
       { minLv: 10, name: 'ขั้นก่อร่างรากฐาน', desc: 'วางศิลาฤกษ์แห่งวิถีเซียน' },
       { minLv: 18, name: 'ขั้นแก่นจิตบริสุทธิ์', desc: 'จิตควบแน่นเป็นแก่นแท้ไร้ตำหนิ' },
-      { minLv: 28, name: 'ขั้นจิตวิญญาณสะท้านภพ', desc: 'พลังจิตกดดันศัตรูได้ทั่วสารทิศ' },
+      { minLv: 28, name: 'ขั้นจิตวิญญาณสะท้านภพ', desc: 'แผ่จิตสังหารสะท้านฟ้าดิน' },
       { minLv: 40, name: 'ขั้นผสานฟ้าดิน', desc: 'เชื่อมโยงจิตเข้ากับธรรมชาติ' },
       { minLv: 55, name: 'ขั้นเซียนจิตอมตะ', desc: 'ก้าวข้ามขีดจำกัดแห่งสังขาร' },
       { minLv: 75, name: 'ขั้นมหาเทพไร้ขอบเขต', desc: 'จุดสูงสุดแห่งพลังจิตนิรันดร์' }
     ];
 
-    const ITEMS_DB = {
-      // Pills
-      hp_pill_s: { id: 'hp_pill_s', name: 'ยาเม็ดฟื้นเลือด (เล็ก)', type: 'pill', price: 25, sell: 10, desc: 'ฟื้นฟู HP 60 หน่วย', effect: { hp: 60 } },
-      hp_pill_m: { id: 'hp_pill_m', name: 'ยาเม็ดโลหิตหยก (กลาง)', type: 'pill', price: 85, sell: 35, desc: 'ฟื้นฟู HP 200 หน่วย', effect: { hp: 200 } },
-      hp_pill_l: { id: 'hp_pill_l', name: 'โอสถคืนชีพบรรพกาล (ใหญ่)', type: 'pill', price: 240, sell: 100, desc: 'ฟื้นฟู HP 650 หน่วย', effect: { hp: 650 } },
-      sp_pill_s: { id: 'sp_pill_s', name: 'ยาเม็ดรวมจิต (เล็ก)', type: 'pill', price: 30, sell: 12, desc: 'ฟื้นฟูพลังจิต 40 หน่วย', effect: { spirit: 40 } },
-      sp_pill_m: { id: 'sp_pill_m', name: 'ยาเม็ดจิตกระจ่าง (กลาง)', type: 'pill', price: 110, sell: 45, desc: 'ฟื้นฟูพลังจิต 130 หน่วย', effect: { spirit: 130 } },
-      exp_pill:  { id: 'exp_pill',  name: 'ยาเม็ดเร่งตบะ', type: 'pill', price: 160, sell: 65, desc: 'ได้รับค่าประสบการณ์ +120 ทันที', effect: { exp: 120 } },
+    const SKILLS = [
+      { key: '1', name: 'กระบวนท่าปฐมจิต (พื้นฐาน)', unlockLv: 1, cost: 0, desc: 'โจมตีพื้นฐานด้วยพลังกายและจิต (100% โจมตี)' },
+      { key: '2', name: 'สมาธิคุ้มกาย', unlockLv: 2, cost: 0, desc: 'ฟื้น HP 12% + พลังจิต 20% และลดดาเมจที่ได้รับ 45% ในเทิร์นนี้' },
+      { key: '3', name: 'คลื่นพลังจิต', unlockLv: 4, cost: 12, desc: 'ปลดปล่อยคลื่นจิต โจมตีแรง 185% + โบนัสพลังจิต' },
+      { key: '4', name: 'ดาบปราณทะลวง', unlockLv: 8, cost: 18, desc: 'โจมตี 220% พร้อมโอกาสติดคริติคอลสูงถึง 50%' },
+      { key: '5', name: 'ดัชนีดูดจิตวิญญาณ', unlockLv: 12, cost: 22, desc: 'โจมตี 190% และดูดซับ HP กลับมา 35% ของความเสียหาย' },
+      { key: '6', name: 'ค่ายกลจิตพันธนาการ', unlockLv: 17, cost: 28, desc: 'โจมตี 170% และทำให้ศัตรูมึนงง หยุดโจมตี 1 เทิร์น' },
+      { key: '7', name: 'อัสนีจิตสะท้านภพ', unlockLv: 24, cost: 38, desc: 'เรียกสายฟ้าพลังจิต โจมตีรุนแรง 300%' },
+      { key: '8', name: 'กายาหยกนิรันดร์', unlockLv: 32, cost: 35, desc: 'ฟื้นฟู HP 45% ทันที และสร้างเกราะลดดาเมจ 65% เทิร์นนี้' },
+      { key: '9', name: 'ผสานฟ้าดินพิฆาต', unlockLv: 42, cost: 55, desc: 'ท่าไม้ตายโจมตี 420% + พลังจิตสูงสุด' },
+      { key: '0', name: 'จิตอมตะทำลายล้าง', unlockLv: 55, cost: 80, desc: 'สุดยอดวิชาขั้นเซียน โจมตี 600% + โบนัสระดับรากฐาน' }
+    ];
 
-      // Weapons
-      w_wood_sword:  { id: 'w_wood_sword', name: 'กระบี่ไม้ท้อจิต', type: 'weapon', price: 60, sell: 25, atk: 8, desc: 'อาวุธเริ่มต้น (+8 พลังโจมตี)' },
-      w_iron_blade:  { id: 'w_iron_blade', name: 'ดาบเหล็กกล้าปราณ', type: 'weapon', price: 220, sell: 90, atk: 22, desc: 'ดาบตีขึ้นรูปด้วยปราณ (+22 พลังโจมตี)' },
-      w_jade_spear:  { id: 'w_jade_spear', name: 'ทวนหยกคราม', type: 'weapon', price: 680, sell: 280, atk: 48, desc: 'ศาสตราวุธขั้นก่อร่าง (+48 พลังโจมตี)' },
-      w_spirit_sword:{ id: 'w_spirit_sword', name: 'กระบี่อัสนีวิญญาณ', type: 'weapon', price: 1800, sell: 750, atk: 95, desc: 'เปล่งประกายสายฟ้าจิต (+95 พลังโจมตี)' },
-      w_immortal:    { id: 'w_immortal', name: 'กระบี่เทพจิตอมตะ', type: 'weapon', price: 4800, sell: 2000, atk: 210, desc: 'ศาสตราวุธระดับเซียน (+210 พลังโจมตี)' },
+    const ITEMS = {
+      hp_s: { id: 'hp_s', name: 'ยาเม็ดฟื้นเลือด (เล็ก)', type: 'pill', price: 25, sell: 10, desc: 'ฟื้น HP +65 หน่วย', hp: 65 },
+      hp_m: { id: 'hp_m', name: 'ยาเม็ดโลหิตหยก (กลาง)', type: 'pill', price: 90, sell: 38, desc: 'ฟื้น HP +220 หน่วย', hp: 220 },
+      hp_l: { id: 'hp_l', name: 'โอสถคืนชีพบรรพกาล (ใหญ่)', type: 'pill', price: 260, sell: 110, desc: 'ฟื้น HP +750 หน่วย', hp: 750 },
+      hp_x: { id: 'hp_x', name: 'โอสถเซียนอมตะ (สูงสุด)', type: 'pill', price: 650, sell: 270, desc: 'ฟื้น HP +2200 หน่วย', hp: 2200 },
+      sp_s: { id: 'sp_s', name: 'ยาเม็ดรวมจิต (เล็ก)', type: 'pill', price: 30, sell: 12, desc: 'ฟื้นพลังจิต +40 หน่วย', sp: 40 },
+      sp_m: { id: 'sp_m', name: 'ยาเม็ดจิตกระจ่าง (กลาง)', type: 'pill', price: 110, sell: 45, desc: 'ฟื้นพลังจิต +130 หน่วย', sp: 130 },
+      sp_l: { id: 'sp_l', name: 'โอสถมหาสมุทรจิต (ใหญ่)', type: 'pill', price: 320, sell: 130, desc: 'ฟื้นพลังจิต +400 หน่วย', sp: 400 },
+      exp_s: { id: 'exp_s', name: 'ยาเม็ดเร่งตบะ', type: 'pill', price: 180, sell: 75, desc: 'รับ EXP +140 ทันที', exp: 140 },
+      exp_l: { id: 'exp_l', name: 'โอสถทะลวงขอบเขต', type: 'pill', price: 620, sell: 260, desc: 'รับ EXP +700 ทันที', exp: 700 },
 
-      // Foundation Materials (Drop from monsters!)
-      mat_stone:   { id: 'mat_stone', name: 'หินรากฐานปฐพี', type: 'material', price: 0, sell: 18, desc: 'หลอมเสริมรากฐาน: +12 HP ถาวร, +2 โจมตีถาวร', fBoost: { hp: 12, spirit: 0, atk: 2 } },
-      mat_grass:   { id: 'mat_grass', name: 'หญ้าวิญญาณเจ็ดสี', type: 'material', price: 0, sell: 24, desc: 'หลอมเสริมรากฐาน: +8 พลังจิตถาวร, +10 HP ถาวร', fBoost: { hp: 10, spirit: 8, atk: 0 } },
-      mat_core:    { id: 'mat_core',  name: 'แก่นอสูรจิตคลั่ง', type: 'material', price: 0, sell: 55, desc: 'หลอมเสริมรากฐาน: +5 โจมตีถาวร, +15 HP ถาวร', fBoost: { hp: 15, spirit: 4, atk: 5 } },
-      mat_crystal: { id: 'mat_crystal', name: 'ผลึกจิตบรรพกาล', type: 'material', price: 0, sell: 120, desc: 'หลอมเสริมรากฐาน: +45 HP, +20 พลังจิต, +10 โจมตีถาวร', fBoost: { hp: 45, spirit: 20, atk: 10 } }
+      w_wood:     { id: 'w_wood', name: 'กระบี่ไม้ท้อจิต', type: 'weapon', price: 60, sell: 25, atk: 8, desc: '+8 พลังโจมตี' },
+      w_iron:     { id: 'w_iron', name: 'ดาบเหล็กกล้าปราณ', type: 'weapon', price: 220, sell: 90, atk: 24, desc: '+24 พลังโจมตี' },
+      w_jade:     { id: 'w_jade', name: 'ทวนหยกคราม', type: 'weapon', price: 700, sell: 290, atk: 55, desc: '+55 พลังโจมตี' },
+      w_thunder:  { id: 'w_thunder', name: 'กระบี่อัสนีวิญญาณ', type: 'weapon', price: 1850, sell: 760, atk: 115, desc: '+115 พลังโจมตี' },
+      w_sky:      { id: 'w_sky', name: 'ง้าวมังกรสวรรค์', type: 'weapon', price: 4200, sell: 1700, atk: 210, desc: '+210 พลังโจมตี' },
+      w_immortal: { id: 'w_immortal', name: 'กระบี่เทพจิตอมตะ', type: 'weapon', price: 8500, sell: 3500, atk: 380, desc: '+380 พลังโจมตี' },
+
+      m_stone:   { id: 'm_stone', name: 'หินรากฐานปฐพี', type: 'material', price: 120, sell: 20, desc: 'หลอมรากฐาน: +12 HP, +2 โจมตีถาวร', boost: { hp: 12, sp: 0, atk: 2 } },
+      m_grass:   { id: 'm_grass', name: 'หญ้าวิญญาณเจ็ดสี', type: 'material', price: 160, sell: 28, desc: 'หลอมรากฐาน: +10 HP, +8 พลังจิตถาวร', boost: { hp: 10, sp: 8, atk: 0 } },
+      m_core:    { id: 'm_core', name: 'แก่นอสูรจิตคลั่ง', type: 'material', price: 380, sell: 60, desc: 'หลอมรากฐาน: +18 HP, +4 จิต, +5 โจมตีถาวร', boost: { hp: 18, sp: 4, atk: 5 } },
+      m_crystal: { id: 'm_crystal', name: 'ผลึกจิตบรรพกาล', type: 'material', price: 950, sell: 140, desc: 'หลอมรากฐาน: +50 HP, +22 จิต, +12 โจมตีถาวร', boost: { hp: 50, sp: 22, atk: 12 } }
     };
 
-    const SHOP_ITEMS = [
-      'hp_pill_s', 'sp_pill_s', 'hp_pill_m', 'sp_pill_m', 'exp_pill', 'hp_pill_l',
-      'w_wood_sword', 'w_iron_blade', 'w_jade_spear', 'w_spirit_sword', 'w_immortal'
-    ];
+    const MONSTER_POOLS = {
+      zone_1: [
+        { name: 'หนูจิตคลั่ง', emoji: '🐀', lv: 1, hp: 42, atk: 6, exp: 26, gold: 18, drops: [['m_stone', 0.55], ['hp_s', 0.25]] },
+        { name: 'หมาป่าเงาหมอก', emoji: '🐺', lv: 3, hp: 78, atk: 10, exp: 45, gold: 30, drops: [['m_grass', 0.5], ['m_stone', 0.4], ['sp_s', 0.2]] },
+        { name: 'ภูตไม้ไผ่คลั่ง', emoji: '🎍', lv: 5, hp: 125, atk: 15, exp: 75, gold: 48, drops: [['m_grass', 0.6], ['m_core', 0.25]] }
+      ],
+      zone_2: [
+        { name: 'อสรพิษหมอกพิษ', emoji: '🐍', lv: 7, hp: 190, atk: 23, exp: 110, gold: 70, drops: [['m_stone', 0.65], ['m_core', 0.4], ['hp_m', 0.2]] },
+        { name: 'พยัคฆ์ปราณศิลา', emoji: '🐯', lv: 10, hp: 290, atk: 34, exp: 165, gold: 105, drops: [['m_core', 0.6], ['m_grass', 0.45]] },
+        { name: 'โกเลมรากฐานยักษ์', emoji: '🗿', lv: 14, hp: 440, atk: 46, exp: 260, gold: 165, drops: [['m_core', 0.75], ['m_crystal', 0.25]] }
+      ],
+      zone_3: [
+        { name: 'ค้างคาวดูดพลังจิต', emoji: '🦇', lv: 17, hp: 580, atk: 64, exp: 370, gold: 240, drops: [['m_grass', 0.65], ['m_crystal', 0.35], ['sp_m', 0.25]] },
+        { name: 'ราชันย์แมงมุมผลึก', emoji: '🕷️', lv: 22, hp: 860, atk: 88, exp: 550, gold: 360, drops: [['m_core', 0.75], ['m_crystal', 0.5]] },
+        { name: 'มารเงาจันทรา', emoji: '👹', lv: 27, hp: 1220, atk: 115, exp: 820, gold: 520, drops: [['m_crystal', 0.7], ['hp_l', 0.25]] }
+      ],
+      zone_4: [
+        { name: 'วิหคเพลิงจิตสวรรค์', emoji: '🦅', lv: 33, hp: 1800, atk: 152, exp: 1250, gold: 800, drops: [['m_crystal', 0.85], ['exp_s', 0.3]] },
+        { name: 'ยักษ์ศิลาทมิฬ', emoji: '🦍', lv: 40, hp: 2650, atk: 205, exp: 1850, gold: 1250, drops: [['m_crystal', 0.9], ['m_core', 0.9]] },
+        { name: 'มังกรรากฐานอมตะ (จ้าวถิ่น)', emoji: '🐉', lv: 50, hp: 4500, atk: 295, exp: 3600, gold: 2800, drops: [['m_crystal', 1.0], ['hp_x', 0.45]] }
+      ]
+    };
 
-    const ZONES = [
-      {
-        id: 'bamboo',
-        name: '🎋 ป่าไผ่หมอกจาง',
-        desc: 'ถิ่นอสูรระดับต่ำ เหมาะสำหรับผู้เริ่มฝึกจิต',
-        minLv: 1,
-        monsters: [
-          { name: 'หนูจิตคลั่ง', emoji: '🐀', lv: 1, hp: 45, atk: 7, exp: 24, gold: 16, drops: [['mat_stone', 0.45], ['hp_pill_s', 0.2]] },
-          { name: 'หมาป่าเงาหมอก', emoji: '🐺', lv: 3, hp: 80, atk: 11, exp: 40, gold: 26, drops: [['mat_grass', 0.45], ['mat_stone', 0.35], ['sp_pill_s', 0.15]] },
-          { name: 'ภูตไม้ไผ่คลั่ง', emoji: '🎍', lv: 5, hp: 120, atk: 15, exp: 65, gold: 42, drops: [['mat_grass', 0.55], ['mat_core', 0.2]] }
-        ]
+    const MAPS = {
+      city_1: {
+        id: 'city_1', name: 'เมืองปฐมจิต (เมืองเริ่มต้น)', type: 'city', size: 7,
+        desc: 'เมืองศูนย์กลางสำหรับผู้เริ่มฝึกจิต ปลอดภัยและมีร้านค้าครบครัน',
+        tiles: {
+          '3,3': { icon: '🏛️', label: 'ลานกลางเมือง', kind: 'landmark', desc: 'ลานกลางเมืองปฐมจิต จุดเริ่มต้นการเดินทาง' },
+          '1,2': { icon: '💊', label: 'ร้านโอสถปฐม', kind: 'shop_pill', items: ['hp_s', 'sp_s', 'hp_m', 'exp_s'], desc: 'ร้านขายยาเม็ดโอสถระดับเริ่มต้น' },
+          '5,2': { icon: '🗡️', label: 'โรงหลอมเหล็กกล้า', kind: 'shop_weapon', items: ['w_wood', 'w_iron'], desc: 'ร้านขายศาสตราวุธระดับต้น' },
+          '1,4': { icon: '🏠', label: 'โรงเตี๊ยมไผ่เขียว', kind: 'inn', desc: 'พักฟื้น HP และพลังจิตฟรีจนเต็ม' },
+          '5,4': { icon: '🪨', label: 'หอหลอมรากฐาน', kind: 'foundation', desc: 'หลอมไอเทมสร้างรากฐานเพิ่มพลังถาวร' },
+          '3,5': { icon: '💰', label: 'แผงรับซื้อของป่า', kind: 'shop_sell', desc: 'ขายไอเทมที่ดรอปจากมอนสเตอร์แลกศิลา' },
+          '6,3': { icon: '🚪', label: 'ประตูตะวันออก', kind: 'gate', toMap: 'zone_1', toX: 0, toY: 3, minLv: 1, desc: 'มุ่งหน้าสู่นอกเมือง: ป่าไผ่หมอกจาง (Lv.1-5)' },
+          '3,0': { icon: '🚪', label: 'ประตูเหนือ', kind: 'gate', toMap: 'zone_2', toX: 3, toY: 6, minLv: 5, desc: 'มุ่งหน้าสู่นอกเมือง: หุบเขาหินปฐพี (แนะนำ Lv.5+)' }
+        }
       },
-      {
-        id: 'valley',
-        name: '⛰️ หุบเขาหินปฐพี',
-        desc: 'เต็มไปด้วยอสูรเกราะหนาและแก่นอสูรธาตุดิน',
-        minLv: 6,
-        monsters: [
-          { name: 'อสรพิษหมอกพิษ', emoji: '🐍', lv: 7, hp: 185, atk: 24, exp: 95, gold: 65, drops: [['mat_stone', 0.6], ['mat_core', 0.35], ['hp_pill_m', 0.15]] },
-          { name: 'พยัคฆ์ปราณศิลา', emoji: '🐯', lv: 10, hp: 280, atk: 34, exp: 145, gold: 95, drops: [['mat_core', 0.55], ['mat_grass', 0.4]] },
-          { name: 'โกเลมรากฐานยักษ์', emoji: '🗿', lv: 14, hp: 420, atk: 46, exp: 230, gold: 150, drops: [['mat_core', 0.7], ['mat_crystal', 0.2]] }
-        ]
+      zone_1: {
+        id: 'zone_1', name: 'ป่าไผ่หมอกจาง (ถิ่นอสูร 1)', type: 'wild', size: 7, recLv: 'Lv.1-5',
+        desc: 'พื้นที่นอกเมืองฝั่งตะวันออก อสูรระดับต้นออกอาละวาด',
+        tiles: {
+          '0,3': { icon: '🚪', label: 'ประตูกลับเมืองปฐมจิต', kind: 'gate', toMap: 'city_1', toX: 6, toY: 3, minLv: 1, desc: 'กลับเข้าสู่เมืองปฐมจิต' },
+          '3,3': { icon: '⛺', label: 'ศาลาพักริมป่า', kind: 'inn', desc: 'จุดพักหายใจกลางป่า ฟื้น HP และพลังจิตเล็กน้อย (ปลอดภัย)' }
+        },
+        monsterSpots: [[2,2,0], [2,4,0], [4,1,1], [4,5,1], [5,3,2]]
       },
-      {
-        id: 'cavern',
-        name: '💎 ถ้ำผลึกวิญญาณ',
-        desc: 'แหล่งรวมผลึกจิตบรรพกาลและสัตว์อสูรคลั่ง',
-        minLv: 16,
-        monsters: [
-          { name: 'ค้างคาวดูดพลังจิต', emoji: '🦇', lv: 17, hp: 560, atk: 65, exp: 340, gold: 220, drops: [['mat_grass', 0.6], ['mat_crystal', 0.3], ['sp_pill_m', 0.2]] },
-          { name: 'ราชันย์แมงมุมผลึก', emoji: '🕷️', lv: 22, hp: 820, atk: 88, exp: 510, gold: 340, drops: [['mat_core', 0.7], ['mat_crystal', 0.45]] },
-          { name: 'มารเงาจันทรา', emoji: '👹', lv: 27, hp: 1180, atk: 115, exp: 760, gold: 500, drops: [['mat_crystal', 0.65], ['hp_pill_l', 0.2]] }
-        ]
+      zone_2: {
+        id: 'zone_2', name: 'หุบเขาหินปฐพี (ถิ่นอสูร 2)', type: 'wild', size: 7, recLv: 'Lv.6-15',
+        desc: 'หุบเขานอกเมืองทางเหนือ เชื่อมต่อระหว่างเมืองปฐมจิตกับเมืองศิลาปราณ',
+        tiles: {
+          '3,6': { icon: '🚪', label: 'ประตูใต้ (กลับเมืองปฐมจิต)', kind: 'gate', toMap: 'city_1', toX: 3, toY: 0, minLv: 1, desc: 'เดินลงใต้กลับเมืองปฐมจิต' },
+          '3,0': { icon: '🚪', label: 'ประตูเหนือ (สู่เมืองศิลาปราณ)', kind: 'gate', toMap: 'city_2', toX: 3, toY: 6, minLv: 6, desc: 'เดินทางขึ้นเหนือเข้าสู่ เมืองศิลาปราณ' }
+        },
+        monsterSpots: [[1,4,0], [5,4,0], [2,2,1], [4,2,1], [3,3,2]]
       },
-      {
-        id: 'ancient',
-        name: '🐉 แดนอสูรบรรพกาล',
-        desc: 'เขตต้องห้ามสำหรับผู้ทะลวงขั้นแก่นจิตขึ้นไป',
-        minLv: 30,
-        monsters: [
-          { name: 'วิหคเพลิงจิตสวรรค์', emoji: '🦅', lv: 33, hp: 1750, atk: 155, exp: 1150, gold: 780, drops: [['mat_crystal', 0.8], ['exp_pill', 0.25]] },
-          { name: 'ยักษ์ศิลาทมิฬ', emoji: '🦍', lv: 40, hp: 2500, atk: 205, exp: 1700, gold: 1200, drops: [['mat_crystal', 0.9], ['mat_core', 0.9]] },
-          { name: 'มังกรรากฐานอมตะ', emoji: '🐉', lv: 50, hp: 4200, atk: 290, exp: 3200, gold: 2500, drops: [['mat_crystal', 1.0], ['hp_pill_l', 0.5]] }
-        ]
+      city_2: {
+        id: 'city_2', name: 'เมืองศิลาปราณ (เมืองขั้นกลาง)', type: 'city', size: 7,
+        desc: 'เมืองใหญ่แห่งแดนกลาง จำหน่ายโอสถและอาวุธระดับก่อร่างรากฐาน',
+        tiles: {
+          '3,3': { icon: '🏛️', label: 'จัตุรัสศิลาปราณ', kind: 'landmark', desc: 'ใจกลางเมืองศิลาปราณ' },
+          '1,2': { icon: '💊', label: 'หอโอสถปราณหยก', kind: 'shop_pill', items: ['hp_m', 'sp_m', 'hp_l', 'exp_s'], desc: 'ร้านยาเม็ดระดับกลาง-สูง' },
+          '5,2': { icon: '🗡️', label: 'สำนักศาสตราศิลาคราม', kind: 'shop_weapon', items: ['w_iron', 'w_jade', 'w_thunder'], desc: 'ร้านอาวุธระดับกลาง-สูง' },
+          '1,4': { icon: '🏠', label: 'โรงเตี๊ยมเมฆา', kind: 'inn', desc: 'พักฟื้น HP และพลังจิตฟรี' },
+          '5,4': { icon: '🪨', label: 'แท่นศิลาหลอมรากฐาน', kind: 'foundation', desc: 'หลอมวัตถุดิบเสริมรากฐาน' },
+          '3,1': { icon: '💰', label: 'สมาคมค้าวัตถุดิบ', kind: 'shop_sell', items: ['m_stone', 'm_grass'], desc: 'รับซื้อของป่า และขายหิน/หญ้ารากฐาน' },
+          '3,6': { icon: '🚪', label: 'ประตูใต้', kind: 'gate', toMap: 'zone_2', toX: 3, toY: 0, minLv: 1, desc: 'ออกสู่หุบเขาหินปฐพี' },
+          '6,3': { icon: '🚪', label: 'ประตูตะวันออก', kind: 'gate', toMap: 'zone_3', toX: 0, toY: 3, minLv: 15, desc: 'มุ่งหน้าสู่ถิ่นอสูร: ถ้ำผลึกวิญญาณ (แนะนำ Lv.15+)' }
+        }
+      },
+      zone_3: {
+        id: 'zone_3', name: 'ถ้ำผลึกวิญญาณ (ถิ่นอสูร 3)', type: 'wild', size: 7, recLv: 'Lv.16-29',
+        desc: 'ถ้ำมืดมิดเต็มไปด้วยผลึกจิตบรรพกาลและอสูรร้าย เชื่อมต่อสู่นครเซียน',
+        tiles: {
+          '0,3': { icon: '🚪', label: 'ประตูตะวันตก (กลับเมืองศิลาปราณ)', kind: 'gate', toMap: 'city_2', toX: 6, toY: 3, minLv: 1, desc: 'กลับเมืองศิลาปราณ' },
+          '3,0': { icon: '🚪', label: 'ประตูเหนือ (สู่นครเซียนบรรพกาล)', kind: 'gate', toMap: 'city_3', toX: 3, toY: 6, minLv: 22, desc: 'ทะลวงเส้นทางสู่นครเซียนบรรพกาล (แนะนำ Lv.22+)' }
+        },
+        monsterSpots: [[2,5,0], [4,5,0], [2,2,1], [5,3,1], [3,2,2]]
+      },
+      city_3: {
+        id: 'city_3', name: 'นครเซียนบรรพกาล (เมืองสูงสุด)', type: 'city', size: 7,
+        desc: 'มหานครแห่งผู้บรรลุขั้นสูง จำหน่ายโอสถและศาสตราวุธระดับเซียน',
+        tiles: {
+          '3,3': { icon: '🏛️', label: 'ลานเซียนอมตะ', kind: 'landmark', desc: 'ใจกลางนครเซียนบรรพกาล' },
+          '1,2': { icon: '💊', label: 'ศาลาโอสถสวรรค์', kind: 'shop_pill', items: ['hp_l', 'hp_x', 'sp_m', 'sp_l', 'exp_l'], desc: 'ร้านยาเม็ดระดับเซียน' },
+          '5,2': { icon: '🗡️', label: 'คลังศาสตรามหาเทพ', kind: 'shop_weapon', items: ['w_thunder', 'w_sky', 'w_immortal'], desc: 'ร้านอาวุธระดับเซียน-มหาเทพ' },
+          '1,4': { icon: '🏠', label: 'วิหารฟื้นฟูจิต', kind: 'inn', desc: 'ฟื้นฟู HP และพลังจิตฟรี' },
+          '5,4': { icon: '🪨', label: 'แท่นเซียนหลอมรากฐาน', kind: 'foundation', desc: 'หลอมผลึกเสริมรากฐาน' },
+          '3,1': { icon: '💰', label: 'หอประมูลวิญญาณ', kind: 'shop_sell', items: ['m_core', 'm_crystal'], desc: 'รับซื้อไอเทมทุกชนิด และขายแก่นอสูร/ผลึกจิต' },
+          '3,6': { icon: '🚪', label: 'ประตูใต้', kind: 'gate', toMap: 'zone_3', toX: 3, toY: 0, minLv: 1, desc: 'ลงสู่ถ้ำผลึกวิญญาณ' },
+          '6,3': { icon: '🚪', label: 'ประตูตะวันออก', kind: 'gate', toMap: 'zone_4', toX: 0, toY: 3, minLv: 28, desc: 'เข้าสู่เขตต้องห้าม: แดนอสูรบรรพกาล (แนะนำ Lv.28+)' }
+        }
+      },
+      zone_4: {
+        id: 'zone_4', name: 'แดนอสูรบรรพกาล (ถิ่นอสูรสูงสุด)', type: 'wild', size: 7, recLv: 'Lv.30-60+',
+        desc: 'ดินแดนต้องห้ามของเหล่าอสูรระดับตำนานและมังกรรากฐานอมตะ',
+        tiles: {
+          '0,3': { icon: '🚪', label: 'ประตูตะวันตก (กลับนครเซียน)', kind: 'gate', toMap: 'city_3', toX: 6, toY: 3, minLv: 1, desc: 'กลับนครเซียนบรรพกาล' }
+        },
+        monsterSpots: [[2,2,0], [2,4,0], [4,2,1], [4,4,1], [5,3,2]]
       }
-    ];
+    };
 
-    // ==================== STATE ====================
+    // ==================== STATE & V1 MIGRATION ====================
     let authMode = 'login';
     let currentUser = null;
     let player = null;
-    let currentTab = 'hunt';
-    let bagFilter = 'all';
-    let shopFilter = 'all';
-    let activeCombat = null; // { zoneId, enemy, guarding }
+    let combat = null;
+    let modalOpen = false;
+    let activeMonsters = {};
+    let logs = [];
+    let announceToggle = false;
+    let announceTimer = null;
 
-    // ==================== AUTH & STORAGE ====================
-    function getAccounts() {
+    ['keydown', 'pointerdown'].forEach(evt => {
+      window.addEventListener(evt, () => {
+        if (SoundFX.init() && player) {
+          SoundFX.startBgmLoop();
+        }
+      }, { passive: true });
+    });
+
+    function migrateV1ToV2IfNeeded() {
       try {
-        return JSON.parse(localStorage.getItem(STORAGE_ACCOUNTS_KEY)) || {};
-      } catch {
-        return {};
+        const v1Raw = localStorage.getItem('spirit_foundation_rpg_accounts_v1');
+        if (!v1Raw) return;
+        const v1Accs = JSON.parse(v1Raw) || {};
+        const v2Accs = getAccounts();
+        const itemMap = {
+          hp_pill_s: 'hp_s', hp_pill_m: 'hp_m', hp_pill_l: 'hp_l',
+          sp_pill_s: 'sp_s', sp_pill_m: 'sp_m', exp_pill: 'exp_s',
+          w_wood_sword: 'w_wood', w_iron_blade: 'w_iron', w_jade_spear: 'w_jade',
+          w_spirit_sword: 'w_thunder', w_immortal: 'w_immortal',
+          mat_stone: 'm_stone', mat_grass: 'm_grass', mat_core: 'm_core', mat_crystal: 'm_crystal'
+        };
+        let changed = false;
+        for (const [k, acc] of Object.entries(v1Accs)) {
+          if (!v2Accs[k] && acc?.data) {
+            const d = acc.data;
+            const newInv = {};
+            for (const [oldId, qty] of Object.entries(d.inventory || {})) {
+              const nid = itemMap[oldId] || oldId;
+              if (ITEMS[nid]) newInv[nid] = (newInv[nid] || 0) + qty;
+            }
+            v2Accs[k] = {
+              pass: acc.password,
+              data: {
+                name: d.name,
+                level: d.level || 1,
+                exp: d.exp || 0,
+                maxExp: d.maxExp || 100,
+                hp: d.hp || 120,
+                maxHp: d.maxHp || 120,
+                spirit: d.spirit || 60,
+                maxSpirit: d.maxSpirit || 60,
+                baseAtk: d.baseAtk || 14,
+                gold: d.gold || 100,
+                equippedWeapon: d.equippedWeapon ? (itemMap[d.equippedWeapon] || null) : null,
+                foundationLevel: d.foundationLevel || 0,
+                foundationBonus: {
+                  hp: d.foundationBonus?.hp || 0,
+                  sp: d.foundationBonus?.spirit || 0,
+                  atk: d.foundationBonus?.atk || 0
+                },
+                mapId: 'city_1',
+                x: 3,
+                y: 3,
+                steps: 0,
+                inventory: newInv
+              }
+            };
+            changed = true;
+          }
+        }
+        if (changed) localStorage.setItem(STORAGE_ACCOUNTS, JSON.stringify(v2Accs));
+        const v1Cur = localStorage.getItem('spirit_foundation_rpg_current_v1');
+        if (v1Cur && !localStorage.getItem(STORAGE_CURRENT) && v2Accs[v1Cur]) {
+          localStorage.setItem(STORAGE_CURRENT, v1Cur);
+        }
+      } catch {}
+    }
+
+    // ==================== FOCUS & ANNOUNCER ====================
+    function focusGameScreen() {
+      if (modalOpen) return;
+      const gs = document.getElementById('gameScreen');
+      if (gs && !gs.classList.contains('hidden')) {
+        gs.focus({ preventScroll: true });
       }
     }
 
-    function saveAccounts(accounts) {
-      localStorage.setItem(STORAGE_ACCOUNTS_KEY, JSON.stringify(accounts));
+    function announce(text) {
+      const el = document.getElementById('srAnnouncer');
+      clearTimeout(announceTimer);
+      announceToggle = !announceToggle;
+      const clean = String(text || '').trim();
+      el.textContent = '';
+      announceTimer = setTimeout(() => {
+        el.textContent = announceToggle ? clean : clean + '\u00A0';
+      }, 25);
     }
 
-    function saveCurrentPlayer() {
+    function addLog(msg, cls = '', speak = false) {
+      logs.push({ msg, cls });
+      if (logs.length > 60) logs.shift();
+      const box = document.getElementById('gameLog');
+      if (box) {
+        box.innerHTML = logs.map(l => `<div class="${l.cls}">${l.msg}</div>`).join('');
+        box.scrollTop = box.scrollHeight;
+      }
+      if (speak) announce(stripHtml(msg));
+    }
+
+    function stripHtml(html) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      return tmp.textContent || tmp.innerText || '';
+    }
+
+    function showInspect(title, html, speakText = null) {
+      document.getElementById('inspectTitle').textContent = title;
+      document.getElementById('inspectBody').innerHTML = html;
+      announce(speakText || stripHtml(html));
+    }
+
+    // ==================== AUTH & SAVE ====================
+    function getAccounts() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_ACCOUNTS)) || {}; }
+      catch { return {}; }
+    }
+
+    function saveData() {
       if (!currentUser || !player) return;
-      const accounts = getAccounts();
-      if (accounts[currentUser]) {
-        accounts[currentUser].data = player;
-        saveAccounts(accounts);
+      const acc = getAccounts();
+      if (acc[currentUser]) {
+        acc[currentUser].data = player;
+        localStorage.setItem(STORAGE_ACCOUNTS, JSON.stringify(acc));
       }
     }
 
-    function createNewCharacter(name) {
+    function manualSave() {
+      saveData();
+      SoundFX.play('save');
+      addLog('💾 บันทึกความคืบหน้าเรียบร้อยแล้ว', 'c-win', true);
+    }
+
+    function createFreshPlayer(name) {
       return {
         name,
         level: 1,
@@ -960,122 +1314,125 @@
         spirit: 60,
         maxSpirit: 60,
         baseAtk: 14,
-        gold: 80,
+        gold: 100,
         equippedWeapon: null,
         foundationLevel: 0,
-        foundationBonus: { hp: 0, spirit: 0, atk: 0 },
-        inventory: {
-          hp_pill_s: 3,
-          sp_pill_s: 2,
-          mat_stone: 1
-        }
+        foundationBonus: { hp: 0, sp: 0, atk: 0 },
+        mapId: 'city_1',
+        x: 3,
+        y: 3,
+        steps: 0,
+        inventory: { hp_s: 3, sp_s: 2, m_stone: 1 }
       };
     }
 
-    function switchAuthMode(mode) {
+    function setAuthMode(mode) {
       authMode = mode;
-      document.getElementById('tabLoginBtn').classList.toggle('active', mode === 'login');
-      document.getElementById('tabRegBtn').classList.toggle('active', mode === 'register');
-      document.getElementById('authSubmitBtn').textContent = mode === 'login' ? 'เข้าสู่ยุทธภพ' : 'สร้างตัวละคร & เริ่มผจญภัย';
-      document.getElementById('authError').textContent = '';
+      document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+      document.getElementById('tabReg').classList.toggle('active', mode === 'register');
+      document.getElementById('authBtn').textContent = mode === 'login' ? 'เข้าสู่ยุทธภพ' : 'สร้างตัวละครใหม่';
+      document.getElementById('authMsg').textContent = '';
     }
 
-    function handleAuth(e) {
+    function submitAuth(e) {
       e.preventDefault();
-      const name = document.getElementById('charNameInput').value.trim();
-      const password = document.getElementById('passwordInput').value;
-      const errEl = document.getElementById('authError');
-
-      if (name.length < 2) {
-        errEl.textContent = 'ชื่อตัวละครต้องมีอย่างน้อย 2 ตัวอักษร';
-        return;
-      }
+      SoundFX.init();
+      const name = document.getElementById('inName').value.trim();
+      const pass = document.getElementById('inPass').value;
+      const msg = document.getElementById('authMsg');
+      if (name.length < 2) { msg.textContent = 'ชื่อตัวละครต้องมีอย่างน้อย 2 ตัวอักษร'; return; }
 
       const accounts = getAccounts();
       const key = name.toLowerCase();
+      const encoded = btoa(unescape(encodeURIComponent(pass)));
 
       if (authMode === 'register') {
-        if (accounts[key]) {
-          errEl.textContent = 'ชื่อตัวละครนี้มีผู้ใช้งานแล้ว กรุณาใช้ชื่ออื่น';
-          return;
-        }
-        const newChar = createNewCharacter(name);
-        accounts[key] = { password: btoa(unescape(encodeURIComponent(password))), data: newChar };
-        saveAccounts(accounts);
-        loginSuccess(key, newChar);
-        showToast('สร้างตัวละครสำเร็จ! ยินดีต้อนรับสู่วิถีสร้างรากฐาน');
+        if (accounts[key]) { msg.textContent = 'ชื่อนี้มีผู้ใช้งานแล้ว กรุณาใช้ชื่ออื่น'; return; }
+        const p = createFreshPlayer(name);
+        accounts[key] = { pass: encoded, data: p };
+        localStorage.setItem(STORAGE_ACCOUNTS, JSON.stringify(accounts));
+        startSession(key, p);
       } else {
-        const acc = accounts[key];
-        const encoded = btoa(unescape(encodeURIComponent(password)));
-        if (!acc || acc.password !== encoded) {
-          errEl.textContent = 'ชื่อตัวละครหรือรหัสผ่านไม่ถูกต้อง';
+        if (!accounts[key] || accounts[key].pass !== encoded) {
+          SoundFX.play('bump');
+          msg.textContent = 'ชื่อตัวละครหรือรหัสผ่านไม่ถูกต้อง';
           return;
         }
-        loginSuccess(key, acc.data);
-        showToast(`ยินดีต้อนรับกลับมา ท่าน ${acc.data.name}`);
+        startSession(key, accounts[key].data);
       }
     }
 
-    function loginSuccess(userKey, charData) {
-      currentUser = userKey;
-      player = charData;
-      localStorage.setItem(STORAGE_SESSION_KEY, userKey);
+    function startSession(key, data) {
+      currentUser = key;
+      player = data;
+      if (!player.mapId || !MAPS[player.mapId]) { player.mapId = 'city_1'; player.x = 3; player.y = 3; }
+      localStorage.setItem(STORAGE_CURRENT, key);
+      initMapMonsters();
+
+      // Force full Focus/Application mode on body immediately upon entering the game
+      document.body.setAttribute('role', 'application');
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('gameScreen').classList.remove('hidden');
-      document.getElementById('mobileNav').classList.remove('hidden');
-      activeCombat = null;
-      switchTab('hunt');
+
+      combat = null;
+      logs = [];
       renderAll();
+      renderSoundButtons();
+      SoundFX.play('start');
+      SoundFX.startBgmLoop();
+      SoundFX.updateAmbienceTone();
+
+      // Focus twice (fast & post-virtual-buffer) so NVDA/JAWS locks directly into Focus Mode
+      setTimeout(() => {
+        focusGameScreen();
+        addLog(`เข้าสู่เกมเรียบร้อย ${player.name} อยู่ที่ ${MAPS[player.mapId].name} พิกัด (${player.x}, ${player.y}) ใช้ลูกศรเดิน กด Enter เข้าสถานที่ กด L สแกนรอบตัว กด H ดูคีย์ลัด`, 'c-win', true);
+      }, 80);
+      setTimeout(() => focusGameScreen(), 380);
     }
 
     function logout() {
-      saveCurrentPlayer();
+      saveData();
+      SoundFX.stopBgmLoop();
+      SoundFX.stopAmbience();
+      SoundFX.play('close');
       currentUser = null;
       player = null;
-      activeCombat = null;
-      localStorage.removeItem(STORAGE_SESSION_KEY);
+      combat = null;
+      document.body.removeAttribute('role');
+      localStorage.removeItem(STORAGE_CURRENT);
+      localStorage.removeItem('spirit_foundation_rpg_current_v1');
       document.getElementById('gameScreen').classList.add('hidden');
-      document.getElementById('mobileNav').classList.add('hidden');
       document.getElementById('authScreen').classList.remove('hidden');
-      document.getElementById('passwordInput').value = '';
+      document.getElementById('inPass').value = '';
+      document.getElementById('inName').focus();
     }
 
     // ==================== STAT HELPERS ====================
-    function getRealm(level) {
-      let current = REALMS[0];
-      for (const r of REALMS) {
-        if (level >= r.minLv) current = r;
-      }
-      return current;
+    function getRealm(lv) {
+      let res = REALMS[0];
+      for (const r of REALMS) if (lv >= r.minLv) res = r;
+      return res;
     }
 
-    function getTotalMaxHp() {
-      return player.maxHp + (player.foundationBonus?.hp || 0);
+    function maxHp() { return player.maxHp + (player.foundationBonus?.hp || 0); }
+    function maxSp() { return player.maxSpirit + (player.foundationBonus?.sp || 0); }
+    function totalAtk() {
+      const wAtk = player.equippedWeapon && ITEMS[player.equippedWeapon] ? ITEMS[player.equippedWeapon].atk : 0;
+      return player.baseAtk + wAtk + (player.foundationBonus?.atk || 0);
     }
 
-    function getTotalMaxSpirit() {
-      return player.maxSpirit + (player.foundationBonus?.spirit || 0);
-    }
-
-    function getTotalAtk() {
-      const weaponAtk = player.equippedWeapon && ITEMS_DB[player.equippedWeapon] ? ITEMS_DB[player.equippedWeapon].atk : 0;
-      return player.baseAtk + weaponAtk + (player.foundationBonus?.atk || 0);
-    }
-
-    function addItem(itemId, qty = 1) {
-      player.inventory[itemId] = (player.inventory[itemId] || 0) + qty;
-    }
-
-    function removeItem(itemId, qty = 1) {
-      if (!player.inventory[itemId]) return false;
-      player.inventory[itemId] -= qty;
-      if (player.inventory[itemId] <= 0) delete player.inventory[itemId];
+    function addItem(id, qty = 1) { player.inventory[id] = (player.inventory[id] || 0) + qty; }
+    function removeItem(id, qty = 1) {
+      if (!player.inventory[id]) return false;
+      player.inventory[id] -= qty;
+      if (player.inventory[id] <= 0) delete player.inventory[id];
       return true;
     }
 
-    function gainExp(amount) {
-      player.exp += amount;
-      let leveled = false;
+    function gainExp(amt) {
+      player.exp += amt;
+      let up = false;
+      let extraMsg = '';
       const oldRealm = getRealm(player.level).name;
       while (player.exp >= player.maxExp) {
         player.exp -= player.maxExp;
@@ -1084,514 +1441,855 @@
         player.maxHp += 26;
         player.maxSpirit += 10;
         player.baseAtk += 4;
-        player.hp = getTotalMaxHp();
-        player.spirit = getTotalMaxSpirit();
-        leveled = true;
+        player.hp = maxHp();
+        player.spirit = maxSp();
+        up = true;
+        const newSkill = SKILLS.find(s => s.unlockLv === player.level);
+        if (newSkill) {
+          extraMsg += ` ปลดล็อกสกิลใหม่ ช่อง ${newSkill.key} ${newSkill.name}`;
+          addLog(`📜 ปลดล็อกสกิลใหม่ ช่อง [${newSkill.key}]: ${newSkill.name}!`, 'c-info');
+        }
       }
-      if (leveled) {
+      if (up) {
+        SoundFX.play('levelup');
         const newRealm = getRealm(player.level).name;
-        if (newRealm !== oldRealm) {
-          showToast(`⚡ ทะลวงขอบเขตใหม่! บรรลุ "${newRealm}"`);
-        } else {
-          showToast(`✨ อัปเลเวล! เลเวล ${player.level} ฟื้นฟูพลังเต็มเปี่ยม`);
-        }
+        const msg = newRealm !== oldRealm
+          ? `⚡ ทะลวงขอบเขตพลังจิตใหม่! บรรลุ ${newRealm} (เลเวล ${player.level})${extraMsg}`
+          : `✨ อัปเลเวล ${player.level}! ฟื้นฟูพลังเต็มเปี่ยม${extraMsg}`;
+        addLog(msg, 'c-win');
+        return msg;
       }
+      return '';
     }
 
-    function restAtCamp() {
-      if (activeCombat) {
-        showToast('ไม่สามารถพักฟื้นระหว่างต่อสู้ได้!');
-        return;
-      }
-      player.hp = getTotalMaxHp();
-      player.spirit = getTotalMaxSpirit();
-      saveCurrentPlayer();
-      renderHeader();
-      showToast('⛺ พักฟื้นที่ค่ายเรียบร้อย HP และพลังจิตเต็มแล้ว');
-    }
-
-    // ==================== NAVIGATION & RENDERING ====================
-    function switchTab(tab) {
-      currentTab = tab;
-      ['hunt', 'foundation', 'bag', 'shop'].forEach(t => {
-        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tab);
+    // ==================== MAP & MOVEMENT ====================
+    function initMapMonsters() {
+      ['zone_1', 'zone_2', 'zone_3', 'zone_4'].forEach(zId => {
+        activeMonsters[zId] = {};
+        MAPS[zId].monsterSpots.forEach(([x, y, idx]) => {
+          activeMonsters[zId][`${x},${y}`] = idx;
+        });
       });
-      document.querySelectorAll('.side-nav .nav-btn, #mobileNav button').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.tab === tab);
-      });
-      renderCurrentTab();
     }
 
-    function renderAll() {
-      renderHeader();
-      renderCurrentTab();
-    }
-
-    function renderHeader() {
-      if (!player) return;
-      const maxHp = getTotalMaxHp();
-      const maxSp = getTotalMaxSpirit();
-      const realm = getRealm(player.level);
-
-      document.getElementById('avatarInitial').textContent = player.name.charAt(0).toUpperCase();
-      document.getElementById('uiCharName').textContent = player.name;
-      document.getElementById('uiRealmName').textContent = realm.name;
-      document.getElementById('uiGold').textContent = player.gold.toLocaleString();
-
-      document.getElementById('uiHpText').textContent = `${player.hp}/${maxHp}`;
-      document.getElementById('uiHpBar').style.width = `${Math.min(100, (player.hp / maxHp) * 100)}%`;
-
-      document.getElementById('uiSpiritText').textContent = `${player.spirit}/${maxSp}`;
-      document.getElementById('uiSpiritBar').style.width = `${Math.min(100, (player.spirit / maxSp) * 100)}%`;
-
-      document.getElementById('uiLevel').textContent = player.level;
-      document.getElementById('uiExpText').textContent = `${player.exp}/${player.maxExp}`;
-      document.getElementById('uiExpBar').style.width = `${Math.min(100, (player.exp / player.maxExp) * 100)}%`;
-
-      document.getElementById('uiAtk').textContent = getTotalAtk();
-      document.getElementById('uiWeaponName').textContent = player.equippedWeapon ? ITEMS_DB[player.equippedWeapon].name : 'มือเปล่า';
-      document.getElementById('uiFoundationLv').textContent = player.foundationLevel || 0;
-    }
-
-    function renderCurrentTab() {
-      if (currentTab === 'hunt') renderHuntTab();
-      if (currentTab === 'foundation') renderFoundationTab();
-      if (currentTab === 'bag') renderBagTab();
-      if (currentTab === 'shop') renderShopTab();
-    }
-
-    // ==================== HUNT & COMBAT ====================
-    function renderHuntTab() {
-      const zoneView = document.getElementById('zoneSelectionView');
-      const combatView = document.getElementById('combatView');
-
-      if (activeCombat) {
-        zoneView.classList.add('hidden');
-        combatView.classList.remove('hidden');
-        renderCombatUI();
-        return;
-      }
-
-      zoneView.classList.remove('hidden');
-      combatView.classList.add('hidden');
-
-      const listEl = document.getElementById('zoneList');
-      listEl.innerHTML = ZONES.map(z => {
-        const locked = player.level < z.minLv;
-        return `
-          <div class="zone-card ${locked ? 'locked' : ''}" onclick="${locked ? '' : `enterZone('${z.id}')`}">
-            <h4>${z.name}</h4>
-            <p>${z.desc}</p>
-            <div class="zone-req">${locked ? `🔒 ต้องการเลเวล ${z.minLv}` : `✅ แนะนำ Lv.${z.minLv}+ (คลิกเพื่อล่า)`}</div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function enterZone(zoneId) {
-      const zone = ZONES.find(z => z.id === zoneId);
-      if (!zone || player.level < zone.minLv) return;
-
-      const template = zone.monsters[Math.floor(Math.random() * zone.monsters.length)];
-      activeCombat = {
-        zoneId,
-        guarding: false,
-        enemy: {
-          ...template,
-          maxHp: template.hp
+    function respawnMonstersInZone(zId) {
+      if (!MAPS[zId]?.monsterSpots) return;
+      activeMonsters[zId] = activeMonsters[zId] || {};
+      MAPS[zId].monsterSpots.forEach(([x, y, idx]) => {
+        if (activeMonsters[zId][`${x},${y}`] === undefined) {
+          activeMonsters[zId][`${x},${y}`] = idx;
         }
+      });
+    }
+
+    function getTileInfo(mapId, x, y) {
+      const m = MAPS[mapId];
+      const key = `${x},${y}`;
+      if (m.tiles[key]) return m.tiles[key];
+      if (m.type === 'wild' && activeMonsters[mapId] && activeMonsters[mapId][key] !== undefined) {
+        const pool = MONSTER_POOLS[mapId];
+        const mon = pool[activeMonsters[mapId][key]];
+        return { icon: mon.emoji, label: mon.name, kind: 'monster', monIndex: activeMonsters[mapId][key], desc: `พบอสูร ${mon.name} (Lv.${mon.lv})` };
+      }
+      return {
+        icon: m.type === 'city' ? '·' : '🌿',
+        label: m.type === 'city' ? 'ถนนในเมือง' : 'ทุ่งอสูร',
+        kind: 'empty',
+        desc: m.type === 'city' ? 'ถนนว่างในเมือง' : 'พื้นที่โล่งนอกเมือง'
       };
-
-      const logEl = document.getElementById('combatLog');
-      logEl.innerHTML = `<div class="log-line log-info">พบ <strong>${template.name}</strong> (Lv.${template.lv}) ใน${zone.name}!</div>`;
-      renderHuntTab();
     }
 
-    function renderCombatUI() {
-      const e = activeCombat.enemy;
-      document.getElementById('enemyEmoji').textContent = e.emoji;
-      document.getElementById('enemyName').textContent = e.name;
-      document.getElementById('enemyMeta').textContent = `Lv.${e.lv} | โจมตี: ${e.atk}`;
-      document.getElementById('enemyHpText').textContent = `${Math.max(0, e.hp)}/${e.maxHp}`;
-      document.getElementById('enemyHpBar').style.width = `${Math.max(0, (e.hp / e.maxHp) * 100)}%`;
-
-      // Quick combat potions
-      const potEl = document.getElementById('combatPotions');
-      const quickIds = ['hp_pill_s', 'hp_pill_m', 'hp_pill_l', 'sp_pill_s', 'sp_pill_m'];
-      const buttons = quickIds
-        .filter(id => (player.inventory[id] || 0) > 0)
-        .map(id => `<button class="btn btn-dark btn-sm" onclick="useCombatPill('${id}')">💊 ${ITEMS_DB[id].name} (${player.inventory[id]})</button>`);
-      potEl.innerHTML = buttons.join('');
+    function dirName(dx, dy) {
+      if (dy < 0) return 'ทิศเหนือ';
+      if (dy > 0) return 'ทิศใต้';
+      if (dx < 0) return 'ทิศตะวันตก';
+      return 'ทิศตะวันออก';
     }
 
-    function appendLog(msg, cls = '') {
-      const logEl = document.getElementById('combatLog');
-      const div = document.createElement('div');
-      div.className = `log-line ${cls}`;
-      div.innerHTML = msg;
-      logEl.appendChild(div);
-      logEl.scrollTop = logEl.scrollHeight;
-    }
+    function movePlayer(dx, dy) {
+      if (combat || modalOpen) return;
+      const m = MAPS[player.mapId];
+      const nx = player.x + dx;
+      const ny = player.y + dy;
+      const pan = dx * 0.45;
 
-    function triggerEnemyShake() {
-      const el = document.getElementById('enemyEmoji');
-      el.classList.remove('shake');
-      void el.offsetWidth;
-      el.classList.add('shake');
-    }
-
-    function playerAction(type) {
-      if (!activeCombat) return;
-      const e = activeCombat.enemy;
-      activeCombat.guarding = false;
-
-      if (type === 'flee') {
-        activeCombat = null;
-        showToast('หลบหนีออกมาอย่างปลอดภัย');
-        renderHuntTab();
+      if (nx < 0 || nx >= m.size || ny < 0 || ny >= m.size) {
+        SoundFX.play('bump', pan);
+        const wallMsg = `ชนขอบแผนที่${dirName(dx, dy)} พิกัดปัจจุบัน (${player.x}, ${player.y})`;
+        document.getElementById('uiTileDesc').textContent = wallMsg;
+        announce(wallMsg);
         return;
       }
 
-      if (type === 'attack') {
-        const isCrit = Math.random() < 0.18;
-        let dmg = Math.round(getTotalAtk() * (0.9 + Math.random() * 0.25));
-        if (isCrit) dmg = Math.round(dmg * 1.65);
-        e.hp -= dmg;
-        triggerEnemyShake();
-        appendLog(`คุณโจมตี ${e.name} สร้างความเสียหาย <strong>${dmg}</strong>${isCrit ? ' 💥(คริติคอล!)' : ''}`, 'log-hit');
-      } else if (type === 'skill') {
-        const cost = 15;
-        if (player.spirit < cost) {
-          showToast('พลังจิตไม่เพียงพอ! (ต้องการ 15)');
+      player.x = nx;
+      player.y = ny;
+      player.steps = (player.steps || 0) + 1;
+
+      if (m.type === 'wild' && player.steps % 4 === 0) {
+        respawnMonstersInZone(player.mapId);
+      }
+
+      const info = getTileInfo(player.mapId, nx, ny);
+      saveData();
+      renderMap();
+
+      SoundFX.play(m.type === 'city' ? 'step_stone' : 'step_grass', pan);
+
+      if (info.kind === 'monster') {
+        startCombat(info.monIndex, `${nx},${ny}`, `เดิน${dirName(dx, dy)} พิกัด (${nx}, ${ny})`);
+        return;
+      }
+
+      if (m.type === 'wild' && info.kind === 'empty' && Math.random() < 0.14) {
+        const pool = MONSTER_POOLS[player.mapId];
+        const rIdx = Math.floor(Math.random() * pool.length);
+        startCombat(rIdx, null, `เดิน${dirName(dx, dy)} พิกัด (${nx}, ${ny}) ถูกซุ่มโจมตี!`);
+        return;
+      }
+
+      let stepSpeech = `เดิน${dirName(dx, dy)} พิกัด (${nx}, ${ny}) ${info.label}`;
+      if (info.kind !== 'empty' && info.kind !== 'landmark') {
+        SoundFX.play('poi');
+        stepSpeech += ' กด Enter เพื่อเข้าใช้งาน';
+      }
+      document.getElementById('uiTileDesc').textContent = `${info.label}: ${info.desc}`;
+      announce(stepSpeech);
+    }
+
+    function interactCurrentTile() {
+      if (combat || modalOpen) return;
+      const info = getTileInfo(player.mapId, player.x, player.y);
+
+      if (info.kind === 'empty' || info.kind === 'landmark') {
+        SoundFX.play('bump');
+        const msg = `พิกัด (${player.x}, ${player.y}) เป็น ${info.label} ไม่มีร้านค้าหรือประตูที่นี่`;
+        addLog(msg, 'c-info', true);
+        return;
+      }
+
+      if (info.kind === 'gate') {
+        if (player.level < (info.minLv || 1)) {
+          SoundFX.play('bump');
+          addLog(`🔒 ต้องการเลเวล ${info.minLv} เพื่อผ่าน${info.label} (ปัจจุบันคุณ Lv.${player.level})`, 'c-bad', true);
           return;
         }
-        player.spirit -= cost;
-        const dmg = Math.round(getTotalAtk() * 1.9 + getTotalMaxSpirit() * 0.25);
+        SoundFX.play('gate');
+        player.mapId = info.toMap;
+        player.x = info.toX;
+        player.y = info.toY;
+        respawnMonstersInZone(player.mapId);
+        SoundFX.updateAmbienceTone();
+        saveData();
+        renderAll();
+        focusGameScreen();
+        addLog(`🚪 เดินทางมาถึง ${MAPS[player.mapId].name} พิกัด (${player.x}, ${player.y})`, 'c-win', true);
+        return;
+      }
+
+      if (info.kind === 'inn') {
+        SoundFX.play('heal');
+        if (MAPS[player.mapId].type === 'city') {
+          player.hp = maxHp();
+          player.spirit = maxSp();
+          addLog(`🏠 พักผ่อนที่ ${info.label} ฟื้นฟู HP และพลังจิตเต็ม 100% แล้ว!`, 'c-win', true);
+        } else {
+          const rHp = Math.round(maxHp() * 0.35);
+          const rSp = Math.round(maxSp() * 0.35);
+          player.hp = Math.min(maxHp(), player.hp + rHp);
+          player.spirit = Math.min(maxSp(), player.spirit + rSp);
+          addLog(`⛺ พักหายใจที่ ${info.label} ฟื้น HP +${rHp}, พลังจิต +${rSp}`, 'c-win', true);
+        }
+        saveData();
+        renderHeader();
+        return;
+      }
+
+      if (info.kind === 'foundation') {
+        openFoundationModal();
+        return;
+      }
+
+      if (info.kind.startsWith('shop_')) {
+        openShopModal(info);
+      }
+    }
+
+    function searchNearbyMonster() {
+      if (combat || modalOpen) return;
+      const m = MAPS[player.mapId];
+      if (m.type !== 'wild') {
+        SoundFX.play('bump');
+        announce('ในเมืองปลอดภัย ไม่มีอสูรให้ล่า กรุณาเดินออกทางประตูเมือง');
+        return;
+      }
+      const pool = MONSTER_POOLS[player.mapId];
+      const idx = Math.floor(Math.random() * pool.length);
+      startCombat(idx, null, 'ค้นพบอสูร!');
+    }
+
+    // ==================== COMBAT (1-0 SKILLS) ====================
+    function startCombat(monIndex, spotKey, prefix = '') {
+      const template = MONSTER_POOLS[player.mapId][monIndex];
+      combat = {
+        spotKey,
+        stunned: false,
+        guarding: false,
+        enemy: { ...template, maxHp: template.hp }
+      };
+      SoundFX.play('encounter');
+      SoundFX.updateAmbienceTone();
+      renderAll();
+      focusGameScreen();
+      addLog(`⚔️ ${prefix ? prefix + ' ' : ''}เผชิญหน้ากับ ${template.name} (Lv.${template.lv}, HP ${template.hp}, โจมตี ${template.atk}) กดเลข 1 ถึง 0 ใช้สกิล`, 'c-bad', true);
+    }
+
+    function useSkillByKey(key) {
+      if (!combat || modalOpen) return;
+      const skill = SKILLS.find(s => s.key === key);
+      if (!skill) return;
+
+      if (player.level < skill.unlockLv) {
+        SoundFX.play('bump');
+        announce(`สกิลช่อง ${key} ${skill.name} ยังไม่ปลดล็อก ต้องใช้เลเวล ${skill.unlockLv}`);
+        return;
+      }
+      if (player.spirit < skill.cost) {
+        SoundFX.play('bump');
+        announce(`พลังจิตไม่พอสำหรับ ${skill.name} ต้องการ ${skill.cost} แต่มี ${player.spirit}`);
+        return;
+      }
+
+      player.spirit -= skill.cost;
+      combat.guarding = false;
+      const e = combat.enemy;
+      let report = '';
+
+      if (key === '1') {
+        SoundFX.play('slash');
+        const dmg = Math.round(totalAtk() * (0.95 + Math.random() * 0.18));
         e.hp -= dmg;
-        triggerEnemyShake();
-        appendLog(`💠 ปลดปล่อยคลื่นพลังจิต! สร้างความเสียหายรุนแรง <strong>${dmg}</strong>`, 'log-info');
-      } else if (type === 'meditate') {
-        activeCombat.guarding = true;
-        const healHp = Math.round(getTotalMaxHp() * 0.14);
-        const healSp = Math.round(getTotalMaxSpirit() * 0.22);
-        player.hp = Math.min(getTotalMaxHp(), player.hp + healHp);
-        player.spirit = Math.min(getTotalMaxSpirit(), player.spirit + healSp);
-        appendLog(`🧘 ตั้งสมาธิฟื้นฟู +${healHp} HP, +${healSp} พลังจิต และลดดาเมจที่ได้รับ 45%`, 'log-info');
+        report = `ใช้ ${skill.name} โจมตี ${e.name} เสียหาย ${dmg}`;
+      } else if (key === '2') {
+        SoundFX.play('shield');
+        combat.guarding = 0.55;
+        const h = Math.round(maxHp() * 0.12);
+        const s = Math.round(maxSp() * 0.20);
+        player.hp = Math.min(maxHp(), player.hp + h);
+        player.spirit = Math.min(maxSp(), player.spirit + s);
+        report = `ใช้ ${skill.name} ฟื้น HP +${h}, จิต +${s} และลดดาเมจ 45%`;
+      } else if (key === '3') {
+        SoundFX.play('spirit_wave');
+        const dmg = Math.round(totalAtk() * 1.85 + maxSp() * 0.25);
+        e.hp -= dmg;
+        report = `ใช้ ${skill.name} สร้างความเสียหาย ${dmg}`;
+      } else if (key === '4') {
+        SoundFX.play('crit_slash');
+        const crit = Math.random() < 0.5;
+        const dmg = Math.round(totalAtk() * 2.2 * (crit ? 1.55 : 1));
+        e.hp -= dmg;
+        report = `ใช้ ${skill.name}${crit ? ' ติดคริติคอล' : ''} สร้างความเสียหาย ${dmg}`;
+      } else if (key === '5') {
+        SoundFX.play('spirit_wave');
+        const dmg = Math.round(totalAtk() * 1.9);
+        const heal = Math.round(dmg * 0.35);
+        e.hp -= dmg;
+        player.hp = Math.min(maxHp(), player.hp + heal);
+        report = `ใช้ ${skill.name} โจมตี ${dmg} และดูด HP กลับ +${heal}`;
+      } else if (key === '6') {
+        SoundFX.play('stun');
+        const dmg = Math.round(totalAtk() * 1.7);
+        e.hp -= dmg;
+        combat.stunned = true;
+        report = `ใช้ ${skill.name} โจมตี ${dmg} และทำให้ศัตรูมึนงง`;
+      } else if (key === '7') {
+        SoundFX.play('thunder');
+        const dmg = Math.round(totalAtk() * 3.0);
+        e.hp -= dmg;
+        report = `ใช้ ${skill.name} ฟาดสายฟ้าเสียหาย ${dmg}`;
+      } else if (key === '8') {
+        SoundFX.play('shield');
+        combat.guarding = 0.35;
+        const heal = Math.round(maxHp() * 0.45);
+        player.hp = Math.min(maxHp(), player.hp + heal);
+        report = `ใช้ ${skill.name} ฟื้น HP +${heal} และลดดาเมจ 65%`;
+      } else if (key === '9') {
+        SoundFX.play('ultimate');
+        const dmg = Math.round(totalAtk() * 4.2 + maxSp());
+        e.hp -= dmg;
+        report = `ใช้ ${skill.name} พิฆาตเสียหาย ${dmg}`;
+      } else if (key === '0') {
+        SoundFX.play('ultimate');
+        const dmg = Math.round(totalAtk() * 6.0 + (player.foundationLevel * 25));
+        e.hp -= dmg;
+        report = `ใช้สุดยอดวิชา ${skill.name} ทำลายล้าง ${dmg}`;
       }
 
       if (e.hp <= 0) {
-        handleVictory();
+        addLog(report, 'c-hit');
+        winCombat(report);
         return;
       }
 
-      // Enemy turn
-      let enemyDmg = Math.round(e.atk * (0.85 + Math.random() * 0.3));
-      if (activeCombat.guarding) enemyDmg = Math.max(1, Math.round(enemyDmg * 0.55));
-      player.hp -= enemyDmg;
-      appendLog(`${e.name} โจมตีสวนกลับ! คุณเสีย <strong>${enemyDmg}</strong> HP`, 'log-enemy');
+      let enemyReport = '';
+      if (combat.stunned) {
+        combat.stunned = false;
+        enemyReport = `ศัตรูติดมึนงง ข้ามการโจมตี`;
+      } else {
+        let eDmg = Math.round(e.atk * (0.88 + Math.random() * 0.24));
+        if (combat.guarding) eDmg = Math.max(1, Math.round(eDmg * combat.guarding));
+        player.hp -= eDmg;
+        setTimeout(() => SoundFX.play('hurt'), 220);
+        enemyReport = `${e.name} สวนกลับเสีย ${eDmg} HP`;
+      }
 
       if (player.hp <= 0) {
-        player.hp = Math.max(1, Math.round(getTotalMaxHp() * 0.5));
-        player.spirit = Math.max(1, Math.round(getTotalMaxSpirit() * 0.5));
-        activeCombat = null;
-        saveCurrentPlayer();
+        SoundFX.play('defeat');
+        player.hp = Math.round(maxHp() * 0.6);
+        player.spirit = Math.round(maxSp() * 0.6);
+        const returnCity = player.mapId === 'zone_4' ? 'city_3' : player.mapId === 'zone_3' ? 'city_2' : 'city_1';
+        player.mapId = returnCity;
+        player.x = 3;
+        player.y = 3;
+        combat = null;
+        SoundFX.updateAmbienceTone();
+        saveData();
         renderAll();
-        showToast('💀 คุณพ่ายแพ้! ถูกส่งกลับค่ายและฟื้นคืนสติ (50% HP)');
+        focusGameScreen();
+        addLog(`💀 พ่ายแพ้ต่อ ${e.name}! ถูกส่งกลับ ${MAPS[returnCity].name} (ฟื้น HP 60%)`, 'c-bad', true);
         return;
       }
 
-      saveCurrentPlayer();
-      renderHeader();
-      renderCombatUI();
+      const fullSpeech = `${report} ศัตรูเหลือ HP ${e.hp} | ${enemyReport} คุณเหลือ HP ${player.hp} จาก ${maxHp()}, จิต ${player.spirit}`;
+      addLog(`${report} | ${enemyReport}`, 'c-hit', false);
+      announce(fullSpeech);
+      saveData();
+      renderAll();
     }
 
-    function useCombatPill(itemId) {
-      if (!activeCombat) return;
-      const item = ITEMS_DB[itemId];
-      if (!item || !removeItem(itemId, 1)) return;
-
-      if (item.effect.hp) {
-        player.hp = Math.min(getTotalMaxHp(), player.hp + item.effect.hp);
-        appendLog(`💊 กลืน ${item.name} ฟื้นฟู +${item.effect.hp} HP`, 'log-win');
+    function winCombat(lastHitReport = '') {
+      const e = combat.enemy;
+      if (combat.spotKey && activeMonsters[player.mapId]) {
+        delete activeMonsters[player.mapId][combat.spotKey];
       }
-      if (item.effect.spirit) {
-        player.spirit = Math.min(getTotalMaxSpirit(), player.spirit + item.effect.spirit);
-        appendLog(`💊 กลืน ${item.name} ฟื้นฟู +${item.effect.spirit} พลังจิต`, 'log-info');
-      }
-
-      saveCurrentPlayer();
-      renderHeader();
-      renderCombatUI();
-    }
-
-    function handleVictory() {
-      const e = activeCombat.enemy;
-      const zoneId = activeCombat.zoneId;
       player.gold += e.gold;
-      gainExp(e.exp);
-
-      const droppedNames = [];
-      (e.drops || []).forEach(([itemId, chance]) => {
-        if (Math.random() <= chance) {
-          addItem(itemId, 1);
-          droppedNames.push(ITEMS_DB[itemId].name);
+      const drops = [];
+      (e.drops || []).forEach(([id, ch]) => {
+        if (Math.random() <= ch) {
+          addItem(id, 1);
+          drops.push(ITEMS[id].name);
         }
       });
 
-      appendLog(`🏆 สังหาร ${e.name} สำเร็จ! ได้รับ +${e.exp} EXP, +${e.gold} ศิลา`, 'log-win');
-      if (droppedNames.length > 0) {
-        appendLog(`🎁 ได้รับไอเทม: <strong>${droppedNames.join(', ')}</strong>`, 'log-win');
+      const dropMsg = drops.length ? ` ได้ไอเทม: ${drops.join(', ')}` : '';
+      combat = null;
+      SoundFX.updateAmbienceTone();
+      const prevLv = player.level;
+      const lvMsg = gainExp(e.exp);
+      if (player.level === prevLv) {
+        setTimeout(() => SoundFX.play('victory'), 180);
       }
-
-      saveCurrentPlayer();
-      renderHeader();
-
-      // Prepare quick next battle button inside arena
-      document.getElementById('enemyHpText').textContent = `0/${e.maxHp}`;
-      document.getElementById('enemyHpBar').style.width = '0%';
-      document.querySelector('.combat-actions').innerHTML = `
-        <button class="btn btn-jade" onclick="continueHunt('${zoneId}')">⚔️ ล่าตัวต่อไปในแดนนี้</button>
-        <button class="btn btn-dark" onclick="exitCombat()">🏕️ กลับไปเลือกพื้นที่</button>
-      `;
-      document.getElementById('combatPotions').innerHTML = '';
-    }
-
-    function continueHunt(zoneId) {
-      restoreCombatButtons();
-      enterZone(zoneId);
-    }
-
-    function exitCombat() {
-      activeCombat = null;
-      restoreCombatButtons();
-      renderHuntTab();
-    }
-
-    function restoreCombatButtons() {
-      document.querySelector('.combat-actions').innerHTML = `
-        <button class="btn btn-danger" onclick="playerAction('attack')">⚔️ โจมตีปกติ</button>
-        <button class="btn btn-spirit" onclick="playerAction('skill')">💠 คลื่นพลังจิต (15 จิต)</button>
-        <button class="btn btn-jade" onclick="playerAction('meditate')">🧘 สมาธิฟื้นฟู &amp; ป้องกัน</button>
-        <button class="btn btn-dark" onclick="playerAction('flee')">💨 หลบหนี</button>
-      `;
-    }
-
-    // ==================== FOUNDATION TAB ====================
-    function renderFoundationTab() {
-      const realm = getRealm(player.level);
-      document.getElementById('fCurrentRealm').textContent = realm.name;
-      document.getElementById('fBonusHp').textContent = player.foundationBonus?.hp || 0;
-      document.getElementById('fBonusSpirit').textContent = player.foundationBonus?.spirit || 0;
-      document.getElementById('fBonusAtk').textContent = player.foundationBonus?.atk || 0;
-
-      const matIds = Object.keys(ITEMS_DB).filter(id => ITEMS_DB[id].type === 'material');
-      document.getElementById('foundationItemsGrid').innerHTML = matIds.map(id => {
-        const item = ITEMS_DB[id];
-        const qty = player.inventory[id] || 0;
-        return `
-          <div class="item-card">
-            <div>
-              <div class="item-head">
-                <div class="item-title">🪨 ${item.name}</div>
-                <div class="item-qty">มี ${qty} ชิ้น</div>
-              </div>
-              <div class="item-desc" style="margin-top:6px;">${item.desc}</div>
-            </div>
-            <div class="item-foot">
-              <button class="btn btn-gold btn-sm" style="width:100%" ${qty < 1 ? 'disabled' : ''} onclick="absorbFoundation('${id}')">
-                🔥 หลอมสร้างรากฐาน
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      document.getElementById('realmRoadmap').innerHTML = REALMS.map(r => {
-        const isCurrent = r.name === realm.name;
-        const reached = player.level >= r.minLv;
-        return `
-          <div class="realm-step ${isCurrent ? 'current' : reached ? 'reached' : ''}">
-            <div>${isCurrent ? '🌟 ' : reached ? '✅ ' : '🔒 '}Lv.${r.minLv}+ : ${r.name}</div>
-            <div style="font-size:11px; opacity:0.8; margin-top:3px;">${r.desc}</div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function absorbFoundation(itemId) {
-      const item = ITEMS_DB[itemId];
-      if (!item || !item.fBoost || !removeItem(itemId, 1)) return;
-
-      player.foundationLevel = (player.foundationLevel || 0) + 1;
-      player.foundationBonus.hp += item.fBoost.hp;
-      player.foundationBonus.spirit += item.fBoost.spirit;
-      player.foundationBonus.atk += item.fBoost.atk;
-      player.hp = Math.min(getTotalMaxHp(), player.hp + item.fBoost.hp);
-      player.spirit = Math.min(getTotalMaxSpirit(), player.spirit + item.fBoost.spirit);
-
-      saveCurrentPlayer();
+      const winMsg = `🏆 ${lastHitReport} สังหาร ${e.name} สำเร็จ! รับ +${e.exp} EXP, +${e.gold} ศิลา.${dropMsg}${lvMsg ? ' ' + lvMsg : ''}`;
+      saveData();
       renderAll();
-      showToast(`🔥 หลอม ${item.name} สำเร็จ! รากฐานแข็งแกร่งขึ้น (ระดับ ${player.foundationLevel})`);
+      focusGameScreen();
+      addLog(winMsg, 'c-win', true);
     }
 
-    // ==================== INVENTORY TAB ====================
-    function setBagFilter(filter, btnEl) {
-      bagFilter = filter;
-      document.querySelectorAll('#bagFilterTabs .filter-tab').forEach(b => b.classList.remove('active'));
-      btnEl.classList.add('active');
-      renderBagTab();
+    function fleeCombat() {
+      if (!combat) return;
+      SoundFX.play('flee');
+      const name = combat.enemy.name;
+      combat = null;
+      SoundFX.updateAmbienceTone();
+      renderAll();
+      focusGameScreen();
+      addLog(`💨 หลบหนีจาก ${name} ออกมาได้สำเร็จ`, 'c-info', true);
     }
 
-    function renderBagTab() {
-      const entries = Object.entries(player.inventory)
-        .filter(([id, qty]) => qty > 0 && ITEMS_DB[id])
-        .filter(([id]) => bagFilter === 'all' || ITEMS_DB[id].type === bagFilter);
+    // ==================== QUICK POTIONS & INSPECT SHORTCUTS ====================
+    function quickHealHp() {
+      const order = ['hp_s', 'hp_m', 'hp_l', 'hp_x'];
+      const found = order.find(id => (player.inventory[id] || 0) > 0);
+      if (!found) { SoundFX.play('bump'); announce('ไม่มียาเม็ดฟื้นเลือดในกระเป๋า'); return; }
+      if (player.hp >= maxHp()) { SoundFX.play('bump'); announce('HP ของคุณเต็มอยู่แล้ว'); return; }
+      removeItem(found, 1);
+      const item = ITEMS[found];
+      player.hp = Math.min(maxHp(), player.hp + item.hp);
+      SoundFX.play('heal');
+      saveData();
+      renderAll();
+      addLog(`💊 ดื่ม ${item.name} ฟื้น HP +${item.hp} (ปัจจุบัน ${player.hp}/${maxHp()})`, 'c-win', true);
+    }
 
-      const grid = document.getElementById('bagGrid');
-      if (entries.length === 0) {
-        grid.innerHTML = `<p style="color:var(--muted); font-size:13px;">ยังไม่มีไอเทมในหมวดนี้ ออกไปล่ามอนสเตอร์หรือแวะร้านค้าได้เลย!</p>`;
-        return;
+    function quickHealSp() {
+      const order = ['sp_s', 'sp_m', 'sp_l'];
+      const found = order.find(id => (player.inventory[id] || 0) > 0);
+      if (!found) { SoundFX.play('bump'); announce('ไม่มียาเม็ดฟื้นพลังจิตในกระเป๋า'); return; }
+      if (player.spirit >= maxSp()) { SoundFX.play('bump'); announce('พลังจิตของคุณเต็มอยู่แล้ว'); return; }
+      removeItem(found, 1);
+      const item = ITEMS[found];
+      player.spirit = Math.min(maxSp(), player.spirit + item.sp);
+      SoundFX.play('spirit_heal');
+      saveData();
+      renderAll();
+      addLog(`💧 ดื่ม ${item.name} ฟื้นพลังจิต +${item.sp} (ปัจจุบัน ${player.spirit}/${maxSp()})`, 'c-info', true);
+    }
+
+    function inspectStatus() {
+      SoundFX.play('open');
+      const wName = player.equippedWeapon ? ITEMS[player.equippedWeapon].name : 'มือเปล่า';
+      const realm = getRealm(player.level).name;
+      const html = `
+        <strong>ชื่อ:</strong> ${player.name} | <strong>ขอบเขต:</strong> ${realm}<br>
+        <strong>เลเวล:</strong> ${player.level} (EXP ${player.exp}/${player.maxExp})<br>
+        <strong>HP:</strong> ${player.hp}/${maxHp()} | <strong>พลังจิต:</strong> ${player.spirit}/${maxSp()}<br>
+        <strong>พลังโจมตีรวม:</strong> ${totalAtk()} | <strong>อาวุธ:</strong> ${wName}<br>
+        <strong>ระดับรากฐาน:</strong> ${player.foundationLevel} | <strong>ศิลา:</strong> ${player.gold}
+      `;
+      showInspect('👤 สถานะตัวละคร [C]', html);
+    }
+
+    function scanMap() {
+      SoundFX.play('poi');
+      const m = MAPS[player.mapId];
+      const landmarks = [];
+      for (const [key, t] of Object.entries(m.tiles)) {
+        const [tx, ty] = key.split(',').map(Number);
+        landmarks.push(`${t.label} ที่ (${tx},${ty}) ${directionHint(player.x, player.y, tx, ty)}`);
       }
-
-      grid.innerHTML = entries.map(([id, qty]) => {
-        const item = ITEMS_DB[id];
-        const isEquipped = player.equippedWeapon === id;
-        let actionBtn = '';
-        if (item.type === 'pill') {
-          actionBtn = `<button class="btn btn-jade btn-sm" onclick="useBagItem('${id}')">ใช้งาน</button>`;
-        } else if (item.type === 'weapon') {
-          actionBtn = isEquipped
-            ? `<button class="btn btn-dark btn-sm" onclick="unequipWeapon()">ถอดออก</button>`
-            : `<button class="btn btn-spirit btn-sm" onclick="equipWeapon('${id}')">สวมใส่</button>`;
-        } else if (item.type === 'material') {
-          actionBtn = `<button class="btn btn-gold btn-sm" onclick="absorbFoundation('${id}')">หลอมรากฐาน</button>`;
+      if (m.type === 'wild' && activeMonsters[player.mapId]) {
+        for (const [key, idx] of Object.entries(activeMonsters[player.mapId])) {
+          const [mx, my] = key.split(',').map(Number);
+          const mon = MONSTER_POOLS[player.mapId][idx];
+          landmarks.push(`อสูร ${mon.name} ที่ (${mx},${my}) ${directionHint(player.x, player.y, mx, my)}`);
         }
-
-        return `
-          <div class="item-card">
-            <div>
-              <div class="item-head">
-                <div class="item-title">${item.name} ${isEquipped ? '<span style="color:var(--gold); font-size:11px;">(สวมใส่อยู่)</span>' : ''}</div>
-                <div class="item-qty">x${qty}</div>
-              </div>
-              <div class="item-desc" style="margin-top:6px;">${item.desc}</div>
-            </div>
-            <div class="item-foot">
-              ${actionBtn}
-              <button class="btn btn-dark btn-sm" onclick="sellItem('${id}')">ขาย (+${item.sell})</button>
-            </div>
-          </div>
-        `;
-      }).join('');
+      }
+      const html = `<strong>${m.name}</strong> พิกัดคุณ (${player.x}, ${player.y})<br>• ` + landmarks.join('<br>• ');
+      showInspect('🧭 สแกนรอบตัว [L]', html);
     }
 
-    function useBagItem(itemId) {
-      const item = ITEMS_DB[itemId];
-      if (!item || item.type !== 'pill' || !removeItem(itemId, 1)) return;
-
-      if (item.effect.hp) player.hp = Math.min(getTotalMaxHp(), player.hp + item.effect.hp);
-      if (item.effect.spirit) player.spirit = Math.min(getTotalMaxSpirit(), player.spirit + item.effect.spirit);
-      if (item.effect.exp) gainExp(item.effect.exp);
-
-      saveCurrentPlayer();
-      renderAll();
-      showToast(`ใช้ ${item.name} เรียบร้อยแล้ว`);
+    function directionHint(px, py, tx, ty) {
+      const dx = tx - px;
+      const dy = ty - py;
+      if (dx === 0 && dy === 0) return '(คุณยืนอยู่ตรงนี้ กด Enter เข้าได้เลย)';
+      const parts = [];
+      if (dy < 0) parts.push(`ขึ้น ${Math.abs(dy)} ก้าว`);
+      if (dy > 0) parts.push(`ลง ${dy} ก้าว`);
+      if (dx < 0) parts.push(`ซ้าย ${Math.abs(dx)} ก้าว`);
+      if (dx > 0) parts.push(`ขวา ${dx} ก้าว`);
+      return `(${parts.join(', ')})`;
     }
 
-    function equipWeapon(itemId) {
-      if (!player.inventory[itemId]) return;
-      player.equippedWeapon = itemId;
-      saveCurrentPlayer();
+    function inspectMapInfo() {
+      SoundFX.play('open');
+      const m = MAPS[player.mapId];
+      const html = `
+        <strong>แผนที่:</strong> ${m.name} (สี่เหลี่ยม ${m.size}×${m.size})<br>
+        <strong>ประเภท:</strong> ${m.type === 'city' ? 'เมืองปลอดภัย' : `ถิ่นอสูร ${m.recLv}`}<br>
+        <strong>พิกัดปัจจุบัน:</strong> (${player.x}, ${player.y})<br>
+        <strong>รายละเอียด:</strong> ${m.desc}
+      `;
+      showInspect('🗺️ ข้อมูลแผนที่ [M]', html);
+    }
+
+    function readRecentLog() {
+      SoundFX.play('open');
+      const last = logs.slice(-3).map(l => stripHtml(l.msg)).join(' | ');
+      announce(last || 'ยังไม่มีบันทึกเหตุการณ์');
+    }
+
+    // ==================== MODALS (ENTER ONLY TO ACTIVATE) ====================
+    function openModal(title, html, customSpeak = null, silent = false) {
+      if (!modalOpen && !silent) SoundFX.play('open');
+      modalOpen = true;
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalBody').innerHTML = html;
+      document.getElementById('modalBackdrop').classList.remove('hidden');
+      setTimeout(() => {
+        const firstFocus = document.querySelector('#modalBody button, #modalCloseBtn');
+        if (firstFocus) firstFocus.focus();
+      }, 30);
+      announce(customSpeak || `${title} กด Tab เลือกรายการ กด Enter เพื่อตกลง กด Esc เพื่อปิด`);
+    }
+
+    function closeModal() {
+      modalOpen = false;
+      SoundFX.play('close');
+      document.getElementById('modalBackdrop').classList.add('hidden');
       renderAll();
-      showToast(`🗡️ สวมใส่ ${ITEMS_DB[itemId].name} แล้ว`);
+      setTimeout(() => {
+        focusGameScreen();
+        announce('ปิดหน้าต่าง กลับสู่เกม');
+      }, 20);
+    }
+
+    function openShopModal(tileInfo, silent = false) {
+      let html = `<p style="color:var(--gold); margin-bottom:8px;">🪙 ศิลาของคุณ: <strong>${player.gold}</strong></p>`;
+      if (tileInfo.kind === 'shop_sell') {
+        html += `<p style="font-size:13px; color:var(--muted);">${tileInfo.desc}</p>`;
+        if (tileInfo.items?.length) {
+          html += `<h4 style="margin-top:10px; color:var(--jade);">สินค้าพิเศษที่ร้านนี้</h4><div class="item-list">` +
+            tileInfo.items.map(id => renderBuyCard(ITEMS[id])).join('') + `</div>`;
+        }
+        const owned = Object.entries(player.inventory).filter(([, q]) => q > 0);
+        html += `<h4 style="margin-top:12px; color:var(--gold);">ไอเทมในกระเป๋าของคุณ (กด Enter เพื่อขาย)</h4>`;
+        html += owned.length ? `<div class="item-list">` + owned.map(([id, q]) => {
+          const it = ITEMS[id];
+          return `<div class="item-card"><div><strong>${it.name}</strong> (มี ${q})<br><small style="color:var(--muted)">${it.desc}</small></div>
+            <button class="btn btn-sm btn-gold" aria-label="ขาย ${it.name} มี ${q} ชิ้น ได้รับ ${it.sell} ศิลา กด Enter เพื่อขาย" onclick="sellFromShop('${id}')">ขาย 1 ชิ้น (+${it.sell} ศิลา)</button></div>`;
+        }).join('') + `</div>` : `<p style="color:var(--muted); margin-top:6px;">กระเป๋าว่างเปล่า</p>`;
+      } else {
+        html += `<p style="font-size:13px; color:var(--muted);">${tileInfo.desc}</p><div class="item-list">` +
+          tileInfo.items.map(id => renderBuyCard(ITEMS[id])).join('') + `</div>`;
+      }
+      openModal(`🏪 ${tileInfo.label}`, html, `เข้าสู่ ${tileInfo.label} คุณมี ${player.gold} ศิลา กด Tab เลือกสินค้า กด Enter เพื่อซื้อ กด Esc ออก`, silent);
+    }
+
+    function renderBuyCard(it) {
+      const owned = player.inventory[it.id] || 0;
+      const can = player.gold >= it.price;
+      return `<div class="item-card">
+        <div><strong>${it.name}</strong> (มี ${owned})<br><small style="color:var(--muted)">${it.desc}</small></div>
+        <button class="btn btn-sm btn-gold" ${can ? '' : 'disabled'} aria-label="ซื้อ ${it.name} ราคา ${it.price} ศิลา ${it.desc} คุณมีอยู่ ${owned} ชิ้น กด Enter เพื่อซื้อ" onclick="buyFromShop('${it.id}')">ซื้อ (${it.price} ศิลา)</button>
+      </div>`;
+    }
+
+    function buyFromShop(id) {
+      const it = ITEMS[id];
+      if (!it || player.gold < it.price) { SoundFX.play('bump'); return; }
+      player.gold -= it.price;
+      addItem(id, 1);
+      SoundFX.play('coin');
+      saveData();
+      renderHeader();
+      addLog(`ซื้อ ${it.name} ราคา ${it.price} ศิลา (เหลือ ${player.gold} ศิลา)`, 'c-win');
+      const info = getTileInfo(player.mapId, player.x, player.y);
+      openShopModal(info, true);
+      announce(`ซื้อ ${it.name} สำเร็จ เหลือ ${player.gold} ศิลา`);
+    }
+
+    function sellFromShop(id) {
+      const it = ITEMS[id];
+      if (!it) return;
+      if (player.equippedWeapon === id && player.inventory[id] <= 1) player.equippedWeapon = null;
+      if (!removeItem(id, 1)) return;
+      player.gold += it.sell;
+      SoundFX.play('coin');
+      saveData();
+      renderHeader();
+      addLog(`ขาย ${it.name} ได้รับ +${it.sell} ศิลา`, 'c-win');
+      const info = getTileInfo(player.mapId, player.x, player.y);
+      openShopModal(info, true);
+      announce(`ขาย ${it.name} ได้ +${it.sell} ศิลา รวมมี ${player.gold} ศิลา`);
+    }
+
+    function openBagModal(silent = false) {
+      const entries = Object.entries(player.inventory).filter(([, q]) => q > 0);
+      let html = entries.length ? `<div class="item-list">` + entries.map(([id, q]) => {
+        const it = ITEMS[id];
+        const eq = player.equippedWeapon === id;
+        let btn = '';
+        if (it.type === 'pill') btn = `<button class="btn btn-sm btn-jade" aria-label="ใช้ยา ${it.name} มี ${q} ชิ้น ${it.desc} กด Enter" onclick="useBagItem('${id}')">ใช้ยา</button>`;
+        if (it.type === 'weapon') btn = eq
+          ? `<button class="btn btn-sm" aria-label="ถอดอาวุธ ${it.name} ที่สวมใส่อยู่ กด Enter" onclick="unequipWeapon()">ถอดออก</button>`
+          : `<button class="btn btn-sm btn-spirit" aria-label="สวมใส่อาวุธ ${it.name} ${it.desc} กด Enter" onclick="equipWeapon('${id}')">สวมใส่</button>`;
+        if (it.type === 'material') btn = `<button class="btn btn-sm btn-gold" aria-label="หลอมรากฐานด้วย ${it.name} มี ${q} ชิ้น ${it.desc} กด Enter" onclick="absorbMaterial('${id}', true)">หลอมรากฐาน</button>`;
+        return `<div class="item-card">
+          <div><strong>${it.name}</strong> ${eq ? '(สวมใส่อยู่)' : ''} x${q}<br><small style="color:var(--muted)">${it.desc}</small></div>
+          <div style="display:flex; gap:6px;">${btn}</div>
+        </div>`;
+      }).join('') + `</div>` : `<p style="color:var(--muted)">ยังไม่มีไอเทมในกระเป๋า</p>`;
+      const summary = entries.length ? `กระเป๋าไอเทม มี ${entries.length} ชนิด กด Tab เลือกไอเทม กด Enter เพื่อใช้งาน` : 'กระเป๋าว่างเปล่า กด Esc ปิด';
+      openModal('🎒 กระเป๋าเก็บไอเทม [I]', html, summary, silent);
+    }
+
+    function useBagItem(id) {
+      const it = ITEMS[id];
+      if (!it || !removeItem(id, 1)) return;
+      if (it.hp) { player.hp = Math.min(maxHp(), player.hp + it.hp); SoundFX.play('heal'); }
+      if (it.sp) { player.spirit = Math.min(maxSp(), player.spirit + it.sp); SoundFX.play('spirit_heal'); }
+      let lvMsg = '';
+      if (it.exp) { SoundFX.play('spirit_heal'); lvMsg = gainExp(it.exp); }
+      saveData();
+      renderHeader();
+      addLog(`ใช้ ${it.name} เรียบร้อยแล้ว`, 'c-win');
+      openBagModal(true);
+      announce(`ใช้ ${it.name} เรียบร้อย ${lvMsg}`);
+    }
+
+    function equipWeapon(id) {
+      player.equippedWeapon = id;
+      SoundFX.play('equip');
+      saveData();
+      renderHeader();
+      addLog(`สวมใส่ ${ITEMS[id].name} แล้ว (พลังโจมตีรวม ${totalAtk()})`, 'c-info');
+      openBagModal(true);
+      announce(`สวมใส่ ${ITEMS[id].name} พลังโจมตีรวม ${totalAtk()}`);
     }
 
     function unequipWeapon() {
       player.equippedWeapon = null;
-      saveCurrentPlayer();
-      renderAll();
+      SoundFX.play('close');
+      saveData();
+      renderHeader();
+      openBagModal(true);
+      announce(`ถอดอาวุธแล้ว พลังโจมตีรวม ${totalAtk()}`);
     }
 
-    function sellItem(itemId) {
-      const item = ITEMS_DB[itemId];
-      if (!item) return;
-      if (player.equippedWeapon === itemId && player.inventory[itemId] <= 1) {
-        player.equippedWeapon = null;
+    function openFoundationModal(silent = false) {
+      const curRealm = getRealm(player.level);
+      const mats = Object.values(ITEMS).filter(i => i.type === 'material');
+      let html = `
+        <div class="detail-box" style="margin-bottom:10px;">
+          <strong>ขอบเขตปัจจุบัน:</strong> ${curRealm.name}<br>
+          <strong>ระดับรากฐาน:</strong> ${player.foundationLevel} (โบนัส +${player.foundationBonus.hp} HP, +${player.foundationBonus.sp} จิต, +${player.foundationBonus.atk} โจมตี)
+        </div>
+        <h4>หลอมไอเทมสร้างรากฐาน</h4>
+        <div class="item-list">` + mats.map(m => {
+          const q = player.inventory[m.id] || 0;
+          return `<div class="item-card">
+            <div><strong>${m.name}</strong> (มี ${q})<br><small style="color:var(--muted)">${m.desc}</small></div>
+            <button class="btn btn-sm btn-gold" ${q < 1 ? 'disabled' : ''} aria-label="หลอม ${m.name} มี ${q} ชิ้น ${m.desc} กด Enter" onclick="absorbMaterial('${m.id}', false)">🔥 หลอมรากฐาน</button>
+          </div>`;
+        }).join('') + `</div>
+        <h4 style="margin-top:14px;">ขอบเขตขั้นพลังจิตทั้ง 8 ขั้น</h4>
+        <div style="font-size:12.5px; margin-top:6px;">` + REALMS.map(r => {
+          const mark = r.name === curRealm.name ? '🌟 [ปัจจุบัน] ' : player.level >= r.minLv ? '✅ ' : '🔒 ';
+          return `<button class="btn btn-sm" style="width:100%; justify-content:flex-start; margin-top:4px; text-align:left;" aria-label="${mark} เลเวล ${r.minLv} ขึ้นไป ${r.name} ${r.desc}">${mark}Lv.${r.minLv}+ : ${r.name} — ${r.desc}</button>`;
+        }).join('') + `</div>`;
+      openModal('🪨 รากฐานและขอบเขตพลังจิต [F]', html, `ขอบเขตปัจจุบัน ${curRealm.name} ระดับรากฐาน ${player.foundationLevel} กด Tab เลือกไอเทมหลอมและกด Enter`, silent);
+    }
+
+    function absorbMaterial(id, fromBag) {
+      const it = ITEMS[id];
+      if (!it || !it.boost || !removeItem(id, 1)) return;
+      player.foundationLevel += 1;
+      player.foundationBonus.hp += it.boost.hp;
+      player.foundationBonus.sp += it.boost.sp;
+      player.foundationBonus.atk += it.boost.atk;
+      player.hp = Math.min(maxHp(), player.hp + it.boost.hp);
+      player.spirit = Math.min(maxSp(), player.spirit + it.boost.sp);
+      SoundFX.play('forge');
+      saveData();
+      renderHeader();
+      addLog(`🔥 หลอม ${it.name} สำเร็จ! รากฐานระดับ ${player.foundationLevel}`, 'c-win');
+      if (fromBag) openBagModal(true); else openFoundationModal(true);
+      announce(`หลอม ${it.name} สำเร็จ ระดับรากฐานเพิ่มเป็น ${player.foundationLevel}`);
+    }
+
+    function openSkillsModal() {
+      const html = `<div class="item-list">` + SKILLS.map(s => {
+        const unlocked = player.level >= s.unlockLv;
+        const st = unlocked ? 'ปลดล็อกแล้ว' : `ปลดล็อกที่เลเวล ${s.unlockLv}`;
+        return `<button class="item-card" style="text-align:left; color:var(--text);" aria-label="ปุ่มเลข ${s.key} ${s.name} ${st} ใช้พลังจิต ${s.cost} ${s.desc}">
+          <div><span class="skill-key">${s.key}</span><strong>${s.name}</strong><br>
+          <small style="color:${unlocked ? 'var(--jade)' : '#fb7185'}">${unlocked ? '✅ ปลดล็อกแล้ว' : `🔒 ปลดล็อกที่ Lv.${s.unlockLv}`} | ใช้จิต: ${s.cost}</small><br>
+          <small style="color:var(--muted)">${s.desc}</small></div>
+        </button>`;
+      }).join('') + `</div>`;
+      openModal('📜 สกิลต่อสู้ทั้งหมด ปุ่ม 1 ถึง 0 [K]', html, 'สกิลต่อสู้ ปุ่ม 1 ถึง 0 กด Tab เพื่ออ่านรายละเอียดแต่ละสกิล กด Esc ปิด');
+    }
+
+    function openHelpModal() {
+      const shortcuts = [
+        'ลูกศร ขึ้น ลง ซ้าย ขวา: เดินบนแผนที่สี่เหลี่ยม (มีเสียงแยกซ้ายขวา)',
+        'ปุ่ม Enter: เข้าสถานที่ ร้านค้า โรงเตี๊ยม หอรากฐาน ประตูเมือง และซื้อหรือใช้ไอเทมในเมนู',
+        'ปุ่ม L: สแกนบอกทิศทางและจำนวนก้าวไปยังร้านค้า ประตู และอสูร',
+        'ปุ่ม A: ค้นหาอสูรทันทีเมื่ออยู่นอกเมือง',
+        'ปุ่มตัวเลข 1 ถึง 0: กดใช้สกิลต่อสู้ช่องที่ 1 ถึง 10',
+        'ปุ่ม Q: ดื่มยาฟื้น HP ด่วน | ปุ่ม W: ดื่มยาฟื้นพลังจิตด่วน',
+        'ปุ่ม R: หลบหนีออกจากการต่อสู้',
+        'ปุ่ม Page Up และ Page Down: เพิ่มหรือลดเสียงดนตรีในเกมทีละ 10 เปอร์เซ็นต์',
+        'ปุ่ม Home และ End: เพิ่มหรือลดเสียงบรรยากาศรวมทั้ง Sound ทุกอย่างในเกมทีละ 10 เปอร์เซ็นต์',
+        'ปุ่ม C: เช็กสถานะตัวละคร | ปุ่ม M: เช็กข้อมูลแผนที่',
+        'ปุ่ม I: เปิดกระเป๋าไอเทม | ปุ่ม F: เปิดหน้าต่างรากฐานและขั้นพลังจิต',
+        'ปุ่ม K: ดูสกิล 1 ถึง 0 | ปุ่ม J: ฟังบันทึกเหตุการณ์ล่าสุด',
+        'ปุ่ม S: บันทึกเกม | ปุ่ม Esc: ปิดหน้าต่างเมนู'
+      ];
+      const html = shortcuts.map(line =>
+        `<button class="btn btn-sm" style="width:100%; justify-content:flex-start; margin-bottom:6px; text-align:left;" aria-label="${line}">${line}</button>`
+      ).join('');
+      openModal('❓ คู่มือคีย์ลัดทั้งหมด [H]', html, 'คู่มือคีย์ลัดทั้งหมด กด Tab ฟังทีละข้อ กด Esc เพื่อปิด');
+    }
+
+    // ==================== RENDERING ====================
+    function renderAll() {
+      if (!player) return;
+      renderHeader();
+      renderMap();
+      renderCombat();
+    }
+
+    function renderHeader() {
+      document.getElementById('uiName').textContent = player.name;
+      document.getElementById('uiLv').textContent = player.level;
+      document.getElementById('uiRealm').textContent = getRealm(player.level).name;
+      document.getElementById('uiGold').textContent = player.gold.toLocaleString();
+      document.getElementById('uiAtk').textContent = totalAtk();
+
+      const mHp = maxHp(), mSp = maxSp();
+      document.getElementById('uiHp').textContent = `${player.hp}/${mHp}`;
+      document.getElementById('barHp').style.width = `${Math.min(100, (player.hp / mHp) * 100)}%`;
+      document.getElementById('uiSp').textContent = `${player.spirit}/${mSp}`;
+      document.getElementById('barSp').style.width = `${Math.min(100, (player.spirit / mSp) * 100)}%`;
+      document.getElementById('uiExp').textContent = `${player.exp}/${player.maxExp}`;
+      document.getElementById('barExp').style.width = `${Math.min(100, (player.exp / player.maxExp) * 100)}%`;
+    }
+
+    function renderMap() {
+      const m = MAPS[player.mapId];
+      document.getElementById('exploreView').classList.toggle('hidden', !!combat);
+      document.getElementById('combatView').classList.toggle('hidden', !combat);
+      if (combat) return;
+
+      document.getElementById('uiMapTitle').textContent = `🗺️ ${m.name} (${m.size}×${m.size})`;
+      document.getElementById('uiCoords').textContent = `พิกัด (${player.x}, ${player.y})`;
+      document.getElementById('btnSearchMonster').classList.toggle('hidden', m.type !== 'wild');
+
+      const curInfo = getTileInfo(player.mapId, player.x, player.y);
+      document.getElementById('uiTileDesc').textContent = `${curInfo.label}: ${curInfo.desc}`;
+
+      const grid = document.getElementById('squareGrid');
+      let html = '';
+      for (let y = 0; y < m.size; y++) {
+        for (let x = 0; x < m.size; x++) {
+          const isPlayer = (x === player.x && y === player.y);
+          const info = getTileInfo(player.mapId, x, y);
+          let cls = m.type === 'city' ? 'city-ground' : 'wild-ground';
+          if (info.kind.startsWith('shop_')) cls = 'shop-tile';
+          if (info.kind === 'gate') cls = 'gate-tile';
+          if (info.kind === 'inn') cls = 'inn-tile';
+          if (info.kind === 'foundation') cls = 'foundation-tile';
+          if (info.kind === 'monster') cls = 'monster-tile';
+          if (isPlayer) cls += ' player-here';
+
+          const icon = isPlayer ? '🧙' : info.icon;
+          const shortLbl = isPlayer ? 'คุณ' : (info.kind === 'empty' ? '' : info.label.slice(0, 6));
+          html += `<div class="tile ${cls}" onclick="clickTile(${x},${y})">
+            <span>${icon}</span>
+            ${shortLbl ? `<span class="tile-sub">${shortLbl}</span>` : ''}
+          </div>`;
+        }
       }
-      if (!removeItem(itemId, 1)) return;
-      player.gold += item.sell;
-      saveCurrentPlayer();
-      renderAll();
-      showToast(`ขาย ${item.name} ได้รับ +${item.sell} ศิลา`);
+      grid.innerHTML = html;
     }
 
-    // ==================== SHOP TAB ====================
-    function setShopFilter(filter, btnEl) {
-      shopFilter = filter;
-      document.querySelectorAll('#shopFilterTabs .filter-tab').forEach(b => b.classList.remove('active'));
-      btnEl.classList.add('active');
-      renderShopTab();
+    function clickTile(tx, ty) {
+      if (combat || modalOpen) return;
+      if (tx === player.x && ty === player.y) {
+        interactCurrentTile();
+        return;
+      }
+      const dx = Math.sign(tx - player.x);
+      const dy = Math.sign(ty - player.y);
+      if (Math.abs(tx - player.x) >= Math.abs(ty - player.y)) movePlayer(dx, 0);
+      else movePlayer(0, dy);
     }
 
-    function renderShopTab() {
-      const items = SHOP_ITEMS
-        .map(id => ITEMS_DB[id])
-        .filter(item => shopFilter === 'all' || item.type === shopFilter);
+    function renderCombat() {
+      if (!combat) return;
+      const e = combat.enemy;
+      document.getElementById('cEnemyEmoji').textContent = e.emoji;
+      document.getElementById('cEnemyName').textContent = e.name;
+      document.getElementById('cEnemyMeta').textContent = `Lv.${e.lv} | พลังโจมตี: ${e.atk}${combat.stunned ? ' | 💫 ติดมึนงง' : ''}`;
+      document.getElementById('cEnemyHp').textContent = `${Math.max(0, e.hp)}/${e.maxHp}`;
+      document.getElementById('cEnemyHpBar').style.width = `${Math.max(0, (e.hp / e.maxHp) * 100)}%`;
 
-      document.getElementById('shopGrid').innerHTML = items.map(item => {
-        const owned = player.inventory[item.id] || 0;
-        const canAfford = player.gold >= item.price;
-        return `
-          <div class="item-card">
-            <div>
-              <div class="item-head">
-                <div class="item-title">${item.type === 'weapon' ? '🗡️ ' : '💊 '}${item.name}</div>
-                <div class="item-qty">มี ${owned}</div>
-              </div>
-              <div class="item-desc" style="margin-top:6px;">${item.desc}</div>
-            </div>
-            <div class="item-foot">
-              <span style="color:var(--gold); font-weight:600; font-size:13px;">🪙 ${item.price} ศิลา</span>
-              <button class="btn btn-gold btn-sm" ${canAfford ? '' : 'disabled'} onclick="buyItem('${item.id}')">ซื้อ</button>
-            </div>
+      document.getElementById('combatSkillGrid').innerHTML = SKILLS.map(s => {
+        const unlocked = player.level >= s.unlockLv;
+        const enoughSp = player.spirit >= s.cost;
+        const canUse = unlocked && enoughSp;
+        const aria = unlocked
+          ? `กดเลข ${s.key} ${s.name} ใช้จิต ${s.cost} ${s.desc}`
+          : `กดเลข ${s.key} ${s.name} ล็อกอยู่ ต้องการเลเวล ${s.unlockLv}`;
+        return `<button class="skill-btn" ${canUse ? '' : 'disabled'} aria-label="${aria}" onclick="useSkillByKey('${s.key}')">
+          <div><span class="skill-key">${s.key}</span><strong>${s.name}</strong></div>
+          <div style="font-size:11px; color:var(--muted);">
+            ${unlocked ? `ใช้จิต: ${s.cost} | ${s.desc}` : `🔒 ปลดล็อกที่ Lv.${s.unlockLv}`}
           </div>
-        `;
+        </button>`;
       }).join('');
     }
 
-    function buyItem(itemId) {
-      const item = ITEMS_DB[itemId];
-      if (!item || player.gold < item.price) return;
-      player.gold -= item.price;
-      addItem(itemId, 1);
-      saveCurrentPlayer();
-      renderAll();
-      showToast(`ซื้อ ${item.name} สำเร็จ!`);
-    }
+    // ==================== GLOBAL KEYBOARD SHORTCUTS ====================
+    document.addEventListener('keydown', (e) => {
+      if (!player) return;
+      const tag = e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 
-    // ==================== TOAST & AUTO-RESTORE ====================
-    let toastTimer = null;
-    function showToast(msg) {
-      const existing = document.querySelector('.toast');
-      if (existing) existing.remove();
-      const el = document.createElement('div');
-      el.className = 'toast';
-      el.textContent = msg;
-      document.body.appendChild(el);
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.remove(), 3000);
-    }
+      if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        return;
+      }
 
-    // Auto-login if session exists
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedUser = localStorage.getItem(STORAGE_SESSION_KEY);
-      if (savedUser) {
-        const accounts = getAccounts();
-        if (accounts[savedUser] && accounts[savedUser].data) {
-          loginSuccess(savedUser, accounts[savedUser].data);
+      if (e.key === 'PageUp')   { e.preventDefault(); adjustBgmVolume(0.1); return; }
+      if (e.key === 'PageDown') { e.preventDefault(); adjustBgmVolume(-0.1); return; }
+      if (e.key === 'Home')     { e.preventDefault(); adjustMasterVolume(0.1); return; }
+      if (e.key === 'End')      { e.preventDefault(); adjustMasterVolume(-0.1); return; }
+
+      if (e.key === 'Escape') {
+        if (modalOpen) { e.preventDefault(); closeModal(); }
+        return;
+      }
+
+      if (modalOpen) return;
+
+      const k = e.key.toLowerCase();
+
+      if (combat) {
+        if (/^[0-9]$/.test(e.key)) {
+          e.preventDefault();
+          useSkillByKey(e.key);
+          return;
         }
+        if (k === 'r') { e.preventDefault(); fleeCombat(); return; }
+      }
+
+      if (!combat) {
+        if (e.key === 'ArrowUp')    { e.preventDefault(); movePlayer(0, -1); return; }
+        if (e.key === 'ArrowDown')  { e.preventDefault(); movePlayer(0, 1); return; }
+        if (e.key === 'ArrowLeft')  { e.preventDefault(); movePlayer(-1, 0); return; }
+        if (e.key === 'ArrowRight') { e.preventDefault(); movePlayer(1, 0); return; }
+        if (e.key === 'Enter' && tag !== 'BUTTON') {
+          e.preventDefault();
+          interactCurrentTile();
+          return;
+        }
+        if (k === 'a') { e.preventDefault(); searchNearbyMonster(); return; }
+      }
+
+      if (k === 'c') { e.preventDefault(); inspectStatus(); }
+      else if (k === 'l') { e.preventDefault(); scanMap(); }
+      else if (k === 'm') { e.preventDefault(); inspectMapInfo(); }
+      else if (k === 'i') { e.preventDefault(); openBagModal(); }
+      else if (k === 'f') { e.preventDefault(); openFoundationModal(); }
+      else if (k === 'k') { e.preventDefault(); openSkillsModal(); }
+      else if (k === 'j') { e.preventDefault(); readRecentLog(); }
+      else if (k === 'q') { e.preventDefault(); quickHealHp(); }
+      else if (k === 'w') { e.preventDefault(); quickHealSp(); }
+      else if (k === 's') { e.preventDefault(); manualSave(); }
+      else if (k === 'h' || e.key === '?') { e.preventDefault(); openHelpModal(); }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (!player) return;
+      const tag = e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+      }
+    });
+
+    // ==================== AUTO-LOGIN ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      migrateV1ToV2IfNeeded();
+      const saved = localStorage.getItem(STORAGE_CURRENT);
+      if (saved) {
+        const acc = getAccounts();
+        if (acc[saved]?.data) startSession(saved, acc[saved].data);
       }
     });
   </script>
 </body>
 </html>
+```
