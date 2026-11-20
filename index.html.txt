@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -490,8 +491,8 @@
       </div>
     </div>
 
-    <!-- GAME SCREEN (DIRECT FOCUS MODE WITH role="application") -->
-    <div id="gameScreen" class="hidden" role="application" tabindex="0" aria-label="หน้าจอเกม วิถีสร้างรากฐาน ใช้ลูกศรเดิน กด Enter เข้าสถานที่ กด L สแกนรอบตัว กด 1 ถึง 0 ต่อสู้ กด PageUp PageDown ปรับเสียงดนตรี กด Home End ปรับเสียงทั้งหมดในเกม กด H ดูคีย์ลัด">
+    <!-- GAME SCREEN -->
+    <div id="gameScreen" class="hidden" role="application" tabindex="0" aria-label="หน้าจอเกม วิถีสร้างรากฐาน ใช้ลูกศรเดิน กด Enter เข้าสถานที่ กด L สแกนรอบตัว กด 1 ถึง 0 ต่อสู้ กด PageUp PageDown ปรับเสียงดนตรี กด Home End ปรับเสียงทั้งหมด กด H ดูคีย์ลัด">
       <header class="top-bar">
         <div class="top-row">
           <div class="char-title">
@@ -639,7 +640,7 @@
   </div>
 
   <script>
-    // ==================== WEB AUDIO API SOUND ENGINE (MASTER + BGM + AMBIENCE + SFX) ====================
+    // ==================== WEB AUDIO API SOUND ENGINE ====================
     const SoundFX = (() => {
       let ctx = null;
       let masterGain = null;
@@ -1159,7 +1160,7 @@
       }
     };
 
-    // ==================== STATE ====================
+    // ==================== STATE & V1 MIGRATION ====================
     let authMode = 'login';
     let currentUser = null;
     let player = null;
@@ -1177,6 +1178,66 @@
         }
       }, { passive: true });
     });
+
+    function migrateV1ToV2IfNeeded() {
+      try {
+        const v1Raw = localStorage.getItem('spirit_foundation_rpg_accounts_v1');
+        if (!v1Raw) return;
+        const v1Accs = JSON.parse(v1Raw) || {};
+        const v2Accs = getAccounts();
+        const itemMap = {
+          hp_pill_s: 'hp_s', hp_pill_m: 'hp_m', hp_pill_l: 'hp_l',
+          sp_pill_s: 'sp_s', sp_pill_m: 'sp_m', exp_pill: 'exp_s',
+          w_wood_sword: 'w_wood', w_iron_blade: 'w_iron', w_jade_spear: 'w_jade',
+          w_spirit_sword: 'w_thunder', w_immortal: 'w_immortal',
+          mat_stone: 'm_stone', mat_grass: 'm_grass', mat_core: 'm_core', mat_crystal: 'm_crystal'
+        };
+        let changed = false;
+        for (const [k, acc] of Object.entries(v1Accs)) {
+          if (!v2Accs[k] && acc?.data) {
+            const d = acc.data;
+            const newInv = {};
+            for (const [oldId, qty] of Object.entries(d.inventory || {})) {
+              const nid = itemMap[oldId] || oldId;
+              if (ITEMS[nid]) newInv[nid] = (newInv[nid] || 0) + qty;
+            }
+            v2Accs[k] = {
+              pass: acc.password,
+              data: {
+                name: d.name,
+                level: d.level || 1,
+                exp: d.exp || 0,
+                maxExp: d.maxExp || 100,
+                hp: d.hp || 120,
+                maxHp: d.maxHp || 120,
+                spirit: d.spirit || 60,
+                maxSpirit: d.maxSpirit || 60,
+                baseAtk: d.baseAtk || 14,
+                gold: d.gold || 100,
+                equippedWeapon: d.equippedWeapon ? (itemMap[d.equippedWeapon] || null) : null,
+                foundationLevel: d.foundationLevel || 0,
+                foundationBonus: {
+                  hp: d.foundationBonus?.hp || 0,
+                  sp: d.foundationBonus?.spirit || 0,
+                  atk: d.foundationBonus?.atk || 0
+                },
+                mapId: 'city_1',
+                x: 3,
+                y: 3,
+                steps: 0,
+                inventory: newInv
+              }
+            };
+            changed = true;
+          }
+        }
+        if (changed) localStorage.setItem(STORAGE_ACCOUNTS, JSON.stringify(v2Accs));
+        const v1Cur = localStorage.getItem('spirit_foundation_rpg_current_v1');
+        if (v1Cur && !localStorage.getItem(STORAGE_CURRENT) && v2Accs[v1Cur]) {
+          localStorage.setItem(STORAGE_CURRENT, v1Cur);
+        }
+      } catch {}
+    }
 
     // ==================== FOCUS & ANNOUNCER ====================
     function focusGameScreen() {
@@ -1307,8 +1368,12 @@
       if (!player.mapId || !MAPS[player.mapId]) { player.mapId = 'city_1'; player.x = 3; player.y = 3; }
       localStorage.setItem(STORAGE_CURRENT, key);
       initMapMonsters();
+
+      // Force full Focus/Application mode on body immediately upon entering the game
+      document.body.setAttribute('role', 'application');
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('gameScreen').classList.remove('hidden');
+
       combat = null;
       logs = [];
       renderAll();
@@ -1316,10 +1381,13 @@
       SoundFX.play('start');
       SoundFX.startBgmLoop();
       SoundFX.updateAmbienceTone();
+
+      // Focus twice (fast & post-virtual-buffer) so NVDA/JAWS locks directly into Focus Mode
       setTimeout(() => {
         focusGameScreen();
-        addLog(`เข้าสู่เกมเรียบร้อย ${player.name} อยู่ที่ ${MAPS[player.mapId].name} พิกัด (${player.x}, ${player.y}) ใช้ลูกศรเดิน กด Enter เข้าสถานที่ กด H ดูคีย์ลัด`, 'c-win', true);
-      }, 60);
+        addLog(`เข้าสู่เกมเรียบร้อย ${player.name} อยู่ที่ ${MAPS[player.mapId].name} พิกัด (${player.x}, ${player.y}) ใช้ลูกศรเดิน กด Enter เข้าสถานที่ กด L สแกนรอบตัว กด H ดูคีย์ลัด`, 'c-win', true);
+      }, 80);
+      setTimeout(() => focusGameScreen(), 380);
     }
 
     function logout() {
@@ -1330,7 +1398,9 @@
       currentUser = null;
       player = null;
       combat = null;
+      document.body.removeAttribute('role');
       localStorage.removeItem(STORAGE_CURRENT);
+      localStorage.removeItem('spirit_foundation_rpg_current_v1');
       document.getElementById('gameScreen').classList.add('hidden');
       document.getElementById('authScreen').classList.remove('hidden');
       document.getElementById('inPass').value = '';
@@ -2141,7 +2211,7 @@
       }).join('');
     }
 
-    // ==================== GLOBAL KEYBOARD SHORTCUTS (ENTER ONLY, NO SPACEBAR, NO V/B) ====================
+    // ==================== GLOBAL KEYBOARD SHORTCUTS ====================
     document.addEventListener('keydown', (e) => {
       if (!player) return;
       const tag = e.target.tagName;
@@ -2152,7 +2222,6 @@
         return;
       }
 
-      // Volume Controls work everywhere (map, combat, and inside modals!)
       if (e.key === 'PageUp')   { e.preventDefault(); adjustBgmVolume(0.1); return; }
       if (e.key === 'PageDown') { e.preventDefault(); adjustBgmVolume(-0.1); return; }
       if (e.key === 'Home')     { e.preventDefault(); adjustMasterVolume(0.1); return; }
@@ -2213,6 +2282,7 @@
 
     // ==================== AUTO-LOGIN ====================
     window.addEventListener('DOMContentLoaded', () => {
+      migrateV1ToV2IfNeeded();
       const saved = localStorage.getItem(STORAGE_CURRENT);
       if (saved) {
         const acc = getAccounts();
@@ -2222,3 +2292,4 @@
   </script>
 </body>
 </html>
+```
