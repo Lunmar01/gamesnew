@@ -171,7 +171,9 @@
       const phone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
         || (window.matchMedia && matchMedia('(pointer: coarse)').matches && !matchMedia('(pointer: fine)').matches);
       const mobile = qs ? qs[1] === '1' : (cap || phone);
-      return { mobile, lazyAmb: mobile, streamMusic: mobile, panBoost: false };
+      let absolute = true;   // เสียงรอบทิศตามแผนที่ (ค่าเริ่ม) · false = หมุนตามทิศที่ตัวละครหัน
+      try { const f = localStorage.getItem('starter-town-frame-v1'); if (f === 'relative') absolute = false; } catch {}
+      return { mobile, lazyAmb: mobile, streamMusic: mobile, panBoost: false, absolute };
     })();
     // ช่วงจังหวะ: mul = ขยายช่วงเวลาตัดสิน, lat = ชดเชยความหน่วงเสียง (มิลลิวินาที), evAt = เวลาที่นิ้วแตะจริง
     const TIMING = { mul: 1, lat: 0, evAt: 0, now() { return (this.evAt || Date.now()) - this.lat; } };
@@ -1254,7 +1256,7 @@
         src.playbackRate.value = rate * (0.96 + Math.random() * 0.08);
         let att = 1, pan = 0;
         if (dx != null) {
-          const pi = calcRelativePanAndFront(dx, dy, state.dir);
+          const pi = spatial(dx, dy);
           att = Math.max(0.35, Math.min(1, 1 / (1 + Math.hypot(dx, dy) * 0.14))) * (pi.isBehind ? 0.75 : 1);
           pan = Math.max(-1, Math.min(1, pi.pan * 0.85));
         }
@@ -1294,7 +1296,7 @@
         const imp = type && MONSTER_IMPACT[type];
         let b = imp ? playSet(imp[0], 'hit', { dx, dy, rate: imp[1], gain: imp[2], delay: 0.03 }) : false;
         if (!b) b = playHitFile('hit_flesh', { dx, dy, gain: 0.8, rate: 0.75, delay: 0.04 });
-        if (Math.random() < 0.85) { const pi = calcRelativePanAndFront(dx || 0, dy || 0, state.dir); playMineFile('hurtvoice', pi.pan * 0.4, 0.5, 0.08, 0.95 + Math.random() * 0.1, false, uiGain); }   // ตัวละครร้องเจ็บ
+        if (Math.random() < 0.85) { const pi = spatial(dx || 0, dy || 0); playMineFile('hurtvoice', pi.pan * 0.4, 0.5, 0.08, 0.95 + Math.random() * 0.1, false, uiGain); }   // ตัวละครร้องเจ็บ
         if (!a && !b) return false;
         return true;
       }
@@ -1308,7 +1310,7 @@
         if (!bufs.length) return false;
         const [rate, vol] = MONSTER_STEP_SOUND[type] || [1, 0.45];
         const dist = Math.hypot(dx, dy);
-        const pi = calcRelativePanAndFront(dx, dy, state.dir);
+        const pi = spatial(dx, dy);
         const att = Math.max(0.12, Math.min(1, 1 / (1 + dist * 0.2))) * (pi.isBehind ? 0.65 : 1);
         const src = ctx.createBufferSource(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
         src.buffer = bufs[Math.floor(Math.random() * bufs.length)];
@@ -1336,7 +1338,7 @@
         if (list.length > 1 && i === lastAnimalIdx[key]) i = (i + 1) % list.length;
         lastAnimalIdx[key] = i;
         const dist = Math.hypot(dx, dy);
-        const pi = calcRelativePanAndFront(dx, dy, state.dir);
+        const pi = spatial(dx, dy);
         const att = Math.max(0.18, Math.min(1, 1 / (1 + dist * 0.14))) * (pi.isBehind ? 0.65 : 1);
         const src = ctx.createBufferSource(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
         src.buffer = list[i];
@@ -1465,7 +1467,7 @@
         const dx = tx - state.x;
         const dy = ty - state.y;
         const dist = Math.hypot(dx, dy);
-        const panInfo = calcRelativePanAndFront(dx, dy, state.dir);
+        const panInfo = spatial(dx, dy);
         const now = ctx.currentTime;
         const vol = Math.max(0.06, Math.min(0.65, 1 / (1 + dist * 0.35))) * (panInfo.isBehind ? 0.55 : 1) * mixOf('beacon', b.id);
         beaconGain.gain.setTargetAtTime(vol, now, 0.05);
@@ -1473,6 +1475,8 @@
         if (beaconPanner) beaconPanner.pan.setTargetAtTime(panInfo.pan, now, 0.05);
       }
 
+      // ตำแหน่งเสียงเทียบกับผู้ฟัง: ตามแผนที่ (ผู้ฟังหันทิศเหนือเสมอ) หรือตามทิศที่ตัวละครหัน
+      function spatial(dx, dy) { return calcRelativePanAndFront(dx, dy, AUDIO_OPTS.absolute ? 0 : state.dir); }
       function calcRelativePanAndFront(dx, dy, facingDir) {
         if (dx === 0 && dy === 0) return { pan: 0, isBehind: false, isDeadAhead: true, diffDeg: 0 };
         const fAngle = facingDir * 45;
@@ -1523,7 +1527,7 @@
         ensureCave();
         let pan = 0, att = 1, behind = false;
         if (dx != null && (dx || dy)) {
-          const pi = calcRelativePanAndFront(dx, dy, state.dir);
+          const pi = spatial(dx, dy);
           pan = Math.max(-1, Math.min(1, pi.pan * 0.9)); behind = pi.isBehind;
           att = Math.max(0.15, Math.min(1, 1 / (1 + Math.hypot(dx, dy) * 0.14))) * (behind ? 0.75 : 1);
         }
@@ -1586,7 +1590,7 @@
         for (const p of Object.values(pointLoops)) {
           if (p.pending && !startPointLoop(p)) continue;
           const dx = p.def.x - state.x, dy = p.def.y - state.y, dist = Math.hypot(dx, dy);
-          const pi = calcRelativePanAndFront(dx, dy, state.dir);
+          const pi = spatial(dx, dy);
           const v = Math.pow(Math.max(0, 1 - dist / p.def.range), 1.6) * p.def.gain * (pi.isBehind ? 0.6 : 1);
           p.g.gain.setTargetAtTime(v, now, 0.12);
           p.lp.frequency.setTargetAtTime(pi.isBehind ? 1400 : 6000, now, 0.12);
@@ -1615,7 +1619,7 @@
         ensureCave();
         let pan = 0, att = 1, behind = false;
         if (dx != null && (dx || dy)) {
-          const pi = calcRelativePanAndFront(dx, dy, state.dir);
+          const pi = spatial(dx, dy);
           pan = Math.max(-1, Math.min(1, pi.pan * 0.9)); behind = pi.isBehind;
           att = Math.max(0.1, Math.min(1, 1 / (1 + Math.hypot(dx, dy) * 0.15))) * (behind ? 0.7 : 1);
         }
@@ -1933,7 +1937,7 @@
         playStep, playSound, playRadarPing, playAnimalCry, playAnimalFile, hasAnimalFiles, playMonsterStep, playHit, playBodyFall, playPlayerHit, playHitFile, playGet, playFx, playWeapon,
         startServiceBeacon, stopServiceBeacon, updateBeaconSpatial,
         mineSfx, setCave, setMusicOverride, setPointLoops, updatePointLoops,
-        calcRelativePanAndFront,
+        calcRelativePanAndFront, spatial,
         volumeTick, duck, setMenuDuck, playSet, previewVol,
         getVol: (k) => vol[k],
         setVol: (k, v) => { if (!(k in vol)) return 0; vol[k] = clampVol(v); saveVol(); syncVolumes(); return vol[k]; },
@@ -2199,7 +2203,7 @@
                 a.nextCryAt = now + (ANIMAL_CRY_GAP[a.typeId] || 4000) * (0.7 + Math.random() * 0.6);
               }
             } else if (idx === 0) {
-              const panInfo = AudioSys.calcRelativePanAndFront(a.x - state.x, a.y - state.y, state.dir);
+              const panInfo = AudioSys.spatial(a.x - state.x, a.y - state.y);
               AudioSys.playAnimalCry(a.typeId, panInfo.pan, d, panInfo.isBehind);
             }
           });
@@ -2340,12 +2344,21 @@
         return;
       }
 
-      const info = AudioSys.calcRelativePanAndFront(dx, dy, state.dir);
+      const info = AudioSys.spatial(dx, dy);
       const mode = info.isDeadAhead ? 'ahead2' : (info.isFront ? 'front' : 'back');
       AudioSys.playRadarPing(info.pan, mode);
+      radarLast = { at: Date.now(), x: state.x, y: state.y, f: state.zoneId };
 
       const interval = Math.max(280, Math.min(1300, Math.round(280 + dist * 9)));
       radarTimer = setTimeout(scheduleRadar, interval);
+    }
+
+    let radarLast = { at: 0, x: 0, y: 0, f: '' };
+    function radarNudge() {
+      if (!radarTimer || !state.trackingId || state.screen !== 'game') return;
+      if (radarLast.x === state.x && radarLast.y === state.y && radarLast.f === state.zoneId) return;
+      if (Date.now() - radarLast.at < 300) return;
+      scheduleRadar();
     }
 
     function stopRadarTimer() {
@@ -2396,7 +2409,7 @@
     function stepByArrow(key, isRunning) {
       // ลูกศรบอกทิศโดยตรง ไม่ต้องหันตัว: ตัวละครหันไปทางลูกศรที่กด แล้วโจมตีไปทางนั้น
       const moveDir = { ArrowUp: 0, ArrowRight: 2, ArrowDown: 4, ArrowLeft: 6 }[key] ?? state.dir;
-      let bumpPan = 0;
+      let bumpPan = AUDIO_OPTS.absolute ? ({ ArrowRight: 0.6, ArrowLeft: -0.6 }[key] || 0) : 0;   // ชนกำแพง: ดังไปทางที่เดิน
       if (moveDir !== state.dir) { state.dir = moveDir; unsavedDirty = true; AudioSys.playSound('turn'); AudioSys.updateBeaconSpatial(); }
 
       const v = DIRS[moveDir];
@@ -2597,6 +2610,13 @@
       }, 1000);
     }
 
+    // ทิศของเสียงเหวี่ยงอาวุธ/หมัด: ไปทางที่ตัวละครหันโจมตี เอียงเล็กน้อยตามหมัดซ้ายขวา
+    function swingDir(lean) {
+      const v = DIRS[state.dir];
+      if (!AUDIO_OPTS.absolute) return { dx: lean, dy: 1 };
+      return { dx: v.dx * 0.8 + lean, dy: v.dy * 0.8 + (v.dx && !v.dy ? 0.35 : 0) };
+    }
+
     function attackAction() {
       if (Mine.isMineZone(state.zoneId) && Mine.tryMine()) return;   // หันหน้าเข้าจุดแร่ = ฟาดจอบขุดแร่
       if (Town.onCtrlPre()) return;   // ในเมือง: ตกปลา หั่นผัก
@@ -2612,7 +2632,7 @@
         const item = ITEMS[wId];
         range = item.range || 2;
         if (ws.swingFile && AudioSys.playWeapon(item.id)) { /* เสียงฟันจากไฟล์เดิม */ }
-        else if (AudioSys.playSet(ws.set, 'fire', { rate: ws.rate })) { /* เสียงเหวี่ยง/ฟันจากชุดเสียงอาวุธ */ }
+        else if (AudioSys.playSet(ws.set, 'fire', Object.assign({ rate: ws.rate }, swingDir(0)))) { /* เสียงเหวี่ยง/ฟันจากชุดเสียงอาวุธ ดังไปทางที่ฟัน */ }
         else if (AudioSys.playWeapon(item.id)) { /* เสียงอาวุธจากไฟล์ */ }
         else if (item.isShortswordFile) AudioSys.playSound('shortsword_file');
         else if (item.style === 'swing') AudioSys.playSound('swing');
@@ -2620,7 +2640,8 @@
         else AudioSys.playSound('slash');
       } else {
         state.punchHand = 1 - state.punchHand;   // ต่อยสลับหมัดซ้ายขวา เสียงเอียงไปข้างนั้นเล็กน้อย
-        if (!AudioSys.playSet('fist', 'fire', { dx: state.punchHand ? 0.35 : -0.35, dy: 1 })) AudioSys.playSound('punch');
+        const fv = swingDir(state.punchHand ? 0.18 : -0.18);
+        if (!AudioSys.playSet('fist', 'fire', fv)) AudioSys.playSound('punch');
       }
 
       if (Mine.isMineZone(state.zoneId)) {
@@ -3600,12 +3621,19 @@
       { k: 'amb', name: 'เสียงบรรยากาศ (ลม ฝน ฟ้าร้อง น้ำ คบเพลิง เสียงประจำสถานที่)' },
       { k: 'fx', name: 'เสียงเดิน เสียงสัตว์ และเสียงนำทาง' },
       { k: 'ui', name: 'เสียงต่อสู้ เอฟเฟกต์ และเมนู' },
+      { k: 'frame', name: 'เสียงรอบทิศ' },
       { k: 'reset', name: 'คืนค่าเริ่มต้นทั้งหมด' },
       { k: 'close', name: 'กลับ' }
     ];
     let soundIdx = 0, soundReturn = 'main_menu';
-    const isVolItem = (it) => !['reset', 'close'].includes(it.k);
-    function soundLabel(i) { const it = SOUND_ITEMS[i]; return isVolItem(it) ? `${it.name} ${AudioSys.getVol(it.k)}%` : it.name; }
+    const isVolItem = (it) => !['reset', 'close', 'frame'].includes(it.k);
+    const frameText = () => AUDIO_OPTS.absolute ? 'ตามแผนที่ ทิศเหนืออยู่ข้างหน้า ตะวันออกขวา ตะวันตกซ้าย ใต้ข้างหลัง' : 'หมุนตามทิศที่ตัวละครหัน';
+    function soundLabel(i) { const it = SOUND_ITEMS[i]; if (it.k === 'frame') return `${it.name}: ${frameText()}, ซ้ายขวาเพื่อเปลี่ยน`; return isVolItem(it) ? `${it.name} ${AudioSys.getVol(it.k)}%` : it.name; }
+    function toggleFrame() {
+      AUDIO_OPTS.absolute = !AUDIO_OPTS.absolute;
+      try { localStorage.setItem('starter-town-frame-v1', AUDIO_OPTS.absolute ? 'absolute' : 'relative'); } catch {}
+      AudioSys.playSound(AUDIO_OPTS.absolute ? 'toggle_on' : 'toggle_off'); AudioSys.updateBeaconSpatial(); renderAll(); speak(soundLabel(soundIdx));
+    }
     function openSoundSettings(from) {
       soundReturn = from; soundIdx = 0;
       if (from === 'game') { state.menuStack = []; AudioSys.setMenuDuck(false); stopRunning(); stopRadarTimer(); }
@@ -3633,6 +3661,7 @@
       }
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         e.preventDefault();
+        if (it.k === 'frame') { toggleFrame(); return; }
         if (!isVolItem(it)) return;
         const step = (e.shiftKey ? 1 : 5) * (e.key === 'ArrowRight' ? 1 : -1);
         const before = AudioSys.getVol(it.k), v = AudioSys.setVol(it.k, before + step);
@@ -3653,6 +3682,7 @@
         e.preventDefault();
         if (e.repeat) return;
         if (it.k === 'close') { closeSoundSettings(); return; }
+        if (it.k === 'frame') { toggleFrame(); return; }
         if (it.k === 'reset') { AudioSys.resetVol(); AudioSys.playSound('confirm'); renderAll(); speak('คืนค่าเสียงเริ่มต้นแล้ว, ดนตรีและเสียงรวม 100%, หมวดอื่น 60%'); return; }
         AudioSys.previewVol(it.k); speak(soundLabel(soundIdx));
         return;
@@ -3801,6 +3831,7 @@
       }
       renderMinimap();
       if (typeof Mobile !== 'undefined') Mobile.refresh();   // ปุ่มบนจอตามสถานการณ์
+      radarNudge();   // ย้ายตำแหน่งแล้ว เรดาร์ชี้ทิศใหม่ทันที
     }
 
     function renderMinimap() {
@@ -7331,6 +7362,7 @@
         }
       }
       function relWord(dx, dy) {
+        if (AUDIO_OPTS.absolute) { let ang = Math.atan2(dx, dy) * 180 / Math.PI; if (ang < 0) ang += 360; return `ทางทิศ${DIRS[Math.round(ang / 45) % 8].name}`; }   // เสียงตามแผนที่: บอกเป็นทิศ
         const p = AudioSys.calcRelativePanAndFront(dx, dy, state.dir);
         if (p.diffDeg <= 45) return 'ข้างหน้า'; if (p.diffDeg >= 135) return 'ข้างหลัง'; return p.pan < 0 ? 'ทางซ้าย' : 'ทางขวา';
       }
@@ -8405,5 +8437,5 @@
       speak('หน้าเมนูหลัก, เริ่มเกม');
     });
   </script>
-
-
+</body>
+</html>
