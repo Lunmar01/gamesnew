@@ -521,13 +521,27 @@
     // set = ชุดเสียง (fire = เหวี่ยง/ฟัน, hit = โดนเป้า, draw = ชักอาวุธตอนสวม) · rate = ความเร็วเล่น · cd = เวลารอระหว่างการโจมตี (มิลลิวินาที)
     // swingFile = ใช้เสียงฟันจากไฟล์ WEAPON_SOUND เดิม แล้วใช้ชุดเสียงนี้ตอนโดนเป้าและตอนชักอาวุธ
     const WEAPON_SET = {
-      wood_sword: { set: 'club', rate: 1, cd: 800 },
-      iron_knife: { set: 'knife', rate: 1.1, cd: 600 },
-      iron_dagger: { set: 'knife', rate: 1, cd: 650 },
-      iron_axe: { set: 'bat', rate: 1, cd: 950 },
-      iron_shortsword: { set: 'knife', rate: 0.88, cd: 750, swingFile: true }
+      // ไม้: ไม้กระทบไม้
+      wood_sword:      { set: 'club',   rate: 1,    hit: 'club',   hitRate: 1,    draw: 'club',   cd: 800 },
+      // มีด กริช: ฟันเร็ว เสียงคมบาง
+      iron_knife:      { set: 'knife',  rate: 1.15, hit: 'knife',  hitRate: 1.1,  draw: 'knife',  cd: 600 },
+      iron_dagger:     { set: 'knife',  rate: 1,    hit: 'knife',  hitRate: 1,    layer: ['bat', 1.3, 0.25],  draw: 'knife', drawRate: 0.95, cd: 650 },
+      // ดาบ: เสียงฟันดาบเต็มวง + เสียงใบมีดเฉือน + เสียงโลหะกังวาน ยิ่งดาบหนักยิ่งทุ้ม ดาบเงินกังวานใส
+      iron_shortsword: { set: 'knife',  fireFile: 'wpn_shortsword', mix: 'iron_shortsword', rate: 1,    hit: 'knife', hitRate: 0.9,  layer: ['bat', 1.1, 0.35],  draw: 'knife', drawRate: 0.85, cd: 750 },
+      bronze_sword:    { set: 'knife',  fireFile: 'wpn_shortsword', mix: 'iron_shortsword', rate: 0.95, hit: 'knife', hitRate: 0.85, layer: ['bat', 0.95, 0.4], draw: 'knife', drawRate: 0.8,  cd: 780 },
+      iron_sword:      { set: 'knife',  fireFile: 'wpn_shortsword', mix: 'iron_shortsword', rate: 0.88, hit: 'knife', hitRate: 0.8,  layer: ['bat', 0.85, 0.45], draw: 'knife', drawRate: 0.75, cd: 800 },
+      silver_sword:    { set: 'knife',  fireFile: 'wpn_shortsword', mix: 'iron_shortsword', rate: 1.06, hit: 'knife', hitRate: 0.95, layer: ['bat', 1.25, 0.5],  draw: 'knife', drawRate: 0.9,  cd: 780 },
+      // ขวาน: เหวี่ยงหนัก + สับลงทุ้ม (ค้อน) + คมขวานเฉือน (มีดช้า)
+      iron_axe:        { set: 'bat',    fireFile: 'wpn_axe', mix: 'iron_axe', rate: 1,    hit: 'hammer', hitRate: 1.15, layer: ['knife', 0.7, 0.5],  draw: 'bat', cd: 950 },
+      bronze_axe:      { set: 'bat',    fireFile: 'wpn_axe', mix: 'iron_axe', rate: 0.95, hit: 'hammer', hitRate: 1.1,  layer: ['knife', 0.7, 0.5],  draw: 'bat', cd: 950 },
+      dw_iron_axe:     { set: 'bat',    fireFile: 'wpn_axe', mix: 'iron_axe', rate: 0.88, hit: 'hammer', hitRate: 1,    layer: ['knife', 0.65, 0.55], draw: 'bat', drawRate: 0.9, cd: 980 },
+      // ค้อน: เหวี่ยงลมหนัก ทุบทุ้ม ค้อนเงินมีเสียงโลหะกังวาน ค้อนคริสตัลมีเสียงระฆังคริสตัล
+      bronze_hammer:   { set: 'hammer', rate: 1.05, hit: 'hammer', hitRate: 1.05, draw: 'hammer', cd: 1000 },
+      iron_warhammer:  { set: 'hammer', rate: 0.92, hit: 'hammer', hitRate: 0.92, layer: ['boot', 0.8, 0.4], draw: 'hammer', drawRate: 0.9, cd: 1050 },
+      silver_hammer:   { set: 'hammer', rate: 1,    hit: 'hammer', hitRate: 1,    layer: ['bat', 1.3, 0.35], draw: 'hammer', cd: 1000 },
+      crystal_hammer:  { set: 'hammer', rate: 0.88, hit: 'hammer', hitRate: 0.88, extra: 'crystal_bells', draw: 'hammer', drawRate: 0.85, cd: 1050 }
     };
-    const FIST_SET = { set: 'fist', rate: 1, cd: 450 };
+    const FIST_SET = { set: 'fist', rate: 1, hit: 'fist', draw: 'fist', cd: 450 };
     // เสียงกระแทกตัวละครเมื่อถูกมอนสเตอร์โจมตี [ชุดเสียง, ความเร็ว, ความดัง] (ไม่ระบุ = เสียงกัด/ข่วนเนื้อเดิม)
     const MONSTER_IMPACT = {
       rabbit: ['fist', 1.4, 0.5], deer: ['feat', 1, 0.9], mountain_goat: ['boot', 0.85, 1], cliff_eagle: ['knife', 1.2, 0.7], cave_bat: ['knife', 1.4, 0.5],
@@ -1209,6 +1223,19 @@
         src.start(ctx.currentTime + 0.003 + delay);
         return true;
       }
+      // เสียงฟันจากไฟล์ (ดาบ ขวาน) ดังจากทิศที่ฟัน · mix = ชื่ออาวุธที่ใช้ระดับความดังของไฟล์นั้น
+      function playWeaponFile(name, { rate = 1, mix = null, dx = 0, dy = 0, gain = 1 } = {}) {
+        if (!init()) return false;
+        const buf = fxBufs[name];
+        if (!buf) return false;
+        const src = ctx.createBufferSource(), g = ctx.createGain();
+        src.buffer = buf; src.playbackRate.value = rate * (0.97 + Math.random() * 0.06);
+        g.gain.value = FX_FILE_GAIN * mixOf('fx', name) * (mix ? mixOf('weapon', mix) : 1) * gain;
+        let node = src.connect(g);
+        if ((dx || dy) && ctx.createStereoPanner) { const p = ctx.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, spatial(dx, dy).pan * 0.85)); node = node.connect(p); }
+        node.connect(uiGain); src.start(ctx.currentTime + 0.003);
+        return true;
+      }
       // เสียงฟัน/เหวี่ยงอาวุธตามชนิดอาวุธที่ถืออยู่
       function playWeapon(itemId) {
         const w = WEAPON_SOUND[itemId];
@@ -1274,7 +1301,11 @@
         const ok = playHitFile('hit_' + mat, { dx, dy, rate: mat === 'flesh' && animalType === 'wolf' ? 0.9 : 1, gain: 0.75 });
         // ชั้นเสียงอาวุธโดนเป้า จากชุดเสียงของอาวุธนั้น (มีด ค้อน ไม้ หมัด) ถ้าไม่มีใช้เสียงเดิม
         const ws = weaponId ? WEAPON_SET[weaponId] : FIST_SET;
-        const setOk = !!ws && playSet(ws.set, 'hit', { dx, dy, rate: ws.rate, delay: 0.005 });
+        const setOk = !!ws && playSet(ws.hit || ws.set, 'hit', { dx, dy, rate: ws.hitRate || ws.rate, delay: 0.005 });
+        if (ws && ws.layer) playSet(ws.layer[0], 'hit', { dx, dy, rate: ws.layer[1], gain: ws.layer[2], delay: 0.012 });
+        if (ws && ws.extra) mineSfx(ws.extra, { dx, dy, gain: 0.35, delay: 0.03 });
+        const wi = weaponId && ITEMS[weaponId];
+        if (mat === 'shell' && wi && wi.material === 'iron') mineSfx('clang', { dx, dy, gain: 0.3, delay: 0.02, rate: 1.15 });   // ใบมีดกระทบเปลือกแข็ง (แมลง แมงมุม โกเลม ภูต)
         if (!setOk) {
           const w = weaponId && ITEMS[weaponId];
           if (w && w.material === 'iron') playHitFile('hit_slice', { dx, dy, gain: 0.7, delay: 0.01 });
@@ -1937,7 +1968,7 @@
         playStep, playSound, playRadarPing, playAnimalCry, playAnimalFile, hasAnimalFiles, playMonsterStep, playHit, playBodyFall, playPlayerHit, playHitFile, playGet, playFx, playWeapon,
         startServiceBeacon, stopServiceBeacon, updateBeaconSpatial,
         mineSfx, setCave, setMusicOverride, setPointLoops, updatePointLoops,
-        calcRelativePanAndFront, spatial,
+        calcRelativePanAndFront, spatial, playWeaponFile,
         volumeTick, duck, setMenuDuck, playSet, previewVol,
         getVol: (k) => vol[k],
         setVol: (k, v) => { if (!(k in vol)) return 0; vol[k] = clampVol(v); saveVol(); syncVolumes(); return vol[k]; },
@@ -2631,7 +2662,7 @@
       if (wId) {
         const item = ITEMS[wId];
         range = item.range || 2;
-        if (ws.swingFile && AudioSys.playWeapon(item.id)) { /* เสียงฟันจากไฟล์เดิม */ }
+        if (ws.fireFile && AudioSys.playWeaponFile(ws.fireFile, Object.assign({ rate: ws.rate, mix: ws.mix }, swingDir(0)))) { /* เสียงฟันดาบ/ขวานจากไฟล์ ดังไปทางที่ฟัน */ }
         else if (AudioSys.playSet(ws.set, 'fire', Object.assign({ rate: ws.rate }, swingDir(0)))) { /* เสียงเหวี่ยง/ฟันจากชุดเสียงอาวุธ ดังไปทางที่ฟัน */ }
         else if (AudioSys.playWeapon(item.id)) { /* เสียงอาวุธจากไฟล์ */ }
         else if (item.isShortswordFile) AudioSys.playSound('shortsword_file');
@@ -3051,7 +3082,8 @@
       if (oldId) { addInv(oldId, 1); note = `, ถอด${ITEMS[oldId].name}เข้ากระเป๋า` + note; }
       state.equipped[organId] = itemId;
       unsavedDirty = true;
-      if (!(it.cat === 'weapon' && WEAPON_SET[itemId] && AudioSys.playSet(WEAPON_SET[itemId].set, 'draw', {}))) AudioSys.playGet(itemId, 0, 'equip');   // สวมใส่: ชักอาวุธ / ชุดเกราะ / เครื่องประดับ
+      if (!(it.cat === 'weapon' && WEAPON_SET[itemId] && AudioSys.playSet(WEAPON_SET[itemId].draw || WEAPON_SET[itemId].set, 'draw', { rate: WEAPON_SET[itemId].drawRate || 1 }))) AudioSys.playGet(itemId, 0, 'equip');
+      if (it.cat === 'weapon' && WEAPON_SET[itemId] && WEAPON_SET[itemId].extra) AudioSys.mineSfx(WEAPON_SET[itemId].extra, { gain: 0.3, delay: 0.15 });   // สวมใส่: ชักอาวุธ / ชุดเกราะ / เครื่องประดับ
       const org = ORGANS.find(o => o.id === organId);
       const msg = `สวม${it.name}ที่${org.name}แล้ว${note}, พลังโจมตี ${getTotalAtk()}, พลังป้องกัน ${getTotalDef()}`;
       refreshBagMenu(msg, { kind: 'equipped', itemId, organId });
@@ -3063,7 +3095,7 @@
       state.equipped[organId] = null;
       addInv(itemId, 1);
       unsavedDirty = true;
-      if (!(WEAPON_SET[itemId] && AudioSys.playSet(WEAPON_SET[itemId].set, 'draw', { rate: 0.8, gain: 0.8 }))) AudioSys.playSound('equip');   // เก็บอาวุธ / ถอดชุด
+      if (!(WEAPON_SET[itemId] && AudioSys.playSet(WEAPON_SET[itemId].draw || WEAPON_SET[itemId].set, 'draw', { rate: 0.8 * (WEAPON_SET[itemId].drawRate || 1), gain: 0.8 }))) AudioSys.playSound('equip');   // เก็บอาวุธ / ถอดชุด
       const msg = `ถอด${ITEMS[itemId].name}แล้ว, พลังโจมตี ${getTotalAtk()}, พลังป้องกัน ${getTotalDef()}`;
       refreshBagMenu(msg, { kind: 'bag', itemId });
     }
@@ -3972,12 +4004,7 @@
         bronze_hammer: ['wpn_axe', 0.78], iron_warhammer: ['wpn_axe', 0.74], silver_hammer: ['wpn_axe', 0.8], crystal_hammer: ['wpn_axe', 0.7],
         bronze_axe: ['wpn_axe', 0.92], dw_iron_axe: ['wpn_axe', 0.88]
       });
-      // ชุดเสียงอาวุธของเหมือง: ดาบใช้เสียงฟันเดิม + เสียงมีดตอนโดน, ค้อนใช้ชุดค้อน, ขวานใช้ชุดไม้ (bat)
-      Object.assign(WEAPON_SET, {
-        bronze_sword: { set: 'knife', rate: 0.85, cd: 750, swingFile: true }, iron_sword: { set: 'knife', rate: 0.82, cd: 800, swingFile: true }, silver_sword: { set: 'knife', rate: 0.92, cd: 750, swingFile: true },
-        bronze_hammer: { set: 'hammer', rate: 1, cd: 1000 }, iron_warhammer: { set: 'hammer', rate: 0.92, cd: 1050 }, silver_hammer: { set: 'hammer', rate: 1.05, cd: 1000 }, crystal_hammer: { set: 'hammer', rate: 0.85, cd: 1000 },
-        bronze_axe: { set: 'bat', rate: 0.95, cd: 950 }, dw_iron_axe: { set: 'bat', rate: 0.9, cd: 950 }
-      });
+      // ชุดเสียงอาวุธของเหมือง (ดาบ ค้อน ขวาน) อยู่ใน WEAPON_SET ของเกมหลักแล้ว
       Object.assign(MIX.weapon, { bronze_sword: 0.589, iron_sword: 0.589, silver_sword: 0.589, bronze_hammer: 0.55, iron_warhammer: 0.55, silver_hammer: 0.55, crystal_hammer: 0.6, bronze_axe: 0.484, dw_iron_axe: 0.484 });
       BAG_CATS.push({ id: 'tool', name: 'เครื่องมือขุดแร่' }, { id: 'ore', name: 'แร่และวัตถุดิบเหมือง' });
       ORGANS.push({ id: 'brooch', name: 'เข็มกลัดที่หน้าอก', accept: 'brooch' });
@@ -7318,7 +7345,7 @@
         targets.forEach(o => { const dx = o.x - state.x, dy = o.y - state.y, d = Math.max(Math.abs(dx), Math.abs(dy)); if (d <= range && d < bd && (d === 0 || AudioSys.calcRelativePanAndFront(dx, dy, state.dir).diffDeg <= 45)) { bd = d; best = o; } });
         if (!best) return;
         const w = getEquippedWeaponSlot(), ws = w ? (WEAPON_SET[state.equipped[w]] || FIST_SET) : FIST_SET;
-        setTimeout(() => AudioSys.playSet(ws.set, 'hit', { ...rel(best.x, best.y), rate: ws.rate }) || AudioSys.playSound('hit_enemy'), 60);
+        setTimeout(() => { AudioSys.playSet(ws.hit || ws.set, 'hit', { ...rel(best.x, best.y), rate: ws.hitRate || ws.rate }) || AudioSys.playSound('hit_enemy'); if (ws.layer) AudioSys.playSet(ws.layer[0], 'hit', { ...rel(best.x, best.y), rate: ws.layer[1], gain: ws.layer[2] }); }, 60);
         if (train.n === 1) {
           train.hp[best.id]--;
           if (train.hp[best.id] <= 0) { setTimeout(() => AudioSys.playHitFile('fall_dirt', rel(best.x, best.y)), 400); const left = DUMMIES.filter(o => train.hp[o.id] > 0).length; speak(left ? `หุ่นไม้ล้มแล้ว เหลืออีก ${left} ตัว` : 'หุ่นไม้ล้มครบ 3 ตัว'); if (!left) passTraining(); }
