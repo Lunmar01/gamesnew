@@ -135,7 +135,9 @@
           <tbody>
             <tr><td>ลูกศร ขึ้น / ลง / ซ้าย / ขวา</td><td>เดินไปทิศเหนือ / ใต้ / ตะวันตก / ตะวันออก ตัวละครหันตามลูกศรทันที และโจมตีไปทางนั้น (กดค้างเพื่อวิ่ง)</td></tr>
             <tr><td>W / C</td><td>บอกทิศและตำแหน่ง / บอกพิกัดตัวเลข</td></tr>
-            <tr><td>Spacebar / Ctrl ซ้าย</td><td>กระโดด (1 วินาที) / โจมตี</td></tr>
+            <tr><td>Spacebar / Ctrl ซ้าย</td><td>กระโดด (1 วินาที) / โจมตีไปทางที่หัน</td></tr>
+            <tr><td>Shift+ลูกศร / Q E / T</td><td>หันโดยไม่เดิน (กด 2 ลูกศรติดกัน = หันเฉียง) / หันซ้ายขวาทีละ 45 องศา / หันเข้าหามอนสเตอร์ที่ใกล้ที่สุด กดซ้ำเปลี่ยนเป้า</td></tr>
+            <tr><td>ท่าต่อสู้</td><td>มีมอนสเตอร์ไล่มาใกล้ 8 ก้าว: ชักอาวุธ หันเข้าหาให้ แล้วล็อกทิศที่หัน ลูกศรเป็นการก้าวข้าง/ถอยโดยไม่หัน พ้นการต่อสู้ 4 วินาทีเก็บอาวุธ</td></tr>
             <tr><td>Enter</td><td>เข้า-ออกอาคาร, ซื้อขาย, รับไอเทมเริ่มต้น</td></tr>
             <tr><td>I / G / Z / H / L</td><td>กระเป๋า / เงิน / ของที่สวม / เลือดและพลัง / เลเวลและ EXP</td></tr>
           </tbody>
@@ -159,11 +161,11 @@
   </div>
 
   <script>window.__lfLoad=function(p){var e=document.getElementById("sr1");if(!e)return;e.textContent="";setTimeout(function(){e.textContent=p>0?"กำลังโหลดเกม "+p+" เปอร์เซ็นต์":"กำลังโหลดเกม ไฟล์ใหญ่ประมาณ 20 เมกะไบต์ กรุณารอสักครู่"},30)};__lfLoad(0);</script>
-<script src="data-music.js?v=1"></script>
+<script src="data-music.js?v=2"></script>
 <script>__lfLoad(25)</script>
-<script src="data-music2.js?v=1"></script>
+<script src="data-music2.js?v=2"></script>
 <script>__lfLoad(50)</script>
-<script src="data-sfx.js?v=1"></script>
+<script src="data-sfx.js?v=2"></script>
 <script>__lfLoad(75)</script>
 <script>
     // ==================== CONSTANTS ====================
@@ -2470,11 +2472,13 @@
       speak(announceMsg);
     }
 
-    function stepByArrow(key, isRunning) {
+    // ลูกศร: ในท่าต่อสู้ทิศที่หันถูกล็อก (เดินแล้วคืนทิศเดิม ชนแล้วหันเข้าหา) นอกท่าต่อสู้หันตามทางเดินเหมือนเดิม
+    function stepByArrow(key, isRunning) { Gear.wrapStep(stepByArrowInner, key, isRunning); }
+    function stepByArrowInner(key, isRunning) {
       // ลูกศรบอกทิศโดยตรง ไม่ต้องหันตัว: ตัวละครหันไปทางลูกศรที่กด แล้วโจมตีไปทางนั้น
       const moveDir = { ArrowUp: 0, ArrowRight: 2, ArrowDown: 4, ArrowLeft: 6 }[key] ?? state.dir;
       let bumpPan = AUDIO_OPTS.absolute ? ({ ArrowRight: 0.6, ArrowLeft: -0.6 }[key] || 0) : 0;   // ชนกำแพง: ดังไปทางที่เดิน
-      if (moveDir !== state.dir) { state.dir = moveDir; unsavedDirty = true; AudioSys.playSound('turn'); AudioSys.updateBeaconSpatial(); }
+      if (moveDir !== state.dir) { state.dir = moveDir; unsavedDirty = true; if (!Gear.quietTurn()) AudioSys.playSound('turn'); AudioSys.updateBeaconSpatial(); }
 
       const v = DIRS[moveDir];
       const nx = state.x + v.dx;
@@ -2678,6 +2682,7 @@
     function attackAction() {
       if (Mine.isMineZone(state.zoneId) && Mine.tryMine()) return;   // หันหน้าเข้าจุดแร่ = ฟาดจอบขุดแร่
       if (Town.onCtrlPre()) return;   // ในเมือง: ตกปลา หั่นผัก
+      Gear.engage('attack');   // ตีครั้งแรก = เข้าท่าต่อสู้
       const wSlot = getEquippedWeaponSlot();
       let range = 1;
       // ความเร็วการโจมตีตามอาวุธ: มีด 0.6 วินาที, ดาบ 0.75–0.8, ขวาน 0.95, ค้อน 1 วินาที, หมัด 0.45 วินาที
@@ -3392,6 +3397,7 @@
         'W: บอกทิศที่หันอยู่และตำแหน่งในแผนที่',
         'C: บอกพิกัดตัวเลข',
         'Spacebar: กระโดด',
+        'ท่าต่อสู้: มีมอนสเตอร์ไล่มาใกล้ 8 ก้าว เกมชักอาวุธ หันเข้าหาให้ แล้วล็อกทิศที่หัน ลูกศรซ้ายขวาเป็นการก้าวข้างโดยไม่หัน ตียังไปข้างหน้า, Shift กับลูกศร หันโดยไม่เดิน, Q และ E หันทีละ 45 องศา, T หันเข้าหามอนสเตอร์ที่ใกล้ที่สุด กดซ้ำเปลี่ยนเป้า',
         'Ctrl ซ้าย: โจมตีไปทางที่หันอยู่ ตีโดนเฉพาะข้างหน้าและเฉียงหน้า ซ้ายขวาตรงๆ และข้างหลังตีไม่โดน, หมัด มีด กริช ดาบไม้ ระยะ 1 ก้าว, ดาบเหล็ก ระยะ 2 ก้าว, ขวานและค้อนตีกวาดได้ถึง 3 ตัว ค้อนทำให้เซ, หนังสติ๊ก 4 ก้าว ธนู 6 ก้าว ยิงตรงแนวเดียว',
         'R: ฟังมอนสเตอร์รอบตัวในป่า 12 ก้าว, ฟังสิ่งรอบตัวในเหมือง, ในเมืองบอก NPC จุดงาน และประตูอาคารในระยะ 15 ก้าว',
         'Ctrl ซ้ายในเมือง: ยืนริมสระหันหน้าเข้าน้ำเพื่อตกปลา, ในโรงครัวใช้หั่นผัก, ในลานฝึกใช้ตีหุ่นฝึก',
@@ -3429,13 +3435,13 @@
 
     function speakDirectionAndZone() {
       if (state.zoneId === 'city') {
-        speak(`หันไปทิศ${DIRS[state.dir].name}, อยู่${getTownZoneName(state.x, state.y)}`);
+        speak(`หันไปทิศ${DIRS[state.dir].name}${Gear.stanceText()}, อยู่${getTownZoneName(state.x, state.y)}`);
       } else if (Mine.isMineZone(state.zoneId)) {
         const z = ZONES[state.zoneId];
-        speak(`หันไปทิศ${DIRS[state.dir].name}, อยู่ใน${z.name}, ${Mine.subName()}, ภูมิประเทศ${z.terrain}, ${z.weather}`);
+        speak(`หันไปทิศ${DIRS[state.dir].name}${Gear.stanceText()}, อยู่ใน${z.name}, ${Mine.subName()}, ภูมิประเทศ${z.terrain}, ${z.weather}`);
       } else {
         const z = ZONES[state.zoneId];
-        speak(`หันไปทิศ${DIRS[state.dir].name}, อยู่ใน${z.name} (${getTownZoneName(state.x, state.y)}), ภูมิประเทศ${z.terrain}, สภาพอากาศ${z.weather}`);
+        speak(`หันไปทิศ${DIRS[state.dir].name}${Gear.stanceText()}, อยู่ใน${z.name} (${getTownZoneName(state.x, state.y)}), ภูมิประเทศ${z.terrain}, สภาพอากาศ${z.weather}`);
       }
     }
 
@@ -7664,6 +7670,7 @@
       function atkBonus() { const b = state.town && state.town.buffs; return b && b.atkUntil > Date.now() ? (b.atk || 0) : 0; }
       function defBonus() { const b = state.town && state.town.buffs; return b && b.defUntil > Date.now() ? (b.def || 0) : 0; }
       function onPlayerHurt() {
+        Gear.engage('hurt');   // ถูกมอนสเตอร์ตี = เข้าท่าต่อสู้
         if (castUntil) { castUntil = 0; sfx('potion_break', { gain: 0.6 }); speak('โดนโจมตี การร่ายคัมภีร์กลับเมืองถูกยกเลิก'); }
         const c = state.town && state.town.companion;
         if (c && c.until > Date.now() && c.hp > 0 && ['north_zone', 'east_zone', 'west_zone', 'south_zone'].includes(state.zoneId)) { c.hp -= 10; if (c.hp <= 0) { c.until = 0; speak('พี่เอกบาดเจ็บ ถอยกลับไปรอที่ลานฝึกซ้อมแล้ว'); } }
@@ -7776,6 +7783,7 @@
           const far = cands.some(c => { const g = geom(c.dx, c.dy); return g.dot > 0 && g.d > lim && g.d <= Math.max(4, lim + 2) && g.s <= (sp.line ? 0 : 1); });
           if (far) msgs.push('ไกลเกินไป');
         }
+        if (!msgs.length) { const h = aimHint(cands, sp); if (h) msgs.push(h); }
         if (msgs.length) speak(msgs.join(', '));
       }
       // เก็บข้อความที่เกิดระหว่างฟันหลายตัว แล้วพูดรวมครั้งเดียว
@@ -8190,12 +8198,132 @@
         }
         if (g.repelUntil && t >= g.repelUntil) { g.repelUntil = 0; speak('ฤทธิ์ผงไล่สัตว์หมดแล้ว มอนสเตอร์กลับมาไล่ได้ตามปกติ'); }
         const sm = checkSets(true); if (sm) speak(sm);
+        if (t - stanceAt >= 250) { stanceAt = t; stanceTick(t); }
       }
+      let stanceAt = 0;
       function onGameStart() {
         G(); applyAll(); lastSets = Object.keys(SETS).filter(setOn).join(',');
         const b = state.town && state.town.buffs; if (b && b.atk > 2) b.atk = b.atk >= 30 ? 2 : 1;   // เซฟเก่า: บัฟพลังโจมตี 30/15 เป็นแรงตี 2/1
         if (tickTimer) clearInterval(tickTimer);
         tickTimer = setInterval(() => { try { tick(); } catch (e) { console.error('gear tick', e); } }, 120);
+      }
+
+      // ==================== ท่าต่อสู้: แยกทิศที่เดินออกจากทิศที่หัน ====================
+      // นอกการต่อสู้ ลูกศรเดินแล้วหันตามทางเดิน · ในท่าต่อสู้ ทิศที่หันถูกล็อก ลูกศรเป็นการก้าว (ข้าง หน้า ถอย) ตีไปทางที่หันเสมอ
+      const ov = (k, d) => opt()[k] === undefined ? d : opt()[k];
+      const FACE_MODES = { combat: 'ล็อกเมื่อต่อสู้', always: 'ล็อกตลอด หันด้วยปุ่มหันเท่านั้น', free: 'หันตามทางเดิน แบบเดิม' };
+      let inCombat = false, quietSince = 0, lastInLine = '', aimHintAt = 0, tCycle = { at: 0, i: 0, key: '' };
+      const dirIndex = (dx, dy) => { let ang = Math.atan2(dx, dy) * 180 / Math.PI; if (ang < 0) ang += 360; return Math.round(ang / 45) % 8; };
+      function lockFacing() { const m = ov('face', 'combat'); return m === 'always' || (m === 'combat' && inCombat); }
+      function setFace(i, sound = true) { if (state.dir === i) return; state.dir = i; unsavedDirty = true; if (sound) AudioSys.playSound('turn'); AudioSys.updateBeaconSpatial(); }
+      const REL_ANY = (dx, dy) => { const rel = (dirIndex(dx, dy) * 45 - state.dir * 45 + 720) % 360; return ['ข้างหน้า', 'หน้าขวา', 'ทางขวา', 'หลังขวา', 'ข้างหลัง', 'หลังซ้าย', 'ทางซ้าย', 'หน้าซ้าย'][Math.round(rel / 45) % 8]; };
+      // มอนสเตอร์รอบตัว (ป่า เหมือง หุ่นที่ลานฝึก) ทิศเทียบผู้เล่น
+      function foes() {
+        if (Mine.isMineZone(state.zoneId)) return Mine.mobsRel().map(c => Object.assign({ threat: !!(c.o.alerted || c.o.provoked || c.o.active) }, c));
+        if (state.zoneId === 'city') {
+          const tr = Town.debug.train(); if (!tr || state.insideBuildingId) return [];
+          if (tr.n === 1) return Town.debug.DUMMIES.filter(o => tr.hp[o.id] > 0).map(o => ({ o, dx: o.x - state.x, dy: o.y - state.y, name: 'หุ่นไม้ฝึก', threat: true }));
+          if (tr.n === 3) return [{ o: tr, dx: tr.x - state.x, dy: tr.y - state.y, name: 'หุ่นเดินได้', threat: true }];
+          return [];
+        }
+        return (zoneAnimals[state.zoneId] || []).map(a => ({ o: a, dx: a.x - state.x, dy: a.y - state.y, snd: a.typeId, name: a.name, threat: !!(a.alerted || a.provoked || a.windAt) }));
+      }
+      const curWeapon = () => { const w = getEquippedWeaponSlot(); return w ? state.equipped[w] : null; };
+      function inReach(c) { return pick([c], spec(curWeapon()), () => false).length > 0; }
+      function drawSound(sheath) {
+        const w = curWeapon(), ws = w ? (WEAPON_SET[w] || FIST_SET) : FIST_SET;
+        if (sheath && ws.draw === 'sword') { sfx('sword_sheath', { gain: 0.8 }); return; }
+        AudioSys.playSet(ws.draw || ws.set, 'draw', { rate: (ws.drawRate || 1) * (sheath ? 0.85 : 1), gain: sheath ? 0.6 : 0.85 });
+      }
+      function enterCombat(why) {
+        if (inCombat) { quietSince = 0; return; }
+        inCombat = true; quietSince = 0; lastInLine = '';
+        if (ov('face', 'combat') === 'free') return;   // แบบเดิม: ไม่มีท่าต่อสู้ให้ล็อก
+        drawSound(false);
+        const list = foes().filter(c => cheb(c.dx, c.dy) <= 8).sort((p, q) => cheb(p.dx, p.dy) - cheb(q.dx, q.dy));
+        let msg = 'ท่าต่อสู้';
+        if (ov('autoFace', true) && list.length && why !== 'attack') { setFace(dirIndex(list[0].dx, list[0].dy), false); msg += `, หันเข้าหา${list[0].name}`; }
+        msg += `, หันหน้าทิศ${DIRS[state.dir].name}`;
+        setTimeout(() => speak(msg), why === 'hurt' ? 900 : 350);
+      }
+      function exitCombat() {
+        if (!inCombat) return;
+        inCombat = false; quietSince = 0;
+        if (ov('face', 'combat') === 'free') return;
+        drawSound(true); speak('เก็บอาวุธ');
+      }
+      function stanceTick(now) {
+        if (state.screen !== 'game') return;
+        const inTown = state.zoneId === 'city' && !Town.debug.train();
+        if (state.insideBuildingId || inTown) { if (inCombat) exitCombat(); return; }
+        const list = foes(), near8 = list.some(c => c.threat && cheb(c.dx, c.dy) <= 8), near10 = list.some(c => c.threat && cheb(c.dx, c.dy) <= 10);
+        if (!inCombat && near8) enterCombat('near');
+        else if (inCombat) {
+          if (near10) quietSince = 0;
+          else if (!quietSince) quietSince = now;
+          else if (now - quietSince >= 4000) exitCombat();
+        }
+        // เสียงติ๊กเมื่อมีเป้าเข้ามาอยู่ในแนวตี
+        if (inCombat && ov('lineTick', true)) {
+          const hit = pick(list, spec(curWeapon()), () => false)[0];
+          const key = hit ? `${hit.dx},${hit.dy},${state.dir}` : '';
+          if (key && key !== lastInLine) { const v = DIRS[state.dir]; sfx('tick', Object.assign({ gain: 0.35, rate: 1.6 }, AUDIO_OPTS.absolute ? { dx: v.dx, dy: v.dy } : { dx: 0, dy: 1 })); }
+          lastInLine = key;
+        }
+      }
+      // ช่วยเล็ง: ตีไม่มีเป้าข้างหน้า แต่มีมอนสเตอร์ในระยะอาวุธทางอื่น
+      const turnHow = () => (typeof Mobile !== 'undefined' && Mobile.active()) ? (Mobile.mode() === 'gesture' ? 'ปัด 3 นิ้วซ้าย' : 'กดปุ่มหันเข้าหาเป้า') : 'กด T';
+      function aimHint(cands, sp) {
+        if (Date.now() - aimHintAt < 4000) return '';
+        const reach = sp.line || sp.reach;
+        const c = cands.filter(o => cheb(o.dx, o.dy) <= Math.max(1, reach)).sort((p, q) => cheb(p.dx, p.dy) - cheb(q.dx, q.dy))[0];
+        if (!c) return '';
+        aimHintAt = Date.now();
+        return `${c.name || 'มอนสเตอร์'}อยู่${REL_ANY(c.dx, c.dy)}, ${turnHow()} เพื่อหันเข้าหา`;
+      }
+      // T: หันเข้าหาเป้า (กดซ้ำภายใน 3 วินาที = เป้าถัดไป)
+      function faceTarget() {
+        const list = foes().filter(c => cheb(c.dx, c.dy) <= 15 && cheb(c.dx, c.dy) > 0).sort((p, q) => cheb(p.dx, p.dy) - cheb(q.dx, q.dy));
+        if (!list.length) { AudioSys.playSound('menu_edge'); speak('ไม่มีมอนสเตอร์ในระยะ 15 ก้าว'); return; }
+        const now2 = Date.now();
+        tCycle.i = now2 - tCycle.at < 3000 ? (tCycle.i + 1) % list.length : 0; tCycle.at = now2;
+        const c = list[tCycle.i];
+        setFace(dirIndex(c.dx, c.dy));
+        if (!inCombat) { inCombat = true; quietSince = 0; if (ov('face', 'combat') !== 'free') drawSound(false); }
+        lastInLine = '';
+        speak(`หันเข้าหา${c.name} ทิศ${DIRS[state.dir].name} ${cheb(c.dx, c.dy)} ก้าว, ${inReach(c) ? 'ตีถึง' : 'ยังไกลเกินระยะ'}${list.length > 1 ? `, กดซ้ำเพื่อเปลี่ยนเป้า มี ${list.length} ตัว` : ''}`);
+      }
+      // Q / E: หันทีละ 45 องศา
+      function turn45(d) { setFace((state.dir + d + 8) % 8); lastInLine = ''; speak(`หันทิศ${DIRS[state.dir].name}`); }
+      // Shift + ลูกศร: หันโดยไม่เดิน (2 ปุ่มติดกันภายใน 0.3 วินาที = หันเฉียง)
+      const ARW = { ArrowUp: [0, 1], ArrowDown: [0, -1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
+      let lastShift = { key: '', at: 0 };
+      function shiftFace(key) {
+        const v = ARW[key]; if (!v) return;
+        let dx = v[0], dy = v[1];
+        const p = ARW[lastShift.key];
+        if (p && Date.now() - lastShift.at < 300 && (p[0] !== 0) !== (dx !== 0)) { dx += p[0]; dy += p[1]; }
+        lastShift = { key, at: Date.now() };
+        setFace(dirIndex(dx, dy)); lastInLine = '';
+        speak(`หันทิศ${DIRS[state.dir].name}`);
+      }
+      // ลูกศรตอนล็อกทิศ: เดินแล้วคืนทิศเดิม · ชนสิ่งกีดขวาง/มอนสเตอร์ = หันเข้าหาสิ่งนั้น
+      let quietTurn = false;
+      function wrapStep(inner, key, running) {
+        if (!lockFacing()) { inner(key, running); return; }
+        const d0 = state.dir, p0 = `${state.zoneId}|${state.insideBuildingId}|${state.x}|${state.y}`;
+        quietTurn = true;
+        try { inner(key, running); } finally { quietTurn = false; }
+        const moved = p0 !== `${state.zoneId}|${state.insideBuildingId}|${state.x}|${state.y}`;
+        if (moved) { if (state.dir !== d0) { state.dir = d0; AudioSys.updateBeaconSpatial(); } }
+        else if (state.dir !== d0) { AudioSys.playSound('turn'); lastInLine = ''; }   // ชนแล้วหันเข้าหา
+      }
+      const stanceText = () => inCombat && ov('face', 'combat') !== 'free' ? ', อยู่ในท่าต่อสู้ ทิศที่หันถูกล็อก' : '';
+      function engage(why) {
+        if (state.screen !== 'game') return;
+        if (why === 'hurt' && !foes().some(c => cheb(c.dx, c.dy) <= 3)) return;   // เจ็บจากแก๊ส ลาวา: ไม่เข้าท่า
+        if (state.zoneId === 'city' && !Town.debug.train()) return;
+        enterCombat(why);
       }
 
       // ---------- เมนู: สมุดของพิเศษ ตั้งค่าการต่อสู้ ----------
@@ -8216,6 +8344,10 @@
         const build = () => [
           { label: `บอก "ไกลเกินไป" เมื่อมอนสเตอร์อยู่ข้างหน้าแต่เกินระยะอาวุธ: ${opt().far ? 'เปิด' : 'ปิด'}`, action: () => { opt().far = !opt().far; unsavedDirty = true; AudioSys.playSound(opt().far ? 'toggle_on' : 'toggle_off'); rebuild(); } },
           { label: `ปุ่ม R บอกมอนสเตอร์: ${opt().hunter ? 'แบบนักล่า บอกชื่อ ทิศคร่าวๆ ใกล้ ปานกลาง ไกล' : 'แบบละเอียด บอกชื่อ ทิศ และระยะเป็นก้าว'}`, action: () => { opt().hunter = !opt().hunter; unsavedDirty = true; AudioSys.playSound(opt().hunter ? 'toggle_on' : 'toggle_off'); rebuild(); } },
+          { label: `ทิศที่หันตอนเดิน: ${FACE_MODES[ov('face', 'combat')]}`, action: () => { const ks = Object.keys(FACE_MODES); opt().face = ks[(ks.indexOf(ov('face', 'combat')) + 1) % ks.length]; unsavedDirty = true; AudioSys.playSound('menu_move'); rebuild(); } },
+          { label: `หันเข้าหามอนสเตอร์ให้เองตอนเข้าท่าต่อสู้: ${ov('autoFace', true) ? 'เปิด' : 'ปิด'}`, action: () => { opt().autoFace = !ov('autoFace', true); unsavedDirty = true; AudioSys.playSound(opt().autoFace ? 'toggle_on' : 'toggle_off'); rebuild(); } },
+          { label: `เสียงติ๊กเมื่อเป้าอยู่ในแนวตี: ${ov('lineTick', true) ? 'เปิด' : 'ปิด'}`, action: () => { opt().lineTick = !ov('lineTick', true); unsavedDirty = true; AudioSys.playSound(opt().lineTick ? 'toggle_on' : 'toggle_off'); rebuild(); } },
+          { label: 'ปุ่มหัน: Shift กับลูกศร หันโดยไม่เดิน กด 2 ลูกศรติดกันหันเฉียง, Q หันซ้าย E หันขวาทีละ 45 องศา, T หันเข้าหามอนสเตอร์ที่ใกล้ที่สุด กดซ้ำเปลี่ยนเป้า, มือถือ ปัด 3 นิ้วซ้ายหันเข้าหาเป้า แตะค้าง 1 นิ้วแล้วปัดเพื่อหัน', action: () => {} },
           { label: 'วิธีตี: ตีได้เฉพาะข้างหน้าและเฉียงหน้า ซ้ายขวาตรงๆ และข้างหลังตีไม่โดน ต้องหันเข้าหาก่อน, มีด กริช ดาบไม้ หมัด ระยะ 1 ก้าว, ดาบเหล็ก ระยะ 2 ก้าว, ขวานและค้อนตีกวาดได้ถึง 3 ตัว ค้อนทำให้เซ, หนังสติ๊กและธนูยิงตรงแนวเดียว', action: () => {} },
           { label: 'กลับ', action: () => popMenu() }
         ];
@@ -8228,11 +8360,12 @@
         spec, pick, miss, swing, hidden, notice, strike, curStrike, cheatDeath, reduce, repelOn, defBonus, expMul, dodgeMs, runMul, visBonus, stepGain,
         oreBonus, goldWin, biteMs, bigFishMul, safeNow, scanRange, hpTag, distText, scanForest, forestAttack, canFire, fireSound,
         openBox, onLevel, bossBox, onDailyBox, onBagActivate, dropGuard, onGameStart, openBook, openSettings, charItems, sageKill,
+        lockFacing, quietTurn: () => quietTurn, wrapStep, faceTarget, turn45, shiftFace, engage, stanceText, inCombat: () => inCombat, exitCombat,
         debug: { G, GI, SETS, SPEC, applyAll, setOn, geom, lastGot: () => lastGot, tick }
       };
     })();
 
-    const GAME_VERSION = {"build": 1, "name": "รุ่น 1.0", "date": "2026-11-23", "notes": ["เริ่มระบบแจ้งเตือนเมื่อเกมมีรุ่นใหม่", "โทรศัพท์: หน้าเลือกวิธีเล่น เล่นกับโปรแกรมอ่านหน้าจอหรือท่าทางนิ้ว และหน้าตรวจเสียง", "เสียงฟันดาบ ธนู หอก ชุดเกราะ และบรรยากาศใหม่จากชุด sounds1", "การต่อสู้ทิศเดียว อาวุธยิง บท 2 ดาบไม้ของเด็กๆ และของพิเศษ 27 ชนิดจากกล่องของขวัญ"]};
+    const GAME_VERSION = {"build": 2, "name": "รุ่น 1.1", "date": "2026-11-23", "notes": ["ท่าต่อสู้: มีมอนสเตอร์ไล่มาใกล้ เกมชักอาวุธ หันเข้าหาให้ แล้วล็อกทิศที่หัน กดซ้ายขวาเป็นการก้าวข้าง ตียังไปข้างหน้า", "ปุ่มหันใหม่: Shift กับลูกศร หันโดยไม่เดิน, Q และ E หันทีละ 45 องศา, T หันเข้าหามอนสเตอร์ที่ใกล้ที่สุด", "หันเฉียงได้ครบ 8 ทิศ และมีเสียงติ๊กเมื่อเป้าอยู่ในแนวตี", "มือถือ: ปัด 3 นิ้วซ้ายหันเข้าหาเป้า, แตะค้าง 1 นิ้วแล้วปัดเพื่อหัน, ปุ่มหันบนจอ"]};
     // ==================== แจ้งเตือนเมื่อเกมมีรุ่นใหม่ (version.json บน GitHub) ====================
     // เช็กทุก 3 นาที (และทันทีเมื่อกลับมาที่หน้าเกม) เจอรุ่นใหม่ รอจังหวะปลอดภัยแล้วแจ้ง ผู้เล่นเลือกโหลดเอง เกมบันทึกให้ก่อน
     const Updater = (() => {
@@ -8488,7 +8621,7 @@
         Enter: ['Enter', 'Enter'], Escape: ['Escape', 'Escape'], Space: [' ', 'Space'], Ctrl: ['Control', 'ControlLeft'], Backspace: ['Backspace', 'Backspace'],
         Home: ['Home', 'Home'], End: ['End', 'End'], Digit1: ['1', 'Digit1'], Digit2: ['2', 'Digit2']
       };
-      'RHIPWCAGZLSK'.split('').forEach(c => { KEYS['Key' + c] = [c.toLowerCase(), 'Key' + c]; });
+      'RHIPWCAGZLSKTQE'.split('').forEach(c => { KEYS['Key' + c] = [c.toLowerCase(), 'Key' + c]; });
       const ARROWS = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
       let held = null;
       function keyEv(type, name, shift = false) {
@@ -8528,7 +8661,8 @@
           if (kind === 'hold' && n === 2) return { key: 'Digit1' };
           if (kind === 'hold' && n === 3) return { key: 'Digit2' };
           if (kind === 'swipe' && n === 2) return { key: { up: 'KeyR', down: 'KeyH', left: 'KeyI', right: 'KeyP' }[dir] };
-          if (kind === 'swipe' && n === 3) return dir === 'right' ? { fn: openInfo } : { key: { up: 'KeyW', down: 'KeyC', left: 'KeyA' }[dir] };
+          if (kind === 'swipe' && n === 3) return dir === 'right' ? { fn: openInfo } : { key: { up: 'KeyW', down: 'KeyC', left: 'KeyT' }[dir] };   // ปัด 3 นิ้วซ้าย = หันเข้าหาเป้า
+          if (kind === 'holdswipe' && n === 1) return { key: DIRKEY[dir], shift: true };   // แตะค้างแล้วปัด = หันโดยไม่เดิน
           return null;
         }
         if (c === 'sound') {
@@ -8557,11 +8691,11 @@
       }
       const NUM = ['', '1 นิ้ว', '2 นิ้ว', '3 นิ้ว'];
       const DIRW = { up: 'ขึ้น', down: 'ลง', left: 'ซ้าย', right: 'ขวา' };
-      const gName = (g) => g.kind === 'swipe' ? `ปัด ${NUM[g.n]} ${DIRW[g.dir]}${g.long ? ' แล้วค้าง' : ''}` : (g.kind === 'tap' ? `แตะ ${NUM[g.n]}` : `แตะค้าง ${NUM[g.n]}`);
+      const gName = (g) => g.kind === 'holdswipe' ? `แตะค้าง 1 นิ้วแล้วปัด${DIRW[g.dir]}` : g.kind === 'swipe' ? `ปัด ${NUM[g.n]} ${DIRW[g.dir]}${g.long ? ' แล้วค้าง' : ''}` : (g.kind === 'tap' ? `แตะ ${NUM[g.n]}` : `แตะค้าง ${NUM[g.n]}`);
       const ACT_W = {
         'swipe1': 'เดินไปทิศนั้น ค้างนิ้วไว้เพื่อวิ่ง', 'tap1': 'โจมตี ขุดแร่ ตกปลา หรือเคาะผนังในเหมือง', 'tap2': 'กระโดด', 'tap3': 'เมนูเกม หรือย้อนกลับ', 'hold1': 'ใช้ คุย เข้าออกอาคาร เก็บของ',
         'hold2': 'ดื่มน้ำยาปุ่มลัด 1', 'hold3': 'ดื่มน้ำยาปุ่มลัด 2', 'swipe2up': 'ฟังสิ่งรอบตัว', 'swipe2down': 'บอกเลือดและพลัง', 'swipe2left': 'เปิดกระเป๋า', 'swipe2right': 'หน้าต่างสถานะ',
-        'swipe3up': 'บอกทิศและพื้นที่', 'swipe3down': 'บอกพิกัด', 'swipe3left': 'บอกสถานที่ที่กำลังแทร็ก', 'swipe3right': 'เมนูข้อมูลด่วน'
+        'swipe3up': 'บอกทิศและพื้นที่', 'swipe3down': 'บอกพิกัด', 'swipe3left': 'หันเข้าหามอนสเตอร์ที่ใกล้ที่สุด กดซ้ำเปลี่ยนเป้า', 'holdswipe1': 'หันไปทิศที่ปัดโดยไม่เดิน', 'swipe3right': 'เมนูข้อมูลด่วน'
       };
       const actWorld = (g) => ACT_W[`${g.kind}${g.n}${g.kind === 'swipe' && g.n > 1 ? g.dir : ''}`] || 'ยังไม่มีคำสั่ง';
 
@@ -8578,8 +8712,8 @@
         if (g.kind === 'swipe' && g.n === 1 && g.phase === 'end') return;   // จบการปัด (ใช้กับโหมดฝึก)
         const m = mapGesture(g, c);
         if (!m) { if (S.gsound) AudioSys.playSound('menu_edge'); return; }
-        if (S.gsound && (g.n > 1 || g.kind === 'hold')) AudioSys.mineSfx('tick', { gain: 0.35 });
-        if (g.kind === 'hold') buzz('hold');
+        if (S.gsound && (g.n > 1 || (g.kind === 'hold' && !g.quiet) || g.kind === 'holdswipe')) AudioSys.mineSfx('tick', { gain: 0.35 });
+        if (g.kind === 'hold' && !g.quiet) buzz('hold');
         if (m.fn) { m.fn(); return; }
         press(m.key, { at: g.at, shift: m.shift, hold: !!m.hold && c === 'world' });
       }
@@ -8611,6 +8745,7 @@
           return;
         }
         G.decided = 'hold';
+        if (G.maxN === 1 && (ctxName() === 'world' || ctxName() === 'gesture_practice')) { G.deferHold = true; G.hx = dx; G.hy = dy; buzz('hold'); if (S.gsound) AudioSys.mineSfx('tick', { gain: 0.35 }); return; }   // รอดูว่าจะปัดต่อ (หัน) หรือยกนิ้ว (ใช้)
         onGesture({ kind: 'hold', n: Math.min(3, G.maxN), at: Date.now() });
       }
       function tMove(e) {
@@ -8619,7 +8754,9 @@
         for (const t of e.changedTouches) { const p = G.pts.get(t.identifier); if (p) { p.x = t.clientX; p.y = t.clientY; } }
         if (G.ignored) return;
         const [dx, dy] = centroid(), px = SWIPE_PX[S.swipe] || 30;
-        if (!G.decided && Math.hypot(dx, dy) >= px) {
+        if (G.decided === 'hold' && G.deferHold && !G.turned && Math.hypot(dx - G.hx, dy - G.hy) >= px) {
+          G.turned = true; onGesture({ kind: 'holdswipe', n: 1, dir: dirOf(dx - G.hx, dy - G.hy), at: evNow(e) });
+        } else if (!G.decided && Math.hypot(dx, dy) >= px) {
           clearTimeout(G.hold);
           G.decided = 'swipe'; G.dir = dirOf(dx, dy); G.swAt = Date.now(); G.pivot = [dx, dy];
           onGesture({ kind: 'swipe', n: Math.min(3, G.maxN), dir: G.dir, at: evNow(e) });
@@ -8649,6 +8786,7 @@
         const g = G; G = null;
         if (g.ignored || g.decided === 'escape') return;
         if (!g.decided && g.h3) { onGesture({ kind: 'hold', n: 3, at: g.t0 }); return; }
+        if (g.decided === 'hold' && g.deferHold && !g.turned) { onGesture({ kind: 'hold', n: 1, at: now, quiet: true }); return; }
         if (!g.decided && now - g.t0 < Math.max(350, S.holdMs)) onGesture({ kind: 'tap', n: Math.min(3, g.maxN), at: g.t0 });
         if (g.decided === 'swipe') {
           if (g.maxN === 1 && ctxName() === 'gesture_practice') onGesture({ kind: 'swipe', n: 1, dir: g.dir, long: Date.now() - g.swAt > 500, phase: 'end', at: now });
@@ -8696,7 +8834,8 @@
       const WORLD_PAD = [
         ['เดินเหนือ', 'ArrowUp', 'mv'], ['เดินใต้', 'ArrowDown', 'mv'], ['เดินตะวันออก', 'ArrowRight', 'mv'],
         ['เดินตะวันตก', 'ArrowLeft', 'mv'], ['โจมตี', 'Ctrl', 'on'], ['ใช้ คุย เข้าออก', 'Enter', 'on'],
-        ['ฟังรอบตัว', 'KeyR'], ['กระเป๋า', 'KeyI'], ['เมนูเกม', 'Escape'],
+        ['หันเข้าหาเป้า', 'KeyT', 'on'], ['ฟังรอบตัว', 'KeyR'], ['กระเป๋า', 'KeyI'], ['เมนูเกม', 'Escape'],
+        ['หันซ้าย 45 องศา', 'KeyQ'], ['หันขวา 45 องศา', 'KeyE'],
         ['เดินเหนือ 5 ก้าว', 'walk5:ArrowUp', 'mv'], ['เดินใต้ 5 ก้าว', 'walk5:ArrowDown', 'mv'], ['เดินตะวันออก 5 ก้าว', 'walk5:ArrowRight', 'mv'],
         ['เดินตะวันตก 5 ก้าว', 'walk5:ArrowLeft', 'mv'], ['กระโดด', 'Space'], ['ข้อมูลด่วน', 'info'],
         ['น้ำยา', 'potion'], ['อ่านข้อความล่าสุดซ้ำ', 'repeat'], ['หน้าเลือกวิธีเล่น', 'start']
@@ -8923,7 +9062,7 @@
         ['swipe', 2, 'up', 'ปัด 2 นิ้ว ขึ้น เพื่อฟังสิ่งรอบตัว'], ['swipe', 2, 'down', 'ปัด 2 นิ้ว ลง เพื่อฟังเลือดและพลัง'],
         ['swipe', 2, 'left', 'ปัด 2 นิ้ว ซ้าย เพื่อเปิดกระเป๋า'], ['swipe', 2, 'right', 'ปัด 2 นิ้ว ขวา เพื่อเปิดหน้าต่างสถานะ'],
         ['swipe', 3, 'up', 'ปัด 3 นิ้ว ขึ้น เพื่อฟังทิศและพื้นที่'], ['swipe', 3, 'down', 'ปัด 3 นิ้ว ลง เพื่อฟังพิกัด'],
-        ['swipe', 3, 'left', 'ปัด 3 นิ้ว ซ้าย เพื่อฟังสถานที่ที่กำลังแทร็ก'], ['swipe', 3, 'right', 'ปัด 3 นิ้ว ขวา เพื่อเปิดเมนูข้อมูลด่วน'],
+        ['swipe', 3, 'left', 'ปัด 3 นิ้ว ซ้าย เพื่อหันหน้าเข้าหามอนสเตอร์ที่ใกล้ที่สุด'], ['holdswipe', 1, 'right', 'แตะค้าง 1 นิ้วจนรู้สึกสั่น แล้วปัดไปทางขวาโดยไม่ยกนิ้ว เพื่อหันทิศตะวันออกโดยไม่เดิน'], ['swipe', 3, 'right', 'ปัด 3 นิ้ว ขวา เพื่อเปิดเมนูข้อมูลด่วน'],
         ['hold', 2, null, 'แตะค้าง 2 นิ้ว เพื่อดื่มน้ำยาปุ่มลัด 1'], ['hold', 3, null, 'แตะค้าง 3 นิ้ว เพื่อดื่มน้ำยาปุ่มลัด 2']
       ];
       let pr = null;
@@ -9284,7 +9423,8 @@
 
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         e.preventDefault();
-        if (!e.repeat) startArrowMovement(e.key);
+        if (e.shiftKey) { if (!e.repeat) Gear.shiftFace(e.key); }   // Shift + ลูกศร: หันโดยไม่เดิน
+        else if (!e.repeat) startArrowMovement(e.key);
         return;
       }
 
@@ -9324,6 +9464,9 @@
       else if (code === 'KeyS' || k === 'ห') { e.preventDefault(); openSaveMenu(); }
       else if (code === 'KeyR' || k === 'พ') { e.preventDefault(); if (Mine.isMineZone(state.zoneId)) Mine.scan(); else if (state.zoneId !== 'city' && !state.insideBuildingId) scanForest(); else Town.scan(); }
       else if (code === 'KeyK' || k === 'า') { e.preventDefault(); Mine.knock(); }
+      else if (code === 'KeyT' || k === 'ะ') { e.preventDefault(); Gear.faceTarget(); }   // หันเข้าหาเป้า
+      else if (code === 'KeyQ' || k === 'ๆ') { e.preventDefault(); Gear.turn45(-1); }   // หันซ้าย 45 องศา
+      else if (code === 'KeyE' || k === 'ำ') { e.preventDefault(); Gear.turn45(1); }    // หันขวา 45 องศา
       else if (code === 'Digit1' || code === 'Numpad1' || k === 'ๅ') { e.preventDefault(); useHotkeyPotion(1); }
       else if (code === 'Digit2' || code === 'Numpad2' || k === '/') { e.preventDefault(); useHotkeyPotion(2); }
     });
