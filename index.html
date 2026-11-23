@@ -161,11 +161,11 @@
   </div>
 
   <script>window.__lfLoad=function(p){var e=document.getElementById("sr1");if(!e)return;e.textContent="";setTimeout(function(){e.textContent=p>0?"กำลังโหลดเกม "+p+" เปอร์เซ็นต์":"กำลังโหลดเกม ไฟล์ใหญ่ประมาณ 20 เมกะไบต์ กรุณารอสักครู่"},30)};__lfLoad(0);</script>
-<script src="data-music.js?v=2"></script>
+<script src="data-music.js?v=3"></script>
 <script>__lfLoad(25)</script>
-<script src="data-music2.js?v=2"></script>
+<script src="data-music2.js?v=3"></script>
 <script>__lfLoad(50)</script>
-<script src="data-sfx.js?v=2"></script>
+<script src="data-sfx.js?v=3"></script>
 <script>__lfLoad(75)</script>
 <script>
     // ==================== CONSTANTS ====================
@@ -1206,7 +1206,8 @@
         src.buffer = bufs[i];
         src.playbackRate.value = rate * (0.97 + Math.random() * 0.06);
         g.gain.value = STEP_FILE_GAIN * mixOf('step', sType) * gainMult * (0.92 + Math.random() * 0.16);
-        src.connect(g).connect(fxGain);   // เสียงเท้าดังตรงกลางเสมอ
+        if (AUDIO_OPTS.stepPan && ctx.createStereoPanner) { const sp = ctx.createStereoPanner(); sp.pan.value = AUDIO_OPTS.stepPan; src.connect(g).connect(sp).connect(fxGain); }   // ก้าวข้าง/ถอยในท่าต่อสู้
+        else src.connect(g).connect(fxGain);   // เสียงเท้าดังตรงกลาง
         src.start(ctx.currentTime + 0.003 + delay);
         return true;
       }
@@ -2476,8 +2477,10 @@
     function stepByArrow(key, isRunning) { Gear.wrapStep(stepByArrowInner, key, isRunning); }
     function stepByArrowInner(key, isRunning) {
       // ลูกศรบอกทิศโดยตรง ไม่ต้องหันตัว: ตัวละครหันไปทางลูกศรที่กด แล้วโจมตีไปทางนั้น
-      const moveDir = { ArrowUp: 0, ArrowRight: 2, ArrowDown: 4, ArrowLeft: 6 }[key] ?? state.dir;
+      const fd = Gear.forcedDir();
+      const moveDir = fd != null ? fd : ({ ArrowUp: 0, ArrowRight: 2, ArrowDown: 4, ArrowLeft: 6 }[key] ?? state.dir);
       let bumpPan = AUDIO_OPTS.absolute ? ({ ArrowRight: 0.6, ArrowLeft: -0.6 }[key] || 0) : 0;   // ชนกำแพง: ดังไปทางที่เดิน
+      if (fd != null && AUDIO_OPTS.absolute) bumpPan = Math.max(-0.6, Math.min(0.6, AudioSys.spatial(DIRS[moveDir].dx, DIRS[moveDir].dy).pan));   // ชนตอนก้าวเทียบทิศที่หัน
       if (moveDir !== state.dir) { state.dir = moveDir; unsavedDirty = true; if (!Gear.quietTurn()) AudioSys.playSound('turn'); AudioSys.updateBeaconSpatial(); }
 
       const v = DIRS[moveDir];
@@ -6699,6 +6702,8 @@
         // มือถือ: แตะ 1 นิ้วตอนหันเข้าผนังหิน = เคาะผนัง (ไม่มีจุดแร่หรือมอนสเตอร์ข้างหน้า)
         frontIsWall: () => { const f = curF(); if (f === undefined) return false; const fr = front(), t = tileAt(f, fr.x, fr.y); if (nodeAtF(f, fr.x, fr.y)) return false; if (F[f].mobs.some(a => !a.gone && a.x === fr.x && a.y === fr.y)) return false; return t === T.ROCK || t === T.SECRET || t === T.PILLAR || t === T.CLIFF; },
         addRep: (n, why) => { ensure(); return addRep(n, why); },
+        // ช่องข้างๆ เดินผ่านได้ไหม (ใช้กันก้าวเฉียงลอดมุมผนัง) dx dy เทียบผู้เล่น ทิศเกม
+        canWalkRel: (dx, dy) => { const f = curF(); if (f === undefined) return true; const x = pdx() + dx, y = pdy() - dy; if (x < 0 || y < 0 || x > 199 || y > 199) return false; if (!playerPassTile(f, tileAt(f, x, y))) return false; if (npcAt(f, x, y) || nodeAtF(f, x, y)) return false; const l = lmAt(f, x, y); return !(l && lmBlocks(f, l)); },
         busy: () => !!bossActive || !!cart.active || !!(rh && rh.timer),   // สู้บอส ขับรถแร่ ขุดตามจังหวะ
         // อาวุธพิเศษ/น้ำยาตาทิพย์: รายชื่อมอนสเตอร์ในชั้นนี้ (ทิศเทียบผู้เล่น)
         mobsRel: () => { const f = curF(); if (f === undefined) return []; return F[f].mobs.filter(a => !a.gone && !a.under).map(a => { const [dx, dy] = mrel(a); return { o: a, dx, dy, snd: a.snd, name: a.name }; }); },
@@ -8238,6 +8243,7 @@
       function enterCombat(why) {
         if (inCombat) { quietSince = 0; return; }
         inCombat = true; quietSince = 0; lastInLine = '';
+        if (typeof Mobile !== 'undefined') setTimeout(() => Mobile.refresh(), 0);
         if (ov('face', 'combat') === 'free') return;   // แบบเดิม: ไม่มีท่าต่อสู้ให้ล็อก
         drawSound(false);
         const list = foes().filter(c => cheb(c.dx, c.dy) <= 8).sort((p, q) => cheb(p.dx, p.dy) - cheb(q.dx, q.dy));
@@ -8249,6 +8255,7 @@
       function exitCombat() {
         if (!inCombat) return;
         inCombat = false; quietSince = 0;
+        if (typeof Mobile !== 'undefined') setTimeout(() => Mobile.refresh(), 0);
         if (ov('face', 'combat') === 'free') return;
         drawSound(true); speak('เก็บอาวุธ');
       }
@@ -8289,7 +8296,7 @@
         tCycle.i = now2 - tCycle.at < 3000 ? (tCycle.i + 1) % list.length : 0; tCycle.at = now2;
         const c = list[tCycle.i];
         setFace(dirIndex(c.dx, c.dy));
-        if (!inCombat) { inCombat = true; quietSince = 0; if (ov('face', 'combat') !== 'free') drawSound(false); }
+        if (!inCombat) { inCombat = true; quietSince = 0; if (ov('face', 'combat') !== 'free') drawSound(false); if (typeof Mobile !== 'undefined') setTimeout(() => Mobile.refresh(), 0); }
         lastInLine = '';
         speak(`หันเข้าหา${c.name} ทิศ${DIRS[state.dir].name} ${cheb(c.dx, c.dy)} ก้าว, ${inReach(c) ? 'ตีถึง' : 'ยังไกลเกินระยะ'}${list.length > 1 ? `, กดซ้ำเพื่อเปลี่ยนเป้า มี ${list.length} ตัว` : ''}`);
       }
@@ -8308,17 +8315,37 @@
         speak(`หันทิศ${DIRS[state.dir].name}`);
       }
       // ลูกศรตอนล็อกทิศ: เดินแล้วคืนทิศเดิม · ชนสิ่งกีดขวาง/มอนสเตอร์ = หันเข้าหาสิ่งนั้น
-      let quietTurn = false;
+      let quietTurn = false, forced = null, hintedRel = false, cornerSayAt = 0;
+      const RELOFF = { ArrowUp: 0, ArrowRight: 2, ArrowDown: 4, ArrowLeft: 6 };
+      // ช่องเดินผ่านได้ไหม (เทียบผู้เล่น) ใช้กันลอดมุม: กำแพง อาคาร ผนังหิน จุดแร่ NPC (มอนสเตอร์ไม่นับ)
+      function tileBlocked(dx, dy) {
+        const nx = state.x + dx, ny = state.y + dy;
+        if (Mine.isMineZone(state.zoneId)) return !Mine.canWalkRel(dx, dy);
+        if (state.insideBuildingId) { const b = BUILDINGS.find(x => x.id === state.insideBuildingId); return !!b && (nx < b.x1 || nx > b.x2 || ny < b.y1 || ny > b.y2); }
+        if (nx < 1 || nx > MAP_SIZE || ny < 1 || ny > MAP_SIZE) return true;
+        if (state.zoneId === 'city') return !!getBuildingAt(nx, ny) || Town.blocks(nx, ny, true);
+        return false;
+      }
+      const forcedDir = () => forced;
       function wrapStep(inner, key, running) {
         if (!lockFacing()) { inner(key, running); return; }
+        // ท่าต่อสู้: ลูกศรเทียบทิศที่หัน (ขึ้น ก้าวหน้า, ลง ก้าวถอย, ซ้าย ขวา ก้าวข้าง)
+        const md = RELOFF[key] === undefined ? state.dir : (state.dir + RELOFF[key]) % 8, v = DIRS[md];
+        if (v.dx && v.dy && (tileBlocked(v.dx, 0) || tileBlocked(0, v.dy))) {   // ก้าวเฉียงลอดมุมไม่ได้
+          stopRunning(); AudioSys.playSound('bump', AudioSys.spatial(v.dx, v.dy).pan * 0.6, 'wall');
+          if (Date.now() - cornerSayAt > 1500) { cornerSayAt = Date.now(); speak('ติดมุม'); }
+          return;
+        }
+        if (!hintedRel) { hintedRel = true; setTimeout(() => speak(`${inCombat ? 'ท่าต่อสู้ ' : ''}ลูกศรเทียบทิศที่หัน, ขึ้นคือก้าวหน้า, ลงคือก้าวถอย, ซ้ายขวาคือก้าวข้าง`), 350); }
         const d0 = state.dir, p0 = `${state.zoneId}|${state.insideBuildingId}|${state.x}|${state.y}`;
-        quietTurn = true;
-        try { inner(key, running); } finally { quietTurn = false; }
+        quietTurn = true; forced = md;
+        AUDIO_OPTS.stepPan = md === d0 ? 0 : Math.max(-0.7, Math.min(0.7, AudioSys.spatial(v.dx, v.dy).pan * 0.7));   // เสียงเท้าดังไปทางที่ก้าวจริง
+        try { inner(key, running); } finally { quietTurn = false; forced = null; AUDIO_OPTS.stepPan = 0; }
         const moved = p0 !== `${state.zoneId}|${state.insideBuildingId}|${state.x}|${state.y}`;
         if (moved) { if (state.dir !== d0) { state.dir = d0; AudioSys.updateBeaconSpatial(); } }
         else if (state.dir !== d0) { AudioSys.playSound('turn'); lastInLine = ''; }   // ชนแล้วหันเข้าหา
       }
-      const stanceText = () => inCombat && ov('face', 'combat') !== 'free' ? ', อยู่ในท่าต่อสู้ ทิศที่หันถูกล็อก' : '';
+      const stanceText = () => lockFacing() ? `, ${inCombat ? 'อยู่ในท่าต่อสู้ ' : ''}ทิศที่หันถูกล็อก ลูกศรเทียบทิศที่หัน ขึ้นคือก้าวหน้า` : '';
       function engage(why) {
         if (state.screen !== 'game') return;
         if (why === 'hurt' && !foes().some(c => cheb(c.dx, c.dy) <= 3)) return;   // เจ็บจากแก๊ส ลาวา: ไม่เข้าท่า
@@ -8360,12 +8387,12 @@
         spec, pick, miss, swing, hidden, notice, strike, curStrike, cheatDeath, reduce, repelOn, defBonus, expMul, dodgeMs, runMul, visBonus, stepGain,
         oreBonus, goldWin, biteMs, bigFishMul, safeNow, scanRange, hpTag, distText, scanForest, forestAttack, canFire, fireSound,
         openBox, onLevel, bossBox, onDailyBox, onBagActivate, dropGuard, onGameStart, openBook, openSettings, charItems, sageKill,
-        lockFacing, quietTurn: () => quietTurn, wrapStep, faceTarget, turn45, shiftFace, engage, stanceText, inCombat: () => inCombat, exitCombat,
+        lockFacing, quietTurn: () => quietTurn, forcedDir, wrapStep, faceTarget, turn45, shiftFace, engage, stanceText, inCombat: () => inCombat, exitCombat,
         debug: { G, GI, SETS, SPEC, applyAll, setOn, geom, lastGot: () => lastGot, tick }
       };
     })();
 
-    const GAME_VERSION = {"build": 2, "name": "รุ่น 1.1", "date": "2026-11-23", "notes": ["ท่าต่อสู้: มีมอนสเตอร์ไล่มาใกล้ เกมชักอาวุธ หันเข้าหาให้ แล้วล็อกทิศที่หัน กดซ้ายขวาเป็นการก้าวข้าง ตียังไปข้างหน้า", "ปุ่มหันใหม่: Shift กับลูกศร หันโดยไม่เดิน, Q และ E หันทีละ 45 องศา, T หันเข้าหามอนสเตอร์ที่ใกล้ที่สุด", "หันเฉียงได้ครบ 8 ทิศ และมีเสียงติ๊กเมื่อเป้าอยู่ในแนวตี", "มือถือ: ปัด 3 นิ้วซ้ายหันเข้าหาเป้า, แตะค้าง 1 นิ้วแล้วปัดเพื่อหัน, ปุ่มหันบนจอ"]};
+    const GAME_VERSION = {"build": 3, "name": "รุ่น 1.2", "date": "2026-11-23", "notes": ["ท่าต่อสู้: ลูกศรเทียบทิศที่หัน ขึ้นคือก้าวหน้า ลงคือก้าวถอย ซ้ายขวาคือก้าวข้าง เดินเฉียงได้ พิกัดตรงกับทิศที่หัน", "หันเข้าหามอนสเตอร์ด้วย T แล้วกดขึ้น จะเดินตรงเข้าหามันแม้อยู่เฉียง", "ก้าวเฉียงลอดมุมกำแพงไม่ได้ บอกว่าติดมุม", "เสียงเท้าดังไปทางที่ก้าวจริง, มือถือปุ่มเดินเปลี่ยนชื่อเป็นก้าวหน้า ก้าวถอย ก้าวข้าง ตอนต่อสู้"]};
     // ==================== แจ้งเตือนเมื่อเกมมีรุ่นใหม่ (version.json บน GitHub) ====================
     // เช็กทุก 3 นาที (และทันทีเมื่อกลับมาที่หน้าเกม) เจอรุ่นใหม่ รอจังหวะปลอดภัยแล้วแจ้ง ผู้เล่นเลือกโหลดเอง เกมบันทึกให้ก่อน
     const Updater = (() => {
@@ -8840,6 +8867,14 @@
         ['เดินตะวันตก 5 ก้าว', 'walk5:ArrowLeft', 'mv'], ['กระโดด', 'Space'], ['ข้อมูลด่วน', 'info'],
         ['น้ำยา', 'potion'], ['อ่านข้อความล่าสุดซ้ำ', 'repeat'], ['หน้าเลือกวิธีเล่น', 'start']
       ];
+      // ท่าต่อสู้: ลูกศรเทียบทิศที่หัน ชื่อปุ่มเดินเปลี่ยนตาม
+      const REL_LABEL = { ArrowUp: 'ก้าวหน้า', ArrowDown: 'ก้าวถอย', ArrowLeft: 'ก้าวข้างซ้าย', ArrowRight: 'ก้าวข้างขวา' };
+      function worldLabel(l, a) {
+        if (!Gear.lockFacing()) return l;
+        const k = a.startsWith('walk5:') ? a.slice(6) : a;
+        if (!REL_LABEL[k]) return l;
+        return a.startsWith('walk5:') ? `${REL_LABEL[k]} 5 ก้าว` : REL_LABEL[k];
+      }
       let walkT = null;
       function walk5(key) {
         clearTimeout(walkT); let n = 0;
@@ -8879,13 +8914,20 @@
         const c = ctxName(), m = currentMenu();
         let key = c;
         let items = [];
+        if (c === 'world') {
+          const lk = Gear.lockFacing(); key += '|' + lk;
+          if (padShape === 'world' && key !== padKey && pad.querySelector('.g')) {   // ท่าต่อสู้: เปลี่ยนแค่ชื่อปุ่มเดินในที่เดิม
+            padKey = key; const bs = pad.querySelectorAll('.g button'); WORLD_PAD.forEach(([l, a], i) => { const t = worldLabel(l, a); if (bs[i] && bs[i].textContent !== t) bs[i].textContent = t; });
+            return;
+          }
+        }
         if (c === 'menu' || c === 'bag') { items = m.items.map(it => it.label); key += '|' + m.title + '|' + items.join('#'); }
         if (c === 'main') { items = state.screen === 'main_menu' ? mainOpts() : ['ตกลง', 'ยกเลิก']; key += '|' + state.screen; }
         if (c === 'sound') key += '|' + soundIdx + SOUND_ITEMS.map(it => it.k in { master: 1, music: 1, amb: 1, fx: 1, ui: 1 } ? AudioSys.getVol(it.k) : '').join(',');
         if (MSCREENS.includes(c)) key += '|' + ctlIdx + JSON.stringify(S);
         if (key === padKey) return;   // ไม่สร้างปุ่มใหม่ถ้าไม่มีอะไรเปลี่ยน โฟกัสของผู้อ่านหน้าจอจะไม่หลุด
         // โครงเดิม (หน้าเดิม จำนวนรายการเท่าเดิม): เปลี่ยนแค่ชื่อปุ่มในที่เดิม โฟกัสไม่หลุด
-        const shape = `${c}|${(m && m.title) || state.screen}|${items.length}`;
+        const shape = c === 'world' ? 'world' : `${c}|${(m && m.title) || state.screen}|${items.length}`;
         if (shape === padShape && pad.querySelector('.items')) {
           padKey = key; const bs = pad.querySelectorAll('.items button'); items.forEach((t, i) => { if (bs[i] && bs[i].textContent !== t) bs[i].textContent = t; });
           return;
@@ -8894,7 +8936,7 @@
         padKey = key; pad.innerHTML = '';
         pad.classList.toggle('list', c !== 'world');
         const grid = document.createElement('div'); grid.className = 'g';
-        if (c === 'world') { WORLD_PAD.forEach(([l, a, cl]) => grid.appendChild(mk(l, a, cl))); pad.appendChild(grid); return; }
+        if (c === 'world') { WORLD_PAD.forEach(([l, a, cl]) => grid.appendChild(mk(worldLabel(l, a), a, cl))); pad.appendChild(grid); return; }
         const h = document.createElement('h2');
         h.textContent = c === 'main' ? (state.screen === 'main_menu' ? 'เมนูหลัก' : 'ต้องการออกจากเกมใช่ไหม') : (c === 'sound' ? 'ตั้งค่าเสียง' : (MSCREENS.includes(c) ? 'ตั้งค่าการควบคุม' : m.title));
         pad.appendChild(h);
