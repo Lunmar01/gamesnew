@@ -158,9 +158,13 @@
     </div>
   </div>
 
-  <script src="data-music.js"></script>
-<script src="data-music2.js"></script>
-<script src="data-sfx.js"></script>
+  <script>window.__lfLoad=function(p){var e=document.getElementById("sr1");if(!e)return;e.textContent="";setTimeout(function(){e.textContent=p>0?"กำลังโหลดเกม "+p+" เปอร์เซ็นต์":"กำลังโหลดเกม ไฟล์ใหญ่ประมาณ 20 เมกะไบต์ กรุณารอสักครู่"},30)};__lfLoad(0);</script>
+<script src="data-music.js?v=1"></script>
+<script>__lfLoad(25)</script>
+<script src="data-music2.js?v=1"></script>
+<script>__lfLoad(50)</script>
+<script src="data-sfx.js?v=1"></script>
+<script>__lfLoad(75)</script>
 <script>
     // ==================== CONSTANTS ====================
     const SAVE_KEY = 'starter-town-save-v1';
@@ -465,10 +469,10 @@
     const AMB_FILE_GAIN = 0.45;
     const ZONE_AMB_LAYERS = {
       city: [['amb_city', 0.75]],
-      north_zone: [['amb_north_morning', 1]],
+      north_zone: [['amb_north_morning', 1], ['amb_birds', 0.55]],   // นกป่า (sounds1)
       east_zone: [['amb_east_drizzle', 1]],
-      west_zone: [['amb_west_storm_wind', 1]],
-      south_zone: [['amb_south_heavy_rain', 1], ['amb_south_swamp_night', 0.5]]
+      west_zone: [['amb_west_storm_wind', 1], ['amb_trees', 0.6]],   // ลมพัดผ่านต้นไม้ (sounds1)
+      south_zone: [['amb_south_heavy_rain', 1], ['amb_south_swamp_night', 0.5], ['amb_river', 0.35]]
     };
     const THUNDER_FILES = ['thunder_1', 'thunder_2', 'thunder_3', 'thunder_4'];
 
@@ -526,11 +530,11 @@
       // มีด กริช: ฟันเร็ว เสียงคมบาง
       iron_knife:      { set: 'knife',  rate: 1.15, hit: 'knife',  hitRate: 1.1,  draw: 'knife',  cd: 600 },
       iron_dagger:     { set: 'knife',  rate: 1,    hit: 'knife',  hitRate: 1,    layer: ['bat', 1.3, 0.25],  draw: 'knife', drawRate: 0.95, cd: 650 },
-      // ดาบ: เสียงฟันดาบเต็มวง + เสียงใบมีดเฉือน + เสียงโลหะกังวาน ยิ่งดาบหนักยิ่งทุ้ม ดาบเงินกังวานใส
-      iron_shortsword: { set: 'knife',  fireFile: 'wpn_shortsword', mix: 'iron_shortsword', rate: 1,    hit: 'knife', hitRate: 0.9,  layer: ['bat', 1.1, 0.35],  draw: 'knife', drawRate: 0.85, cd: 750 },
-      bronze_sword:    { set: 'knife',  fireFile: 'wpn_shortsword', mix: 'iron_shortsword', rate: 0.95, hit: 'knife', hitRate: 0.85, layer: ['bat', 0.95, 0.4], draw: 'knife', drawRate: 0.8,  cd: 780 },
-      iron_sword:      { set: 'knife',  fireFile: 'wpn_shortsword', mix: 'iron_shortsword', rate: 0.88, hit: 'knife', hitRate: 0.8,  layer: ['bat', 0.85, 0.45], draw: 'knife', drawRate: 0.75, cd: 800 },
-      silver_sword:    { set: 'knife',  fireFile: 'wpn_shortsword', mix: 'iron_shortsword', rate: 1.06, hit: 'knife', hitRate: 0.95, layer: ['bat', 1.25, 0.5],  draw: 'knife', drawRate: 0.9,  cd: 780 },
+      // ดาบ: เสียงฟันดาบชุดใหม่ (ลมคมดาบ + ประกายใบดาบ 3 แบบสลับกัน) + เสียงใบมีดเฉือน + เสียงโลหะกังวาน ยิ่งดาบหนักยิ่งทุ้ม ดาบเงินกังวานใส
+      iron_shortsword: { set: 'sword',  rate: 1,    hit: 'blade', hitRate: 1.05, layer: ['knife', 0.9, 0.3],  draw: 'sword', cd: 750 },
+      bronze_sword:    { set: 'sword',  rate: 0.96, hit: 'blade', hitRate: 1,    layer: ['knife', 0.85, 0.3], draw: 'sword', drawRate: 0.95, cd: 780 },
+      iron_sword:      { set: 'gsword', rate: 0.97, hit: 'blade', hitRate: 0.92, layer: ['bat', 0.85, 0.35], draw: 'sword', drawRate: 0.9, cd: 800 },
+      silver_sword:    { set: 'gsword', rate: 1.06, hit: 'blade', hitRate: 1.05, layer: ['bat', 1.25, 0.45], draw: 'sword', drawRate: 1.05, cd: 780 },
       // ขวาน: เหวี่ยงหนัก + สับลงทุ้ม (ค้อน) + คมขวานเฉือน (มีดช้า)
       iron_axe:        { set: 'bat',    fireFile: 'wpn_axe', mix: 'iron_axe', rate: 1,    hit: 'hammer', hitRate: 1.15, layer: ['knife', 0.7, 0.5],  draw: 'bat', cd: 950 },
       bronze_axe:      { set: 'bat',    fireFile: 'wpn_axe', mix: 'iron_axe', rate: 0.95, hit: 'hammer', hitRate: 1.1,  layer: ['knife', 0.7, 0.5],  draw: 'bat', cd: 950 },
@@ -539,7 +543,17 @@
       bronze_hammer:   { set: 'hammer', rate: 1.05, hit: 'hammer', hitRate: 1.05, draw: 'hammer', cd: 1000 },
       iron_warhammer:  { set: 'hammer', rate: 0.92, hit: 'hammer', hitRate: 0.92, layer: ['boot', 0.8, 0.4], draw: 'hammer', drawRate: 0.9, cd: 1050 },
       silver_hammer:   { set: 'hammer', rate: 1,    hit: 'hammer', hitRate: 1,    layer: ['bat', 1.3, 0.35], draw: 'hammer', cd: 1000 },
-      crystal_hammer:  { set: 'hammer', rate: 0.88, hit: 'hammer', hitRate: 0.88, extra: 'crystal_bells', draw: 'hammer', drawRate: 0.85, cd: 1050 }
+      crystal_hammer:  { set: 'hammer', rate: 0.88, hit: 'hammer', hitRate: 0.88, extra: 'crystal_bells', draw: 'hammer', drawRate: 0.85, cd: 1050 },
+      // อาวุธยิง (ร้านอาวุธ): ยิงตรงไปข้างหน้าแนวเดียว
+      slingshot:       { set: 'feat',   rate: 1.2,  hit: 'club',   hitRate: 1.4,  draw: 'feat',   cd: 900,  ranged: 'sling' },
+      short_bow:       { set: 'feat',   rate: 1,    hit: 'arrow',  hitRate: 1, draw: 'feat',   cd: 1100, ranged: 'bow' },
+      // อาวุธพิเศษจากกล่องของขวัญ
+      hawk_bow:        { set: 'feat',   rate: 0.92, hit: 'arrow',  hitRate: 0.95, layer: ['bat', 1.4, 0.25], draw: 'feat', cd: 1000, ranged: 'bow' },
+      gale_spear:      { set: 'spear',  rate: 1,    hit: 'blade',  hitRate: 0.9,  layer: ['bat', 1.1, 0.3], draw: 'knife', drawRate: 0.8, cd: 850 },
+      moon_knife:      { set: 'knife',  rate: 1.2,  hit: 'knife',  hitRate: 1.15, draw: 'knife', drawRate: 1.1, cd: 400 },
+      thunder_hammer:  { set: 'hammer', rate: 0.85, hit: 'hammer', hitRate: 0.85, layer: ['knife', 0.6, 0.45], draw: 'hammer', drawRate: 0.8, cd: 1100 },
+      echo_blade:      { set: 'sword',  rate: 1.08, hit: 'blade',  hitRate: 1.1,  layer: ['bat', 1.35, 0.45], draw: 'sword', drawRate: 1.1, cd: 700 },
+      traveler_staff:  { set: 'club',   rate: 1.1,  hit: 'club',   hitRate: 1.1,  draw: 'club',   cd: 800 }
     };
     const FIST_SET = { set: 'fist', rate: 1, hit: 'fist', draw: 'fist', cd: 450 };
     // เสียงกระแทกตัวละครเมื่อถูกมอนสเตอร์โจมตี [ชุดเสียง, ความเร็ว, ความดัง] (ไม่ระบุ = เสียงกัด/ข่วนเนื้อเดิม)
@@ -699,7 +713,29 @@
           if (!ctx) {
             const AC = window.AudioContext || window.webkitAudioContext;
             if (!AC) return false;
-            ctx = new AC();
+            // มือถือ: ถอดรหัสเสียงที่ 32 kHz ใช้หน่วยความจำน้อยลงราว 1 ใน 4
+            try { ctx = AUDIO_OPTS.mobile ? new AC({ sampleRate: 32000 }) : new AC(); } catch (e) { ctx = new AC(); }
+            if (AUDIO_OPTS.mobile) {
+              // ถอดรหัสทีละ 3 ไฟล์ ไฟล์เล็กก่อน (เสียงเมนู เสียงเท้า) ไม่ถอดพร้อมกันหลายร้อยไฟล์จนเครื่องค้าง
+              const rawDecode = ctx.decodeAudioData.bind(ctx), Q = [], D = AUDIO_OPTS.decode = { done: 0, total: 0 };
+              let active = 0, sched = false;
+              const pump = () => {
+                sched = false;
+                while (active < 3 && Q.length) {
+                  let k = 0; for (let i = 1; i < Q.length; i++) if (Q[i].n < Q[k].n) k = i;
+                  const j = Q.splice(k, 1)[0]; active++;
+                  const fin = () => { active--; D.done++; if (!sched) { sched = true; setTimeout(pump, 0); } };
+                  try { rawDecode(j.ab, (b) => { fin(); if (j.ok) j.ok(b); }, (er) => { fin(); if (j.err) j.err(er); }); } catch (er) { fin(); if (j.err) j.err(er); }
+                }
+              };
+              ctx.decodeAudioData = (ab, ok, err) => {
+                D.total++;
+                const p = new Promise((res, rej) => Q.push({ ab, n: ab.byteLength, ok: (b) => { if (ok) ok(b); res(b); }, err: (er) => { if (err) err(er); rej(er); } }));
+                if (!sched) { sched = true; setTimeout(pump, 0); }
+                p.catch(() => {});
+                return p;
+              };
+            }
             compressor = ctx.createDynamicsCompressor();
             masterGain = ctx.createGain();
             masterGain.gain.value = 2.5;
@@ -1347,7 +1383,7 @@
         src.buffer = bufs[Math.floor(Math.random() * bufs.length)];
         src.playbackRate.value = rate * (0.95 + Math.random() * 0.1);
         lp.type = 'lowpass'; lp.frequency.value = pi.isBehind ? 1600 : 9000;
-        g.gain.value = STEP_FILE_GAIN * vol * mixOf('mstep', type) * att;
+        g.gain.value = STEP_FILE_GAIN * vol * mixOf('mstep', type) * att * (typeof Gear !== 'undefined' ? Gear.stepGain() : 1);   // แหวนนกฮูก
         let node = src.connect(lp).connect(g);
         if (ctx.createStereoPanner) { const p = ctx.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, pi.pan * 0.9)); node = node.connect(p); }
         node.connect(fxGain);
@@ -1975,6 +2011,7 @@
         resetVol: () => { Object.assign(vol, VOL_DEFAULT); saveVol(); syncVolumes(); },
         // มือถือ: พักเสียงตอนแอปถูกพัก แล้วเล่นต่อเมื่อกลับมา
         suspend: () => { try { if (ctx && ctx.state === 'running') ctx.suspend(); if (fm.cur && fm.cur.el) fm.cur.el.pause(); } catch {} },
+        ctxState: () => !ctx ? 'ยังไม่เริ่ม' : ({ running: 'ทำงานอยู่', suspended: 'ถูกระงับ (ต้องแตะจอเพื่อเปิด)', interrupted: 'ถูกขัดจังหวะ', closed: 'ปิดแล้ว' }[ctx.state] || ctx.state),
         resume: () => { try { if (ctx && ctx.state !== 'running') ctx.resume(); if (fm.cur && fm.cur.el) fm.cur.el.play().catch(() => {}); } catch {} }
       };
     })();
@@ -2032,7 +2069,9 @@
     let hardResetTimer = null;
 
     // ==================== SCREEN READER & LOGS ====================
+    let lastSpeakAt = 0;
     function speak(text, addToLog = true) {
+      lastSpeakAt = Date.now();
       const clean = String(text || '').trim();
       if (!clean) return;
       srChannel = 1 - srChannel;
@@ -2073,16 +2112,8 @@
       return Math.max(0, nextTotal - state.exp);
     }
 
-    function getTotalAtk() {
-      let sum = 10 * state.level;
-      for (const o of ORGANS) {
-        const itemId = state.equipped[o.id];
-        if (itemId && ITEMS[itemId]) sum += (ITEMS[itemId].atk || 0);
-      }
-      if (state.mine) sum += Mine.atkBonus();   // อัปเกรดอาวุธที่ดอร์น และบัฟเพลงของเบิร์ก
-      sum += Town.atkBonus();   // น้ำยาโทสะ ข้าวปั้นนักรบ
-      return sum;
-    }
+    // แรงตีต่อครั้ง (แต้มที่ลดเลือดมอนสเตอร์จริง) = แต้มอาวุธ + แรงตีเสริมจากของที่สวม + บัฟ
+    function getTotalAtk() { return Gear.curStrike(); }
 
     function getTotalDef() {
       let sum = 0;
@@ -2090,7 +2121,7 @@
         const itemId = state.equipped[o.id];
         if (itemId && ITEMS[itemId]) sum += (ITEMS[itemId].def || 0);
       }
-      return sum + Town.defBonus();   // ซุปผู้กล้า
+      return sum + Town.defBonus() + Gear.defBonus();   // ซุปผู้กล้า · ชุดนักรบภูผา
     }
 
     function getEquippedWeaponSlot() {
@@ -2100,6 +2131,7 @@
     }
 
     function addInv(id, qty = 1) {
+      if (id === 'arrow_pack') { id = 'arrow'; qty *= 10; }   // ชุดลูกศร = ลูกศร 10 ดอก
       state.inventory[id] = (state.inventory[id] || 0) + qty;
     }
 
@@ -2195,7 +2227,7 @@
       unsavedDirty = true;
       AudioSys.playAnimalFile(a.typeId, 'attack', a.x - state.x, a.y - state.y);   // สัตว์โจมตี ดังจากทิศของสัตว์
       if (!AudioSys.playPlayerHit(a.x - state.x, a.y - state.y, a.typeId)) AudioSys.playSound('player_hurt');   // เสียงกระแทกตัวละครตามชนิดมอนสเตอร์
-      if (state.hp <= 0) {
+      if (state.hp <= 0 && !Gear.cheatDeath()) {   // แหวนพิทักษ์ชีวิต / ขนนกฟีนิกซ์
         state.zoneId = 'city';
         state.x = 100;
         state.y = 106;
@@ -2242,10 +2274,11 @@
 
         let moved = false;
         for (const a of arr) {
+          if ((a.stunUntil || 0) > now) continue;   // โดนค้อน/สายฟ้าฟาด: ชะงัก
           const d = Math.max(Math.abs(a.x - state.x), Math.abs(a.y - state.y));
           // ป่ากระต่ายทิศเหนือ: มอนสเตอร์ไม่ก้าวร้าวจนกว่าจะถูกตี และเลิกโกรธเมื่อผู้เล่นหนีไปไกล
           if (a.provoked && (state.zoneId === 'north_zone' || Town.relaxed()) && d > 14) a.provoked = false;
-          const aggressive = a.provoked || (state.zoneId !== 'north_zone' && !Town.relaxed());   // โหมดผ่อนคลาย: ไม่โจมตีก่อน
+          const aggressive = a.provoked || (state.zoneId !== 'north_zone' && !Town.relaxed() && Gear.notice(a, d, MONSTER_SIGHT));   // ผงไล่สัตว์ เข็มขัดเงาพราง ถุงเท้าย่องเบา   // โหมดผ่อนคลาย: ไม่โจมตีก่อน
           if (d > 10) a.alerted = false;
 
           if (aggressive && d <= MONSTER_SIGHT) {
@@ -2263,11 +2296,11 @@
             // โจมตีเมื่ออยู่ติดตัวผู้เล่น
             if (a.windAt && now >= a.windAt) {
               a.windAt = 0;
-              if (Math.max(Math.abs(a.x - state.x), Math.abs(a.y - state.y)) <= 1) { if (monsterAttackPlayer(a)) return; break; }
+              if (Math.max(Math.abs(a.x - state.x), Math.abs(a.y - state.y)) <= 1 && !Gear.safeNow()) { if (monsterAttackPlayer(a)) return; break; }
               AudioSys.mineSfx('dodgewhoosh', { dx: a.x - state.x, dy: a.y - state.y });
               speak(`หลบการโจมตีของ${a.name}ได้`);
             } else if (!a.windAt && d <= 1 && now - a.lastAtkAt >= MONSTER_ATTACK_MS) {
-              a.lastAtkAt = now; a.windAt = now + 450 * TIMING.mul + TIMING.lat;   // ง้างโจมตี: เสียงขู่ก่อนโจมตีจริง 0.45 วินาที
+              a.lastAtkAt = now; a.windAt = now + (450 + Gear.dodgeMs()) * TIMING.mul + TIMING.lat;   // ง้างโจมตี (รองเท้าลมพัด: หลบได้นานขึ้น): เสียงขู่ก่อนโจมตีจริง 0.45 วินาที
               AudioSys.playAnimalFile(a.typeId, 'alert', a.x - state.x, a.y - state.y);
             }
           } else if (now >= (a.nextWanderAt || 0)) {
@@ -2419,7 +2452,7 @@
             return;
           }
           stepByArrow(key, true);
-        }, 220);
+        }, Math.round(220 * Gear.runMul()));   // รองเท้าลมพัด: วิ่งเร็วขึ้น
       }, 380);
     }
 
@@ -2614,13 +2647,7 @@
       if (now - (a.lastBumpSay || 0) > 1500) { a.lastBumpSay = now; speak(`ชน${a.name}ข้างหน้า, พลังชีวิต ${Math.max(0, Math.ceil(a.hp))} จาก ${a.maxHp}, กด Ctrl เพื่อโจมตี`); }
     }
     // R ในป่า: บอกมอนสเตอร์ที่ใกล้ที่สุด 5 ตัวในระยะ 12 ก้าว พร้อมเสียงบอกตำแหน่ง 3 ตัวแรก
-    function scanForest() {
-      const arr = zoneAnimals[state.zoneId] || [];
-      const near = arr.map(a => [a, Math.max(Math.abs(a.x - state.x), Math.abs(a.y - state.y))]).filter(([, d]) => d <= 12).sort((p, q) => p[1] - q[1]).slice(0, 5);
-      AudioSys.mineSfx('scan');
-      near.slice(0, 3).forEach(([a], i) => AudioSys.mineSfx('ping', { dx: a.x - state.x, dy: a.y - state.y, delay: 0.25 + i * 0.22 }));
-      speak(near.length ? `มอนสเตอร์ในระยะ 12 ก้าว: ` + near.map(([a]) => `${a.name} ${formatDistanceText(a.x - state.x, a.y - state.y)}`).join(', ') : 'ไม่มีมอนสเตอร์ในระยะ 12 ก้าว');
-    }
+    function scanForest() { Gear.scanForest(); }   // แบบละเอียด / แบบนักล่า, เข็มกลัดหูทิพย์
 
     function turnPlayer(delta) {
       state.dir = (state.dir + delta + 8) % 8;
@@ -2657,12 +2684,14 @@
       const atkNow = Date.now();
       const wId = wSlot ? state.equipped[wSlot] : null;
       const ws = wId ? (WEAPON_SET[wId] || { set: 'knife', rate: 1, cd: 900 }) : FIST_SET;
-      if (atkNow - state.lastWeaponAtkAt < ws.cd * Town.atkSpeedMul()) return;   // บท 5 ในเมือง: เร็วขึ้น 30%
+      if (atkNow - state.lastWeaponAtkAt < ws.cd * Town.atkSpeedMul()) return;   // บท 5 ในเมือง: เร็วขึ้น 30% · กำไลสายฟ้า
+      if (!Gear.canFire(wId)) return;   // ธนูสั้น: ต้องมีลูกศร
       state.lastWeaponAtkAt = atkNow;
       if (wId) {
         const item = ITEMS[wId];
         range = item.range || 2;
-        if (ws.fireFile && AudioSys.playWeaponFile(ws.fireFile, Object.assign({ rate: ws.rate, mix: ws.mix }, swingDir(0)))) { /* เสียงฟันดาบ/ขวานจากไฟล์ ดังไปทางที่ฟัน */ }
+        if (Gear.fireSound(wId, ws, swingDir(0))) { /* ธนู หนังสติ๊ก หอก: เสียงยิงและลูกพุ่งไปข้างหน้า */ }
+        else if (ws.fireFile && AudioSys.playWeaponFile(ws.fireFile, Object.assign({ rate: ws.rate, mix: ws.mix }, swingDir(0)))) { /* เสียงฟันดาบ/ขวานจากไฟล์ ดังไปทางที่ฟัน */ }
         else if (AudioSys.playSet(ws.set, 'fire', Object.assign({ rate: ws.rate }, swingDir(0)))) { /* เสียงเหวี่ยง/ฟันจากชุดเสียงอาวุธ ดังไปทางที่ฟัน */ }
         else if (AudioSys.playWeapon(item.id)) { /* เสียงอาวุธจากไฟล์ */ }
         else if (item.isShortswordFile) AudioSys.playSound('shortsword_file');
@@ -2680,65 +2709,7 @@
       } else if (state.zoneId === 'city') {
         Town.onAttack(range);   // ลานฝึกซ้อม
       } else {
-        const arr = zoneAnimals[state.zoneId] || [];
-        let targetIdx = -1;
-        let bestDist = Infinity;
-
-        for (let i = 0; i < arr.length; i++) {
-          const a = arr[i];
-          const dx = a.x - state.x;
-          const dy = a.y - state.y;
-          const chebDist = Math.max(Math.abs(dx), Math.abs(dy));
-          if (chebDist <= range) {
-            const rel = AudioSys.calcRelativePanAndFront(dx, dy, state.dir);
-            if (chebDist === 0 || rel.diffDeg <= 45) {
-              if (chebDist < bestDist) {
-                bestDist = chebDist;
-                targetIdx = i;
-              }
-            }
-          }
-        }
-
-        if (targetIdx !== -1) {
-          const a = arr[targetIdx];
-          a.provoked = true;
-          // มอนสเตอร์หลบ: ไม่เสียพลังชีวิต แล้วกระโดดถอยไปด้านข้าง 1 ก้าว
-          if (Math.random() < (ZONE_DODGE_CHANCE[state.zoneId] || 0) && monsterSidestep(a)) {
-            const hx = a.x - state.x, hy = a.y - state.y;
-            setTimeout(() => { AudioSys.playHitFile('dodge', { dx: hx, dy: hy }); AudioSys.playMonsterStep(a.typeId, hx, hy); }, 60);
-            renderAll();
-            speak(`${a.name}หลบ`);
-            return;
-          }
-          a.hp -= wSlot ? HIT_POINTS_WEAPON : HIT_POINTS_FIST;
-          // ตีโดน: เสียงกระทบตามชนิดสัตว์และอาวุธ ดังจากตำแหน่งสัตว์ (ถ้าไม่มีไฟล์ใช้เสียงเดิม)
-          { const hx = a.x - state.x, hy = a.y - state.y, wId = wSlot ? state.equipped[wSlot] : null, tp = a.typeId;
-            setTimeout(() => { if (!AudioSys.playHit(tp, wId, hx, hy)) AudioSys.playSound('hit_enemy'); }, 60);
-            if (a.hp <= 0) setTimeout(() => AudioSys.playBodyFall(tp, hx, hy, 0), 600); }
-          // สัตว์โดนตีหรือตาย: เสียงของสัตว์ตัวนั้น ดังจากตำแหน่งของมัน
-          { const hx = a.x - state.x, hy = a.y - state.y, kind = a.hp <= 0 ? 'death' : 'hurt';
-            setTimeout(() => AudioSys.playAnimalFile(a.typeId, kind, hx, hy), 110); }
-
-          if (a.hp <= 0) {
-            const z = ZONES[state.zoneId];
-            const dropId = a.drops[Math.floor(Math.random() * a.drops.length)];
-            addInv(dropId, 1);
-            AudioSys.playFx('kill', { delay: 0.12, gain: 0.9 });   // สังหารสัตว์
-            AudioSys.playGet(dropId, 0.9);   // เก็บวัตถุดิบจากซากสัตว์
-            unsavedDirty = true;
-            arr.splice(targetIdx, 1);
-            setTimeout(() => {
-              if (zoneAnimals[z.id]) zoneAnimals[z.id].push(spawnSingleAnimal(z.id, false));
-            }, 4000);
-            const gExp = Town.expMul(z.exp);
-            const lvMsg = addExp(gExp);
-            Town.learn(a.typeId); Town.onForestKill(a);
-            const killMsg = `สังหาร${a.name}, ได้รับ ${gExp} ค่าประสบการณ์, ได้รับ ${ITEMS[dropId].name} 1 ชิ้น` + (lvMsg ? `, ${lvMsg}` : '');
-            renderAll();
-            speak(killMsg);
-          }
-        }
+        Gear.forestAttack(wId);   // ตีทิศเดียว ระยะตามอาวุธ ขวาน/ค้อนกวาด อาวุธยิงเป็นแนวตรง
       }
     }
 
@@ -2947,7 +2918,7 @@
       Object.entries(state.inventory).forEach(([id, qty]) => {
         if (qty <= 0 || !ITEMS[id]) return;
         const it = ITEMS[id];
-        if (it.cat !== cat) return;
+        if ((it.special ? 'special' : it.cat) !== cat) return;
         const unit = it.cat === 'consumable' ? 'ขวด' : 'ชิ้น';
         let hk = '';
         if (state.potKey1 === id) hk = ', ปุ่มลัด 1';
@@ -2964,7 +2935,7 @@
         const eqId = state.equipped[org.id];
         if (!eqId || !ITEMS[eqId]) return;
         const it = ITEMS[eqId];
-        if (it.cat !== cat) return;
+        if ((it.special ? 'special' : it.cat) !== cat) return;
         list.push({
           kind: 'equipped',
           organId: org.id,
@@ -3005,12 +2976,13 @@
       if (m.idx >= m.items.length) m.idx = Math.max(0, m.items.length - 1);
       renderAll();
       if (customSpeak) speak(customSpeak);
-      else announceMenuState(true);
+      else { const it0 = m.items[m.idx]; speak(`${cat.name}, ${it0 ? it0.label : 'ไม่มีรายการ'}`); }
     }
 
     function activateBagItem(id) {
       const it = ITEMS[id];
       if (!it) return;
+      if (Gear.onBagActivate(id)) return;   // ของพิเศษใช้ครั้งเดียว ลูกศร
       if (Town.onBagActivate(id)) return;   // อาหารเมือง ม้วนคัมภีร์ กล่องของขวัญ
       if (Mine.onBagActivate(id)) return;   // แร่ เครื่องมือขุด อาหารและยาของเหมือง
       if (it.cat === 'consumable') {
@@ -3084,8 +3056,9 @@
       unsavedDirty = true;
       if (!(it.cat === 'weapon' && WEAPON_SET[itemId] && AudioSys.playSet(WEAPON_SET[itemId].draw || WEAPON_SET[itemId].set, 'draw', { rate: WEAPON_SET[itemId].drawRate || 1 }))) AudioSys.playGet(itemId, 0, 'equip');
       if (it.cat === 'weapon' && WEAPON_SET[itemId] && WEAPON_SET[itemId].extra) AudioSys.mineSfx(WEAPON_SET[itemId].extra, { gain: 0.3, delay: 0.15 });   // สวมใส่: ชักอาวุธ / ชุดเกราะ / เครื่องประดับ
+      if (it.cat === 'armor' && ['body', 'legs', 'shins', 'head', 'shoes', 'waist'].includes(it.slotType)) AudioSys.mineSfx('armor_on', { delay: 0.08, gain: 0.9 });   // ชุดเกราะเสียดสี
       const org = ORGANS.find(o => o.id === organId);
-      const msg = `สวม${it.name}ที่${org.name}แล้ว${note}, พลังโจมตี ${getTotalAtk()}, พลังป้องกัน ${getTotalDef()}`;
+      const msg = `สวม${it.name}ที่${org.name}แล้ว${note}, แรงตีต่อครั้ง ${getTotalAtk()} แต้ม, พลังป้องกัน ${getTotalDef()}`;
       refreshBagMenu(msg, { kind: 'equipped', itemId, organId });
     }
 
@@ -3095,8 +3068,9 @@
       state.equipped[organId] = null;
       addInv(itemId, 1);
       unsavedDirty = true;
-      if (!(WEAPON_SET[itemId] && AudioSys.playSet(WEAPON_SET[itemId].draw || WEAPON_SET[itemId].set, 'draw', { rate: 0.8 * (WEAPON_SET[itemId].drawRate || 1), gain: 0.8 }))) AudioSys.playSound('equip');   // เก็บอาวุธ / ถอดชุด
-      const msg = `ถอด${ITEMS[itemId].name}แล้ว, พลังโจมตี ${getTotalAtk()}, พลังป้องกัน ${getTotalDef()}`;
+      if (WEAPON_SET[itemId] && WEAPON_SET[itemId].draw === 'sword') AudioSys.mineSfx('sword_sheath', {});   // เก็บดาบเข้าฝัก
+      else if (!(WEAPON_SET[itemId] && AudioSys.playSet(WEAPON_SET[itemId].draw || WEAPON_SET[itemId].set, 'draw', { rate: 0.8 * (WEAPON_SET[itemId].drawRate || 1), gain: 0.8 }))) AudioSys.playSound('equip');   // เก็บอาวุธ / ถอดชุด
+      const msg = `ถอด${ITEMS[itemId].name}แล้ว, แรงตีต่อครั้ง ${getTotalAtk()} แต้ม, พลังป้องกัน ${getTotalDef()}`;
       refreshBagMenu(msg, { kind: 'bag', itemId });
     }
 
@@ -3115,6 +3089,7 @@
         return;
       }
       const it = ITEMS[entry.itemId];
+      if (Gear.dropGuard(entry.itemId)) return;   // ของพิเศษ: ยืนยัน 2 ครั้ง
       removeInv(entry.itemId, 1);
       if (!state.inventory[entry.itemId]) {
         if (state.potKey1 === entry.itemId) state.potKey1 = null;
@@ -3122,6 +3097,7 @@
       }
       unsavedDirty = true;
       AudioSys.playSound('drop');
+      if (it.cat === 'weapon') AudioSys.mineSfx('weapon_drop', { gain: 0.8, delay: 0.05 });   // อาวุธตกพื้น
       if (it.cat === 'consumable' && (it.healHp || it.healSp)) AudioSys.mineSfx('potion_break', { delay: 0.2, gain: 0.8 });
       refreshBagMenu(`ทิ้ง${it.name} 1 ชิ้นแล้ว`);
     }
@@ -3244,11 +3220,11 @@
       const m = currentMenu();
       if (m) m.title = `ซื้อ มี ${state.gold} เหรียญ`;
       renderAll();
-      speak(`ซื้อ${it.name}แล้ว เหลือ ${state.gold} เหรียญ`);
+      speak(`ซื้อ${it.name}แล้ว เหลือ ${state.gold} เหรียญ` + Town.buyNote(id) + (id === 'arrow_pack' ? `, มีลูกศร ${state.inventory.arrow || 0} ดอก` : ''));
     }
 
     function doesShopAccept(shopType, item) {
-      if (item.starter) return false;
+      if (item.starter || item.special) return false;   // ของพิเศษขายไม่ได้
       if (shopType === 'weapon_armor') return item.cat === 'weapon' || item.cat === 'armor' || item.cat === 'accessory';
       if (shopType === 'potion') return item.cat === 'consumable' || !!item.potionSell;
       if (shopType === 'general') return item.cat === 'material';
@@ -3319,6 +3295,9 @@
           { label: 'บันทึกเควสต์ เหมืองคนแคระ', action: () => { Mine.ensure(); Mine.openQuestLog(); } },
           { label: 'บันทึกเควสต์ เมืองเริ่มต้น', action: () => Town.openQuestLog() },
           { label: 'สมุดมอนสเตอร์', action: () => Town.openBook() },
+          { label: 'สมุดของพิเศษ', action: () => Gear.openBook() },
+          Updater.statusItem(),
+          { label: 'ตั้งค่าการต่อสู้', action: () => Gear.openSettings() },
           { label: 'แทร็กแผนที่', action: openTrackMapMenu },
           { label: 'คีย์ลัด', action: openShortcutsMenu },
           { label: 'ปิดหน้าต่างสถานะ', action: () => popMenu() }
@@ -3333,7 +3312,7 @@
         `เลือด ${state.hp}เต็ม${getMaxHp()}`,
         `พลังวิญญาณ ${state.sp}เต็ม${getMaxSp()}`,
         `เงิน ${state.gold} เหรียญ`,
-        `พลังโจมตี ${getTotalAtk()}`,
+        `แรงตีต่อครั้ง ${getTotalAtk()} แต้ม`,
         `พลังป้องกัน ${getTotalDef()}`
       ];
 
@@ -3362,7 +3341,7 @@
         type: 'char_info',
         title: 'ข้อมูลตัวละคร',
         idx: 0,
-        items: lines.map(txt => ({ label: txt, action: () => speak(txt) }))
+        items: lines.map(txt => ({ label: txt, action: () => speak(txt) })).concat(Gear.charItems())
       });
     }
 
@@ -3413,7 +3392,7 @@
         'W: บอกทิศที่หันอยู่และตำแหน่งในแผนที่',
         'C: บอกพิกัดตัวเลข',
         'Spacebar: กระโดด',
-        'Ctrl ซ้าย: โจมตีไปทางที่หันอยู่ (ทางลูกศรที่กดล่าสุด) มีดและหมัดตีได้เร็ว ค้อนและขวานช้ากว่า',
+        'Ctrl ซ้าย: โจมตีไปทางที่หันอยู่ ตีโดนเฉพาะข้างหน้าและเฉียงหน้า ซ้ายขวาตรงๆ และข้างหลังตีไม่โดน, หมัด มีด กริช ดาบไม้ ระยะ 1 ก้าว, ดาบเหล็ก ระยะ 2 ก้าว, ขวานและค้อนตีกวาดได้ถึง 3 ตัว ค้อนทำให้เซ, หนังสติ๊ก 4 ก้าว ธนู 6 ก้าว ยิงตรงแนวเดียว',
         'R: ฟังมอนสเตอร์รอบตัวในป่า 12 ก้าว, ฟังสิ่งรอบตัวในเหมือง, ในเมืองบอก NPC จุดงาน และประตูอาคารในระยะ 15 ก้าว',
         'Ctrl ซ้ายในเมือง: ยืนริมสระหันหน้าเข้าน้ำเพื่อตกปลา, ในโรงครัวใช้หั่นผัก, ในลานฝึกใช้ตีหุ่นฝึก',
         'Escape ระหว่างมินิเกมในเมือง: เลิกเล่นมินิเกมนั้น',
@@ -3521,6 +3500,7 @@
         trackingId: state.trackingId,
         mine: state.mine,
         town: state.town,
+        gameBuild: GAME_VERSION.build,   // รุ่นเกมที่ใช้บันทึก (ช่วยแปลงเซฟข้ามหลายรุ่น)
         menuStackSnapshot: state.menuStack.map(m => ({ type: m.type, shopType: m.shopType || null })),
       };
       localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
@@ -3591,6 +3571,8 @@
       initAllZoneAnimals();
       Mine.onGameStart();
       Town.onGameStart();
+      Gear.onGameStart();
+      Updater.onGameStart();
       AudioSys.startMusic('city');
       AudioSys.startAmbience();
       startAnimalLoop();
@@ -3644,7 +3626,7 @@
       AudioSys.mineSfx(`bd${n}_close`, { delay: 0.55 });
     }
 
-    function mainOpts() { return ['เริ่มเกม', 'ตั้งค่าเสียง'].concat(Mobile.enabled ? ['ตั้งค่าการควบคุม'] : []).concat(['ออกจากเกม']); }
+    function mainOpts() { const up = Updater.mainLabel(); return (up ? [up] : []).concat(['เริ่มเกม', 'ตั้งค่าเสียง']).concat(Mobile.enabled ? ['ตั้งค่าการควบคุม'] : []).concat(['ออกจากเกม']); }
 
     // ==================== เมนูตั้งค่าเสียง ====================
     const SOUND_ITEMS = [
@@ -3728,8 +3710,10 @@
         title: 'เมนูเกม',
         idx: 0,
         items: [
+          ...Updater.gameMenuItems(),   // มีรุ่นใหม่: โหลดรุ่นใหม่ ฟังสิ่งที่เปลี่ยน ปิดเตือนซ้ำ
           { label: 'เล่นต่อ', action: () => popMenu() },
           { label: 'ตั้งค่าเสียง', action: () => openSoundSettings('game') },
+          { label: 'ตั้งค่าการต่อสู้ (ไกลเกินไป, ปุ่ม R แบบนักล่า)', action: () => Gear.openSettings() },
           ...(Mobile.enabled ? [{ label: 'ตั้งค่าการควบคุมและมือถือ', action: () => Mobile.openControl('game') }] : []),
           ...(state.zoneId === 'city' ? [{ label: `โหมดผ่อนคลาย ตอนนี้${Town.relaxed() ? 'เปิด' : 'ปิด'}, กด Enter เพื่อสลับ`, action: () => { popMenu(true); Town.toggleRelaxed(); } }] : []),
           { label: 'ออกจากเกม', action: () => openExitConfirm('game_menu') }
@@ -3797,6 +3781,8 @@
 
     // ==================== LEVEL UP ====================
     function addExp(amount) {
+      amount = Gear.expMul(amount);   // หมวกปราชญ์
+      const startLv = state.level;
       state.exp += amount;
       let msg = '';
       while (state.exp >= expTotalToReachLevel(state.level + 1)) {
@@ -3807,6 +3793,7 @@
         if (!AudioSys.playFx('level_up', { delay: 1.8, jitter: 0 })) AudioSys.playSound('fanfare');   // เลเวลอัป: ดังหลังเสียงสังหารและเก็บของ
         msg = `เลเวลอัป! ตอนนี้เลเวล ${state.level}, เลือด ${state.hp}เต็ม${getMaxHp()}, พลังวิญญาณ ${state.sp}เต็ม${getMaxSp()}`;
       }
+      for (let L = startLv + 1; L <= state.level; L++) { const b = Gear.onLevel(L); if (b) msg += `, ${b}`; }   // เลเวล 5 10 15 20 25 ได้กล่องของขวัญ
       return msg;
     }
 
@@ -3857,7 +3844,7 @@
           subEl.textContent = `พิกัด (${state.x}, ${state.y}) | หันทิศ${DIRS[state.dir].name} | เลเวล ${state.level} | เงิน ${state.gold} เหรียญ`;
           bodyEl.innerHTML = `<p style="color:var(--muted); font-size:13px;">
             ${z.terrain} | ${z.weather}<br>
-            เลือด ${state.hp}/${getMaxHp()} | พลังวิญญาณ ${state.sp}/${getMaxSp()} | พลังโจมตี ${getTotalAtk()} | พลังป้องกัน ${getTotalDef()}
+            เลือด ${state.hp}/${getMaxHp()} | พลังวิญญาณ ${state.sp}/${getMaxSp()} | แรงตีต่อครั้ง ${getTotalAtk()} แต้ม | พลังป้องกัน ${getTotalDef()}
           </p>`;
         }
       }
@@ -3980,13 +3967,13 @@
         mine_surface: [['amb_mine_wind', 0.8]],
         mine_b1: [['amb_mine_drips', 0.8], ['amb_cave', 0.9]],
         mine_b2: [['amb_mine_drips', 0.6], ['amb_cave', 1]],
-        mine_b3: [['amb_mine_drips', 0.3], ['amb_cave', 0.8]]
+        mine_b3: [['amb_mine_drips', 0.3], ['amb_cave', 0.8], ['amb_abyss', 0.55]]
       });
       Object.assign(ZONE_FALL, { mine_surface: 'rock', mine_b1: 'rock', mine_b2: 'rock', mine_b3: 'rock' });
       Object.assign(ANIMAL_MATERIAL, { ssnake: 'flesh', hound: 'flesh', mimic: 'shell', necro: 'flesh', goat: 'flesh', eagle: 'flesh', bat: 'flesh', goblin: 'flesh', slug: 'flesh', golem: 'shell', spirit: 'shell', salamander: 'flesh', ghost: 'flesh', worm: 'flesh' });
       Object.assign(MONSTER_STEP_SOUND, { hound: [1.05, 0.5], necro: [0.85, 0.6], goat: [1.15, 0.5], salamander: [0.9, 0.5] });
       // รวมเสียงมอนสเตอร์ทีละท่า: ท่าที่มีไฟล์ใหม่จะแทนไฟล์เดิม ท่าที่ไม่มีใช้ของเดิม
-      Object.entries(MINE_ANIMAL_FILES).forEach(([t, kinds]) => { ANIMAL_FILES[t] = Object.assign({}, ANIMAL_FILES[t] || {}, kinds); });
+      Object.entries(MINE_ANIMAL_FILES).forEach(([t, kinds]) => { const base = ANIMAL_FILES[t] || {}, m = Object.assign({}, base, kinds); if (t === 'rabbit' && base.idle && kinds.idle) m.idle = base.idle.concat(kinds.idle); ANIMAL_FILES[t] = m; });   // กระต่าย: เสียงเดิม + เสียงชุด sounds1
       Object.assign(AMB_FILES, MINE_AMB_FILES);
       // ความดังของเสียงมอนสเตอร์ในเหมือง ปรับจากการวัดเทียบกับเสียงหมาป่า (ร้องปกติ −20, โจมตี −15 dB)
       Object.assign(MIX.animal, {
@@ -4532,7 +4519,7 @@
         const f = curF(); if (f === 0 || f === undefined) return 60;
         let r = state.inventory.mine_lantern ? 8 : 4;
         if ((M().buffs.torchUntil || 0) > Date.now()) r += 2;
-        return r;
+        return r + Gear.visBonus();   // แหวนนกฮูก
       }
       // ---------- กระเป๋าแร่ ----------
       const oreCount = () => RAW_ORE_IDS.reduce((s, id) => s + (state.inventory[id] || 0), 0);
@@ -4937,6 +4924,7 @@
           loops.push({ key: 'forge', src: 'beacon:weapon_shop', ...toGame(72, 96), range: 26, gain: 0.55 });
           loops.push({ key: 'cauldron', src: 'beacon:potion_shop', ...toGame(134, 112), range: 14, gain: 0.5 });
           loops.push({ key: 'shrine', src: 'amb:amb_chapel', ...toGame(100, 18), range: 30, gain: 0.8 });
+          loops.push({ key: 'inn_fire', src: 'amb:amb_campfire', ...toGame(110, 117), range: 14, gain: 0.6 });   // กองไฟโรงเตี๊ยม
         } else if (f === 2) {
           loops.push({ key: 'lake', src: 'amb:amb_lake', ...toGame(30, 130), range: 60, gain: 0.9 });
           loops.push({ key: 'stream', src: 'amb:amb_mine_water', ...toGame(30, 130), range: 35, gain: 0.5 });
@@ -5233,6 +5221,7 @@
         const b = blinkNode(), d = dailyFresh();
         const isBlink = b && b.n === n && !d.done.d3;
         if (isBlink) qty *= 2;
+        qty += Gear.oreBonus();   // กำไลนักขุดทอง
         const space = oreCap() - oreCount();
         const got = Math.max(0, Math.min(qty, space));
         if (got > 0) giveItem(o.item, got);
@@ -5300,7 +5289,7 @@
       function stopRhythm() { if (rh.timer) { clearInterval(rh.timer); rh.timer = null; } }
       function rhythmJudge(now) {
         if (!rh.timer) return false;
-        const t = (TIMING.evAt || now) - TIMING.lat, w = WINDOW * TIMING.mul;   // มือถือ: เวลาแตะจริง ชดเชยความหน่วง ช่วงกว้างขึ้น
+        const t = (TIMING.evAt || now) - TIMING.lat, w = WINDOW * TIMING.mul * Gear.goldWin();   // มือถือ: เวลาแตะจริง ชดเชยความหน่วง ช่วงกว้างขึ้น
         return Math.abs(t - rh.lastGold) <= w || Math.abs(rh.nextGold - t) <= w;
       }
 
@@ -5333,49 +5322,46 @@
       const told = {};           // ข้อความแนะนำที่บอกไปแล้วในรอบเล่นนี้
       const tellOnce = (k, long, short) => { if (!told[k]) { told[k] = 1; return long; } return short; };
       const mrel = (a) => [a.x - pdx(), pdy() - a.y];
-      function weaponPts(wId) {
-        if (!wId) return 1;
-        const it = ITEMS[wId]; let p = it.hitPts || 2;
-        p += 0.5 * ((M().upg[wId]) || 0);
-        return p;
-      }
+      function weaponPts(wId) { return Gear.strike(wId); }   // แรงตีต่อครั้ง = แต้มอาวุธ + อัปเกรด + แรงตีเสริมจากไอเทม + บัฟ
       function wClass(wId) { return wId ? (ITEMS[wId].wclass || 'blade') : 'fist'; }
 
+      // ตีทิศเดียว: เลือกเป้าตามระยะอาวุธ (ตรงหน้า + เฉียงหน้าข้างละ 1) ขวาน/ค้อนกวาดได้ถึง 3 ตัว อาวุธยิงเป็นแนวตรง หินบังได้
       function attackMobs(range, wSlot) {
         const f = curF(); if (f === undefined) return;
-        const arr = F[f].mobs; let best = null, bd = Infinity;
-        for (const a of arr) {
-          if (a.gone || a.under) continue;
-          const [dx, dy] = mrel(a); const d = Math.max(Math.abs(dx), Math.abs(dy));
-          if (d > range) continue;
-          const rel = AudioSys.calcRelativePanAndFront(dx, dy, state.dir);
-          if ((d === 0 || rel.diffDeg <= 45) && d < bd) { bd = d; best = a; }
-        }
-        if (!best) return;
-        const a = best, t = MOBS[a.type], wId = wSlot ? state.equipped[wSlot] : null;
-        a.provoked = true;
-        if (!a.alerted) { a.alerted = true; alertPack(a); }
+        const wId = wSlot ? state.equipped[wSlot] : null, spec = Gear.spec(wId);
+        const cands = F[f].mobs.filter(a => !a.gone && !a.under).map(a => { const [dx, dy] = mrel(a); return { o: a, dx, dy, snd: a.snd, name: a.name }; });
+        const px = pdx(), py = pdy();
+        const blocked = (dx, dy) => { const x = px + dx, y = py - dy, t = tileAt(f, x, y); return !(t === T.FLOOR || t === T.HOT || t === T.GAS || t === T.BRIDGE || t === T.WATER || t === T.GAP) || !!nodeAtF(f, x, y) || !!npcAt(f, x, y); };
+        const picks = Gear.pick(cands, spec, blocked);
+        if (!picks.length) { Gear.miss(cands, spec, blocked); return; }
+        Gear.swing(picks, spec, cands, (c, mods) => hitOneMob(c.o, wId, mods));
+      }
+      function hitOneMob(a, wId, mods) {
+        const t = MOBS[a.type];
+        const unaware = !a.alerted && !a.provoked;
+        if (!mods.keepHidden(a, unaware)) { a.provoked = true; if (!a.alerted) { a.alerted = true; alertPack(a); } }
         const [dx, dy] = mrel(a);
         if (!a.boss && Math.random() < t.dodge && mobSidestep(a)) {
           const [hx, hy] = mrel(a);
           setTimeout(() => { AudioSys.playHitFile('dodge', { dx: hx, dy: hy }); AudioSys.playMonsterStep(a.snd, hx, hy); }, 60);
-          renderAll(); speak(`${a.name}หลบ`); return;
+          renderAll(); speak(`${a.name}หลบ`); return null;
         }
         // ภูตคริสตัลเรืองแสง: สะท้อนการโจมตีกลับ
         if (a.type === 'crystal_spirit' && (a.glowUntil || 0) > Date.now()) {
           AudioSys.mineSfx('reflect', { dx, dy });
           hurtPlayer(Math.round(12 * a.lvl * 0.8), 'แสงคริสตัลสะท้อนการโจมตีกลับ', dx, dy, { noFile: true });
-          return;
+          return null;
         }
-        let pts = weaponPts(wId); const wc = wClass(wId); let note = '';
+        let pts = mods.pts(a, unaware); const wc = wClass(wId); let note = '';
         if (a.type === 'iron_golem') { pts *= wc === 'hammer' ? 2 : (wc === 'blade' ? 0.5 : (wc === 'fist' ? 0.5 : 1)); if (wc === 'blade') note = tellOnce('golemblade', 'ดาบแทบไม่ระคายผิวโกเลม ใช้ค้อนจะได้ผล 2 เท่า', ''); }
         if (a.type === 'ghost_miner' && wId && ITEMS[wId].silver) pts *= 2;
         if (a.type === 'core_golem') {
           if (a.phase === 1) pts *= wc === 'hammer' ? 1.5 : (wc === 'blade' ? 0.75 : 1);
-          if (a.phase === 2 && !((a.coreOpenUntil || 0) > Date.now())) { AudioSys.mineSfx('clank', { dx, dy }); speak(tellOnce('coreclosed', 'กระทบเกราะคริสตัล ไม่เป็นผล รอให้แกนอกเปิดก่อน', 'เกราะคริสตัล')); return; }
+          if (a.phase === 2 && !((a.coreOpenUntil || 0) > Date.now())) { AudioSys.mineSfx('clank', { dx, dy }); speak(tellOnce('coreclosed', 'กระทบเกราะคริสตัล ไม่เป็นผล รอให้แกนอกเปิดก่อน', 'เกราะคริสตัล')); return null; }
         }
         damageMob(a, pts, wId);
         if (note) speak(note);
+        return { pts, dead: a.hp <= 0, boss: !!a.boss, dx, dy };
       }
       function alertPack(a) {
         const fl = F[a.f];
@@ -5384,7 +5370,7 @@
       function damageMob(a, pts, wId, src = '') {
         const [hx, hy] = mrel(a), t = MOBS[a.type];
         if (a.boss && !a.active && playerInArena(a)) bossProximity(curF(), pdx(), pdy());
-        a.hp -= pts; a.provoked = true;
+        a.hp -= pts; if (!Gear.hidden(a)) a.provoked = true;
         const dead = a.hp <= 0;
         setTimeout(() => { if (!AudioSys.playHit(a.snd, wId, hx, hy)) AudioSys.playSound('hit_enemy'); }, 60);
         setTimeout(() => AudioSys.playAnimalFile(a.snd, dead && !(a.boss && a.type === 'core_golem' && a.phase < 3) ? 'death' : 'hurt', hx, hy, { rate: t.rate || 1 }), 110);
@@ -5406,7 +5392,7 @@
         const parts = [`สังหาร${a.name}${src ? 'ด้วย' + src : ''}`];
         let exp = 40 * a.lvl;
         if ((m.buffs.songUntil || 0) > Date.now() && m.buffs.songType === 'legend') exp = Math.round(exp * 1.1);
-        exp = Town.expMul(exp); Town.learn(a.type);   // โหมดผ่อนคลาย / บันทึกสมุดมอนสเตอร์
+        exp = Town.expMul(exp); const sageMsg = Gear.sageKill(Town.learn(a.type));   // โหมดผ่อนคลาย / บันทึกสมุดมอนสเตอร์
         // ของดรอป
         const drops = [];
         if (a.type === 'goblin') { drops.push(['ore_copper', ri(1, 2)]); const g = ri(20, 60); state.gold += g; parts.push(`ได้ ${g} เหรียญ`); }
@@ -5424,6 +5410,7 @@
         }
         onKill(a);
         if (lv) parts.push(lv);
+        if (sageMsg) parts.push(sageMsg.slice(2));
         checkQuests(true).forEach(x => parts.push(x));
         if (a.plan && !a.minionOf && !a.raid) respawnQ.push({ f: a.f, plan: a.plan, at: Date.now() + 60000, lvl: a.lvl });
         unsavedDirty = true;
@@ -5435,11 +5422,11 @@
       function hurtPlayer(raw, why, dx = 0, dy = 0, opt = {}) {
         if (state.screen !== 'game' || dying) return false;
         const def = playerDef();
-        let dmg = Town.dmgMul(def > 0 ? Math.max(MONSTER_MIN_DMG_ARMORED, Math.round(raw - def)) : Math.round(raw));
+        let dmg = Gear.reduce(Town.dmgMul(def > 0 ? Math.max(MONSTER_MIN_DMG_ARMORED, Math.round(raw - def)) : Math.round(raw)), why);   // เกล็ดมังกร / สนับแข้งหินผา
         state.hp -= dmg; unsavedDirty = true; Town.onPlayerHurt();
         if (def > 0) AudioSys.mineSfx('shield_hit', { dx, dy, gain: 0.5, delay: 0.05 });   // เกราะรับแรงกระแทก
         if (!AudioSys.playPlayerHit(dx, dy, opt.type || null)) AudioSys.playSound('player_hurt');   // เสียงกระแทกตามชนิดมอนสเตอร์
-        if (state.hp <= 0) { die(why); return true; }
+        if (state.hp <= 0) { if (Gear.cheatDeath()) { renderAll(); return false; } die(why); return true; }
         renderAll();
         speak(`${why}, เสียเลือด ${dmg}, เลือด ${state.hp}เต็ม${getMaxHp()}`);
         return false;
@@ -5448,9 +5435,10 @@
         if (state.screen !== 'game' || dying) return;
         let dmg = Town.dmgMul(Math.max(1, Math.round(getMaxHp() * p))); Town.onPlayerHurt();
         if (halveHelmet && state.equipped.head === 'miner_helmet') dmg = Math.round(dmg / 2);
+        dmg = Gear.reduce(dmg, why);
         state.hp -= dmg; unsavedDirty = true;
         if (sfx) AudioSys.mineSfx(sfx, {}); else AudioSys.playSound('player_hurt');
-        if (state.hp <= 0) { die(why); return; }
+        if (state.hp <= 0) { if (Gear.cheatDeath()) { renderAll(); return; } die(why); return; }
         renderAll(); speak(`${why}, เสียเลือด ${dmg}, เลือด ${state.hp}เต็ม${getMaxHp()}`);
       }
       let dying = false;
@@ -5530,6 +5518,7 @@
           if (a.gone && !(a.boss && a.active)) continue;
           if (a.boss) { if (bossTick(a, now)) moved = true; continue; }
           const t = MOBS[a.type];
+          if ((a.stunUntil || 0) > now) continue;   // ค้อน/สายฟ้าฟาด: ชะงัก
           const d = cheb(a.x, a.y, px, py);
           const playerNear = !safe && a.home && (a.provoked || !Town.relaxed()) && inR(px, py, [a.home[0] - 3, a.home[1] + 3, a.home[2] - 3, a.home[3] + 3]);
           const sight = f === 0 ? 7 : Math.min(7, visRadius() + 3);
@@ -5544,7 +5533,7 @@
             if (now >= a.t2) { emergeBehind(a); moved = true; }
             continue;
           }
-          if (playerNear && d <= sight) {
+          if (playerNear && d <= sight && Gear.notice(a, d, sight)) {
             if (!a.alerted) { a.alerted = true; alertPack(a); const [dx, dy] = mrel(a); AudioSys.playAnimalFile(a.snd, 'alert', dx, dy, { rate: t.rate || 1 }); Town.onMonsterAlert(a.snd, a.name, dx, dy); }
             if (specialAct(a, now, d)) { moved = true; continue; }
             if (a.type === 'goblin_bomber') { if (now >= a.nextMoveAt) { a.nextMoveAt = now + t.step; if (d < 3 ? stepAway(a, px, py) : (d > 5 && stepToward(a, px, py))) moved = true; } continue; }
@@ -5557,10 +5546,10 @@
             // ง้างโจมตี: เสียงขู่ก่อนตีจริง 0.45 วินาที ถ้าก้าวหนีทันจะหลบได้
             if (a.windAt && now >= a.windAt) {
               a.windAt = 0;
-              if (cheb(a.x, a.y, pdx(), pdy()) <= 1) { if (meleeHit(a)) return; }
+              if (cheb(a.x, a.y, pdx(), pdy()) <= 1 && !Gear.safeNow()) { if (meleeHit(a)) return; }
               else { const [wx, wy] = mrel(a); AudioSys.mineSfx('dodgewhoosh', { dx: wx, dy: wy }); speak(`หลบการโจมตีของ${a.name}ได้`); }
             } else if (!a.windAt && d <= 1 && now - a.lastAtkAt >= t.cd) {
-              a.lastAtkAt = now; a.windAt = now + 450 * TIMING.mul + TIMING.lat;
+              a.lastAtkAt = now; a.windAt = now + (450 + Gear.dodgeMs()) * TIMING.mul + TIMING.lat;
               const [wx, wy] = mrel(a); AudioSys.playAnimalFile(a.snd, 'alert', wx, wy, { rate: t.rate || 1 });
             }
           } else if (now >= (a.nextWanderAt || 0)) {
@@ -5706,6 +5695,7 @@
         a.active = true; bossActive = a; a.t = { lastQ: 4 }; a.st = 'idle';
         AudioSys.setMusicOverride(a.type === 'core_golem' ? 'boss_final' : 'boss'); AudioSys.mineSfx('ominous'); AudioSys.mineSfx('gong', { delay: 0.3, gain: 0.7 });
         const [bx, by] = mrel(a); if (a.type === 'goblin_king') AudioSys.playAnimalFile('necro', 'alert', bx, by);
+        if (a.type === 'stone_worm') AudioSys.mineSfx('worm_roar', { dx: bx, dy: by, delay: 0.6 });   // หนอนหินยักษ์คำราม
         speak(line);
       }
       function resetBoss(a, announce = false) {
@@ -5813,6 +5803,7 @@
           const hit = cheb(pdx(), pdy(), a.t.tx, a.t.ty) <= 1;
           surfaceAt(a, a.t.tx, a.t.ty, now, hit);
           AudioSys.mineSfx('emerge_big', { dx: a.t.tx - pdx(), dy: pdy() - a.t.ty });
+          if (Math.random() < 0.5) AudioSys.mineSfx('worm_roar', { dx: a.t.tx - pdx(), dy: pdy() - a.t.ty, delay: 0.25, gain: 0.8 });
           if (hit) { if (mobHit(a, 2, 'กรวดกลืนพุ่งขึ้นจากใต้เท้า')) return true; } else speak('หนอนหินพุ่งขึ้นจากพื้นข้างๆ หลบได้! ตีมันตอนนี้');
           return true;
         }
@@ -5922,6 +5913,7 @@
         fl.mobs = fl.mobs.filter(m => m !== a && m.minionOf !== a.uid);
         a.gone = true; a.active = false; bossActive = null; hazards.length = 0;
         AudioSys.setMusicOverride(null); AudioSys.mineSfx('victory'); AudioSys.playFx('kill', { delay: 0.1 });
+        Gear.bossBox(a.type);   // ชนะบอสครั้งแรก ได้กล่องของขวัญ
       }
       function victoryKing(a) {
         const m = M(); endBossCommon(a); m.flags.king = true; AudioSys.mineSfx('door_grant', { delay: 3 }); AudioSys.mineSfx('unlock_move', { delay: 3.4 });
@@ -6175,7 +6167,7 @@
         erda: ['หินพูดได้นะ คนนอก แต่เจ้ายังไม่ได้ยินมัน ลองเคาะผนังด้วยปุ่ม K แล้วตั้งใจฟัง', 'เสียงของหินบอกข้าว่ามีบางอย่างกำลังตื่นขึ้นในโพรงคริสตัลชั้นลึกสุด', 'ใจภูเขาเต้นช้าลงแล้ว เพราะเจ้า หินขอบคุณเจ้า'],
         dorn: ['เตาของข้าร้อนพอจะหลอมกระดูกคนนอกได้ ถ้ามีแท่งโลหะมา ข้าจะตีของให้', 'เอาแท่งสำริดหรือแท่งเหล็กมา ข้าจะตีอาวุธที่ดีที่สุดให้เจ้า', 'ค้อนคริสตัลแห่งค้อนศิลา ข้ารอวันได้ตีให้เจ้ามานานแล้ว'],
         gren: ['เตาหลอมนี้สำหรับคนของเผ่าเท่านั้น กลับมาเมื่อเจ้าเป็นคนงานรับจ้างแล้ว', 'แร่สามก้อนกับถ่านหินหนึ่งก้อน ได้แท่งทองแดงหนึ่งแท่ง ง่ายนิดเดียว', 'ไฟเตาของข้าไม่เคยดับ เพราะถ่านหินจากเจ้า'],
-        pippa: ['อัญมณีดิบก็แค่ก้อนหิน จนกว่ามันจะผ่านมือพิพพาสองคม', 'ทับทิมเพิ่มพลังโจมตี ไพลินเพิ่มพลังเวท มรกตรักษาบาดแผล เลือกเอาเถอะ', 'เข็มกลัดค้อนศิลาบนอกเจ้า งามที่สุดในค่ายนี้'],
+        pippa: ['อัญมณีดิบก็แค่ก้อนหิน จนกว่ามันจะผ่านมือพิพพาสองคม', 'ทับทิมเพิ่มแรงตี ไพลินเพิ่มพลังเวท มรกตรักษาบาดแผล เลือกเอาเถอะ', 'เข็มกลัดค้อนศิลาบนอกเจ้า งามที่สุดในค่ายนี้'],
         balin: ['ยามเหมืองห้ามคนนอกลงอุโมงค์ ไปพิสูจน์ตัวเองกับหัวหน้าเผ่าก่อน', 'ก็อบลินพวกนั้นขโมยแร่ไปทุกคืน ได้ยินเสียงหัวเราะของพวกมันในอุโมงค์ไหม', 'เจ้าขุดแร่ได้มากกว่าคนงานของข้าทั้งกะ'],
         gerda: ['จอบ คบเพลิง ตะเกียง มีครบ เงินพร้อมก็ซื้อได้เลย', 'ตะเกียงเหมืองนี่สำคัญที่สุด ข้างล่างมืดยิ่งกว่ากลางคืน', 'สำหรับพี่น้องร่วมค้อน ข้าลดให้สิบเปอร์เซ็นต์'],
         thorin: ['เบียร์ของทอรินดื่มแล้วหายเหนื่อย ส่วนคนนอกจ่ายก่อนนะ', 'นั่งพักก่อนสิ เตียงชั้นบนว่างอยู่ หลับที่นี่แล้วเจ้าจะฟื้นที่นี่', 'ขวดนี้ข้าเลี้ยงใจ แต่เงินยังต้องจ่ายตามเดิม ฮ่า ฮ่า'],
@@ -6281,7 +6273,7 @@
           case 'frey': add('ซื้อแผนที่', () => openMineShop('หอแผนที่ของเฟรย์', FREY_STOCK)); break;
           case 'urga': add('ฝากของเข้าคลัง', openVaultDeposit); add('ถอนของจากคลัง', openVaultWithdraw); add('บริจาคแร่ แลกค่าความนับถือ', openDonateMenu); break;
           case 'berk': add('ฟังตำนานของเผ่าค้อนศิลา', () => speak(LEGENDS[Math.min(rankIdx(), LEGENDS.length - 1)]));
-            add('ขอเพลงปลุกใจคนขุดแร่ 30 นาที (30 เหรียญ) พลังโจมตี +5 พลังกายฟื้นเร็ว 2 เท่า', () => buySong('work', 30));
+            add('ขอเพลงปลุกใจคนขุดแร่ 30 นาที (30 เหรียญ) แรงตี +1 ต่อครั้ง พลังกายฟื้นเร็ว 2 เท่า', () => buySong('work', 30));
             if (m.flags.newSong) add('ขอเพลงตำนานนักขุดโบราณ 30 นาที (50 เหรียญ) ค่าประสบการณ์ +10%', () => buySong('legend', 50)); break;
           case 'apprentice': add('ขอคำแนะนำการขุดแร่', () => speak('จุดแร่ต้องฟาดหลายครั้งจึงแตก หินธรรมดากับถ่านหินใช้จอบไม้ได้ ทองแดงต้องใช้จอบหินและทักษะ 3 กด R ฟังสิ่งรอบตัว ถ้าถุงแร่เต็มให้ฝากที่คลังแร่'));
             if (!hasAnyPick() && !m.freePick) add('ขอยืมจอบไม้ (ฟรีครั้งเดียว)', () => { m.freePick = true; giveItem('pick_wood'); refreshNpc(n); speak('ได้รับจอบไม้ 1 เล่ม'); }); break;
@@ -6301,7 +6293,7 @@
         if (state.gold < price) { AudioSys.playSound('error'); speak('เหรียญไม่พอ'); return; }
         state.gold -= price; m.buffs.songUntil = Date.now() + 30 * 60000; m.buffs.songType = type;
         AudioSys.mineSfx('song', {}); renderAll();
-        speak(type === 'legend' ? 'เบิร์กขับร้องเพลงตำนานนักขุดโบราณ ค่าประสบการณ์จากการสังหารเพิ่ม 10% นาน 30 นาที' : 'เบิร์กขับร้องเพลงปลุกใจคนขุดแร่ พลังโจมตี +5 และพลังกายฟื้นเร็ว 2 เท่า นาน 30 นาที');
+        speak(type === 'legend' ? 'เบิร์กขับร้องเพลงตำนานนักขุดโบราณ ค่าประสบการณ์จากการสังหารเพิ่ม 10% นาน 30 นาที' : 'เบิร์กขับร้องเพลงปลุกใจคนขุดแร่ แรงตี +1 ต่อครั้ง และพลังกายฟื้นเร็ว 2 เท่า นาน 30 นาที');
       }
 
       // ---------- ร้านค้า ----------
@@ -6422,7 +6414,7 @@
           { label: `ตกลง ใช้${nm(mat)} ${need} และ ${gold} เหรียญ (มี${nm(mat)} ${state.inventory[mat] || 0})`, action: () => {
             if (!has(mat, need) || state.gold < gold) { AudioSys.playSound('error'); speak('วัตถุดิบหรือเหรียญไม่พอ'); return; }
             removeInv(mat, need); state.gold -= gold; m.upg[wId] = lv + 1; unsavedDirty = true; AudioSys.mineSfx('forge', {});
-            popMenu(true); renderAll(); speak(`ดอร์นตี${nm(wId)}เป็น +${lv + 1} แล้ว พลังโจมตี +2 และตีมอนสเตอร์ในเหมืองแรงขึ้น 0.5 แต้ม, พลังโจมตีรวม ${getTotalAtk()}`);
+            popMenu(true); renderAll(); speak(`ดอร์นตี${nm(wId)}เป็น +${lv + 1} แล้ว แรงตีต่อครั้งเพิ่มขึ้น 0.5 แต้ม, ตอนนี้แรงตีต่อครั้ง ${getTotalAtk()} แต้ม`);
           } },
           { label: 'ยกเลิก', action: () => popMenu() }
         ] });
@@ -6503,14 +6495,14 @@
         NPCS.forEach(n => { if (n.f === f && npcVisible(n)) addObj(n.x, n.y, n.name, 2); });
         LANDMARKS[f].forEach(l => { if (l.kind === 'toy' && !toyPresent()) return; if (l.kind === 'sack' && !sackPresent()) return; if (l.kind === 'support' && f === 1 && Math.abs(l.y - py) > 4) return; addObj(l.x, l.y, lmLabel(f, l), 1); });
         F[f].nodes.forEach(n => { if (nodeAlive(n)) addObj(n.x, n.y, nodeLabel(n), 0); });
-        F[f].mobs.forEach(a => { if (!a.gone && !a.under) addObj(a.x, a.y, a.name + (a.boss ? ' (บอส)' : ''), 3); });
+        F[f].mobs.forEach(a => { if (a.gone || a.under) return; const d = cheb(a.x, a.y, px, py); if (d > 0 && d <= Gear.scanRange(R)) found.push({ d, x: a.x, y: a.y, text: a.name + (a.boss ? ' (บอส)' : '') + Gear.hpTag(a), pri: 3, mob: true }); });   // เข็มกลัดหูทิพย์: ไกล 20 ก้าว บอกเลือด
         const gas = nearestTile(f, T.GAS, Math.min(R, 6)); if (gas) addObj(gas[0], gas[1], 'บ่อแก๊สพิษสีเขียว', 3);
         const water = nearestTile(f, T.WATER, Math.min(R, 4)); if (water) addObj(water[0], water[1], 'น้ำ', 0);
         found.sort((a, b) => b.pri - a.pri || a.d - b.d);
         const fr = front(), ft = tileAt(f, fr.x, fr.y);
         const ahead = nodeAtF(f, fr.x, fr.y) ? nodeLabel(nodeAtF(f, fr.x, fr.y)) : (mobAt(f, fr.x, fr.y)?.name || npcAt(f, fr.x, fr.y)?.name || (playerPassTile(f, ft) ? 'ทางเดิน' : (TILE_NAME[ft] || (ft === T.PILLAR ? 'เสา' : 'ผนัง'))));
         AudioSys.mineSfx('scan', {});
-        const list = found.slice(0, 7).map(o => { const [dx, dy] = [o.x - px, py - o.y]; return `${o.text} ${formatDistanceText(dx, dy)}`; });
+        const list = found.slice(0, 7).map(o => { const [dx, dy] = [o.x - px, py - o.y]; return `${o.text} ${o.mob ? Gear.distText(dx, dy) : formatDistanceText(dx, dy)}`; });   // แบบนักล่า: ทิศคร่าวๆ ใกล้/ปานกลาง/ไกล
         const lightTxt = f === 0 ? '' : `รัศมีมองเห็น ${vr} ช่อง, `;
         speak(`${lightTxt}ข้างหน้า ${ahead}, ` + (list.length ? list.join(', ') : 'ไม่เห็นสิ่งใดในระยะ'));
         // เสียงตำแหน่งของ 3 อย่างที่ใกล้ที่สุด
@@ -6701,6 +6693,9 @@
         // มือถือ: แตะ 1 นิ้วตอนหันเข้าผนังหิน = เคาะผนัง (ไม่มีจุดแร่หรือมอนสเตอร์ข้างหน้า)
         frontIsWall: () => { const f = curF(); if (f === undefined) return false; const fr = front(), t = tileAt(f, fr.x, fr.y); if (nodeAtF(f, fr.x, fr.y)) return false; if (F[f].mobs.some(a => !a.gone && a.x === fr.x && a.y === fr.y)) return false; return t === T.ROCK || t === T.SECRET || t === T.PILLAR || t === T.CLIFF; },
         addRep: (n, why) => { ensure(); return addRep(n, why); },
+        busy: () => !!bossActive || !!cart.active || !!(rh && rh.timer),   // สู้บอส ขับรถแร่ ขุดตามจังหวะ
+        // อาวุธพิเศษ/น้ำยาตาทิพย์: รายชื่อมอนสเตอร์ในชั้นนี้ (ทิศเทียบผู้เล่น)
+        mobsRel: () => { const f = curF(); if (f === undefined) return []; return F[f].mobs.filter(a => !a.gone && !a.under).map(a => { const [dx, dy] = mrel(a); return { o: a, dx, dy, snd: a.snd, name: a.name }; }); },
         setUpgrade: (wId, lv) => { ensure(); const m = M(); m.upg[wId] = Math.max(m.upg[wId] || 0, lv); unsavedDirty = true; },
         cleanup: () => { stopRhythm(); if (cart.active) endCart(true); AudioSys.setPointLoops([]); AudioSys.setCave(0); AudioSys.setMusicOverride(null); },
         debug: { F, M, ORES, QUESTS, NPCS, LANDMARKS, BOSSES, MOBS, cart, flood, raid, song, merchant, hazards, goFloor, tileAt, toGame, nodeAtF, completeQuest, acceptQuest, qs, qd, checkQuests, dailyFresh, blinkNode, startRaid, luckyCollapse, spawnFloorMobs, rhythm: rh, rhythmJudge, startCart, endCart, die, T, distField, resolveTarget, makeMob, makeBoss, bossActive: () => bossActive, tick, subzoneAt, buildAll, addRep, maxSta }
@@ -6798,14 +6793,9 @@
       I('lucky_bell', { name: 'กระดิ่งนำโชค', cat: 'accessory', price: 30, def: 1, slotType: 'neck', desc: 'พลังป้องกัน 1 ของขวัญจากน้องต้น' });
       I('warn_charm', { name: 'เครื่องรางเตือนภัย', cat: 'accessory', shop: 'general', price: 120, slotType: 'wrist', warn: true, desc: 'สวมที่ข้อมือ มอนสเตอร์ไล่มาใน 6 ก้าวจะมีกริ่งเตือนจากทิศของมัน' });
       I('return_scroll', { name: 'ม้วนคัมภีร์กลับเมือง', cat: 'consumable', shop: 'potion', price: 30, desc: 'ร่ายเวท 3 วินาทีแล้วกลับกลางเมือง ถ้าโดนตีระหว่างร่ายจะยกเลิก' });
-      I('gift_box', { name: 'กล่องของขวัญเมือง', cat: 'consumable', price: 0, desc: 'เปิดแล้วได้ของพิเศษที่ไม่มีขายในร้าน เสริมพลังโจมตี' });
-      // ของพิเศษจากกล่องของขวัญ (ไม่มีขายในร้าน ทุกชิ้นเสริมการโจมตี)
-      I('hunter_ring', { name: 'แหวนนักล่า', cat: 'accessory', price: 300, atk: 15, slotType: 'finger', special: true, desc: 'ของพิเศษ พลังโจมตี 15' });
-      I('thunder_bangle', { name: 'กำไลสายฟ้า', cat: 'accessory', price: 300, atk: 8, slotType: 'wrist', atkSpeed: 0.1, special: true, desc: 'ของพิเศษ พลังโจมตี 8 โจมตีเร็วขึ้น 10%' });
-      I('tiger_fang', { name: 'สร้อยเขี้ยวพยัคฆ์', cat: 'accessory', price: 350, atk: 20, slotType: 'neck', special: true, desc: 'ของพิเศษ พลังโจมตี 20' });
-      I('fighter_band', { name: 'ผ้าคาดหัวนักสู้', cat: 'armor', price: 300, atk: 12, def: 2, slotType: 'head', special: true, desc: 'ของพิเศษ พลังโจมตี 12 พลังป้องกัน 2' });
-      I('rage_potion', { name: 'น้ำยาโทสะ', cat: 'consumable', price: 150, special: true, buffAtk: 30, buffMin: 5, desc: 'ของพิเศษ พลังโจมตี +30 นาน 5 นาที' });
-      I('warrior_rice', { name: 'ข้าวปั้นนักรบ', cat: 'consumable', price: 150, special: true, food: { hp: 0.3 }, buffAtk: 15, buffMin: 10, desc: 'ของพิเศษ ฟื้นเลือด 30% และพลังโจมตี +15 นาน 10 นาที' });
+      I('gift_box', { name: 'กล่องของขวัญเมือง', cat: 'consumable', price: 0, desc: 'เปิดแล้วได้ของพิเศษ 1 ใน 27 ชนิด ที่ไม่มีขายในร้าน' });
+      I('golden_box', { name: 'กล่องทองคำ', cat: 'consumable', price: 0, desc: 'ทำงานประจำวันครบ 7 วันติดต่อกัน เปิดแล้วได้ของพิเศษระดับหายากขึ้นไปแน่นอน' });
+      // ของพิเศษจากกล่องของขวัญ 27 ชนิด อยู่ในส่วน Gear (ระบบต่อสู้และของพิเศษ)
       { const tc = BAG_CATS.find(c => c.id === 'tool'); if (tc) tc.name = 'เครื่องมือ (ขุดแร่ ตกปลา ทำสวน)'; else BAG_CATS.push({ id: 'tool', name: 'เครื่องมือ' }); }
       SHOP_STOCK.potion.push('return_scroll', 'veg_soup', 'grilled_fish');
       SHOP_STOCK.general.push('warn_charm');
@@ -6813,11 +6803,11 @@
       // ---------- เควสต์ ----------
       const QUESTS = {
         t1: { title: 'บท 1 ลงทะเบียนนักผจญภัย', giver: 'guild', goal: 'เข้าไปที่จุดซื้อขายของร้านทั้ง 3 ร้าน (ร้านอาวุธ ร้านของทั่วไป ร้านขายน้ำยา) แล้วกด Enter', need: 3, reward: 'บัตรนักผจญภัย, 100 เหรียญ, ค่าประสบการณ์ 300' },
-        t2: { title: 'บท 2 ของหายในเมือง', giver: 'ton', goal: 'หาของเล่น 5 ชิ้นที่ซ่อนในเมือง เมื่อใกล้ 8 ก้าวจะได้ยินเสียงกรุ๊งกริ๊ง ยืนบนจุดแล้วกด Enter', need: 5, reward: 'กระดิ่งนำโชค, ค่าประสบการณ์ 500' },
-        t3: { title: 'บท 3 ฝีมือแม่ครัว', giver: 'kitchen', goal: 'ทำอาหารให้สำเร็จ 3 เมนูที่ไม่ซ้ำกันที่โรงครัวเมือง', need: 3, reward: 'สูตรซุปผู้กล้า, ค่าประสบการณ์ 800' },
+        t2: { title: 'บท 2 ดาบไม้ของเด็กๆ', giver: 'ton', goal: 'น้องต้นกับเพื่อนอีก 4 คนอยากเล่นเป็นอัศวิน ซื้อดาบไม้ฝึกหัด 5 เล่มที่ร้านอาวุธ (เล่มละ 20 เหรียญ) แล้วกลับมามอบให้น้องต้น นับเฉพาะดาบไม้ในกระเป๋า เล่มที่ถืออยู่ไม่นับ', need: 5, reward: 'กระดิ่งนำโชค, ค่าประสบการณ์ 500, คืนเงินค่าดาบ 50 เหรียญ' },
+        t3: { title: 'บท 3 ฝีมือแม่ครัว', giver: 'kitchen', goal: 'ทำอาหารให้สำเร็จ 3 เมนูที่ไม่ซ้ำกันที่โรงครัวเมือง', need: 3, reward: 'สูตรซุปผู้กล้า, กล่องของขวัญเมือง, ค่าประสบการณ์ 800' },
         t4: { title: 'บท 4 จดหมายถึงประตูเมือง', giver: 'post_office', goal: 'ส่งจดหมายให้ทหารยามครบ 4 ประตูเมือง (ยืนติดทหารแล้วกด Enter)', need: 4, reward: 'แผนที่ป่า 4 ทิศ, ค่าประสบการณ์ 1,000' },
         t5: { title: 'บท 5 บทเรียนที่ลานฝึก', giver: 'ek', goal: 'ผ่านการฝึก 3 ด่านในลานฝึกซ้อม', need: 3, reward: 'ดาบไม้ฝึกหัด +1, เสื้อหนัง, ค่าประสบการณ์ 1,500 และอาวุธทุกชนิดโจมตีเร็วขึ้น 30%' },
-        t6: { title: 'บท 6 ก้าวแรกนอกประตู (ไม่บังคับ)', giver: 'guild', goal: 'ออกไปป่ากระต่ายทิศเหนือพร้อมผู้ติดตามพี่เอก แล้วล่ากระต่าย 3 ตัว', need: 3, reward: 'ยศนักผจญภัยฝึกหัด, 500 เหรียญ, ค่าประสบการณ์ 2,000' }
+        t6: { title: 'บท 6 ก้าวแรกนอกประตู (ไม่บังคับ)', giver: 'guild', goal: 'ออกไปป่ากระต่ายทิศเหนือพร้อมผู้ติดตามพี่เอก แล้วล่ากระต่าย 3 ตัว', need: 3, reward: 'ยศนักผจญภัยฝึกหัด, 500 เหรียญ, กล่องของขวัญเมือง, ค่าประสบการณ์ 2,000' }
       };
       const ORDER = ['t1', 't2', 't3', 't4', 't5', 't6'];
       const DAILY = {
@@ -6862,6 +6852,11 @@
         const t = state.town, d = { q: {}, pages: {}, relaxed: false, fastAtk: false, title: false, herbs: {}, plots: {}, toys: {}, cooked: {}, letters: {}, shopsVisited: {}, train: {}, trainDay: {}, daily: { date: '', prog: {}, claimed: {}, box: false }, canWater: 0, companion: { until: 0, hp: 100, day: '' }, buffs: {}, rabbitsWithEk: 0, rep50: false };
         for (const k of Object.keys(d)) if (t[k] === undefined) t[k] = d[k];
         if (t.daily.date !== today()) t.daily = { date: today(), prog: {}, claimed: {}, box: false };
+        if (!t.mig2) {   // เซฟเก่า: บท 2 เดิม (หาของเล่น) เปลี่ยนเป็นบทดาบไม้ ของเล่นที่เก็บแล้วนับเป็นเด็กที่ได้ดาบแล้ว
+          t.mig2 = true; const st = t.q.t2 && t.q.t2.s, n = Object.keys(t.toys || {}).length;
+          if (st === 'active' || st === 'ready') { t.kids = st === 'ready' ? 5 : Math.min(5, n); t.toys = {}; }
+          else if (st === 'done') t.toyQ = 'done';
+        }
         return t;
       }
       const qs = (id) => (T().q[id] && T().q[id].s) || '';
@@ -6870,32 +6865,36 @@
       function progress(id) {
         const t = T();
         if (id === 't1') return Object.keys(t.shopsVisited).length;
-        if (id === 't2') return Object.keys(t.toys).length;
+        if (id === 't2') return Math.min(5, (t.kids || 0) + swordsInBag());
         if (id === 't3') return Object.keys(t.cooked).length;
         if (id === 't4') return Object.keys(t.letters).length;
         if (id === 't5') return Object.keys(t.train).length;
         if (id === 't6') return t.rabbitsWithEk;
         return 0;
       }
+      // บท 2: ดาบไม้ที่อยู่ในกระเป๋า (เล่มที่ถืออยู่ไม่นับ) + เด็กที่ได้ดาบไปแล้ว (เซฟเก่า: ของเล่นที่เก็บแล้ว)
+      const swordsInBag = () => state.inventory.wood_sword || 0;
+      const swordsNeed = () => Math.max(0, 5 - (T().kids || 0));
       function checkReady() {
         ORDER.forEach(id => { if (qs(id) === 'active' && progress(id) >= QUESTS[id].need) { qset(id, 'ready'); sfx('quest_ready'); speak(`ภารกิจ ${QUESTS[id].title} ทำครบแล้ว กลับไปส่งที่${giverName(QUESTS[id].giver)}`); } });
       }
+      const tonNpc = () => NPCS.find(n => n.id === 'ton');
       const giverName = (g) => ({ guild: 'ครูบุญหัวหน้ากิลด์', kitchen: 'ป้ามาลีแม่ครัว', post_office: 'ลุงทองไปรษณีย์', ton: 'น้องต้นเด็กหาย', ek: 'พี่เอกครูฝึก' }[g] || g);
       function dprog(id, n = 1) { const d = T().daily; d.prog[id] = (d.prog[id] || 0) + n; if (d.prog[id] === DAILY[id].need) { sfx('quest_ready'); setTimeout(() => speak(`งานประจำวัน ${DAILY[id].title} ครบแล้ว รับรางวัลที่กระดานประกาศงาน`), 900); } }
       function gainExp(n, parts) { const lv = addExp(n); parts.push(`ได้รับ ${n} ค่าประสบการณ์`); if (lv) parts.push(lv); }
       function completeQuest(id) {
         const t = T(), parts = [`ภารกิจ ${QUESTS[id].title} สำเร็จ`];
-        const gold = (n) => { state.gold += n; parts.push(`ได้รับ ${n} เหรียญ`); };
+        const gold = (n) => { state.gold += n; parts.push(`ได้รับ ${n} เหรียญ`); sfx('coin_get', { delay: 0.35 }); };
         const item = (i, n = 1) => { give(i, n); parts.push(`ได้รับ${nm(i)} ${n}`); if (ITEMS[i].cat === 'quest') sfx('key_get', { delay: 0.6 }); };
         switch (id) {
-          case 't1': item('adventurer_card'); gold(100); gainExp(300, parts); break;
-          case 't2': item('lucky_bell'); gainExp(500, parts); break;
-          case 't3': t.heroRecipe = true; sfx('key_get', { delay: 0.6 }); parts.push('ได้สูตรซุปผู้กล้า ทำได้ที่โรงครัวเมือง'); gainExp(800, parts); break;
+          case 't1': item('adventurer_card'); gold(100); gainExp(300, parts); parts.push('ครูบุญบอกว่า บทต่อไปไปหาน้องต้น เด็กชอบเดินเล่นแถวลานรูปปั้นผู้กล้า ทางเหนือของบ่อน้ำกลางเมือง ฟังเสียงหัวเราะของเด็ก หรือกด P เลือกแทร็กแผนที่ แล้วเลือกน้องต้นเด็กหาย'); break;
+          case 't2': { const n = swordsNeed(); removeInv('wood_sword', n); t.kids = 5; parts.splice(1, 0, `มอบดาบไม้ ${n} เล่มให้เด็กๆ แล้ว`); sfx('kid_laugh', { delay: 0.9 }); AudioSys.playSet('club', 'hit', { rate: 1.3, gain: 0.6, delay: 1.2 }); AudioSys.playSet('club', 'hit', { rate: 1.45, gain: 0.5, delay: 1.45 }); item('lucky_bell'); gold(50); gainExp(500, parts); break; }
+          case 't3': item('gift_box'); t.heroRecipe = true; sfx('key_get', { delay: 0.6 }); parts.push('ได้สูตรซุปผู้กล้า ทำได้ที่โรงครัวเมือง'); gainExp(800, parts); break;
           case 't4': item('forest_map'); gainExp(1000, parts); break;
           case 't5': item('wood_sword'); Mine.setUpgrade('wood_sword', 1); item('leather_shirt'); t.fastAtk = true; parts.push('ดาบไม้ฝึกหัดได้อัปเกรดเป็น +1, ตั้งแต่นี้อาวุธทุกชนิดและหมัดโจมตีเร็วขึ้น 30%'); gainExp(1500, parts); break;
-          case 't6': t.title = true; gold(500); gainExp(2000, parts); parts.push('ได้ยศ นักผจญภัยฝึกหัด'); if (!t.rep50) { t.rep50 = true; Mine.ensure(); const r = Mine.addRep(50, 'ยศนักผจญภัยฝึกหัด'); if (r) parts.push(r + ' ที่เหมืองคนแคระ'); } break;
+          case 't6': t.title = true; gold(500); item('gift_box'); gainExp(2000, parts); parts.push('ได้ยศ นักผจญภัยฝึกหัด'); if (!t.rep50) { t.rep50 = true; Mine.ensure(); const r = Mine.addRep(50, 'ยศนักผจญภัยฝึกหัด'); if (r) parts.push(r + ' ที่เหมืองคนแคระ'); } break;
         }
-        qset(id, 'done'); sfx('pgive'); sfx('quest_done', { delay: 0.5 }); renderAll();
+        qset(id, 'done'); sfx('pgive'); sfx('lute_stinger', { delay: 0.5 }); renderAll();   // จบบท: เพลงลูทสั้น
         return parts.join(', ');
       }
 
@@ -6907,7 +6906,7 @@
         library: ['แม่ชีอรุณพูดเบาๆ ว่า ความรู้คือเกราะที่ดีที่สุด', 'อ่านสมุดมอนสเตอร์ก่อนออกไปป่า จะรู้ว่าต้องหลบท่าไหน'],
         theater: ['จ้อยดีดพิณทักทาย ฟังให้ดี โน้ตมาจากซ้าย กลาง และขวา', 'หูดีอย่างเจ้า ไปหลบมอนสเตอร์ได้สบาย'],
         pen: ['ยายเพ็ญรดน้ำต้นไม้อยู่ สมุนไพรในสวนเก็บได้เลยนะหลาน', 'ปลูกเองก็ได้ ซื้อเมล็ดกับยาย แล้วเอาบัวไปตักน้ำที่บ่อกลางเมือง'],
-        ton: ['น้องต้นทำหน้าเศร้า ของเล่นหายหมดเลย', 'พี่เก่งจัง เล่นซ่อนแอบกันไหม'],
+        ton: ['น้องต้นทำหน้าเศร้า อยากมีดาบไม้เล่นเป็นอัศวินเหมือนพี่ๆ นักผจญภัย', 'พี่เก่งจัง เล่นซ่อนแอบกันไหม'],
         ek: ['พี่เอกครูฝึกยืนกอดอก ในลานฝึกไม่มีใครเจ็บจริง มาฝึกได้ทุกเมื่อ', 'จำไว้ ได้ยินเสียงง้างเมื่อไหร่ ก้าวหนีทันที'],
         kham: ['ลุงคำนั่งตกปลาอยู่ ตกปลาต้องใจเย็น ฟังเสียงทุ่นให้ดี', 'ปลาใหญ่ว่ายไปทางไหน ให้ดึงไปทางตรงข้าม']
       };
@@ -6918,7 +6917,9 @@
           const q = QUESTS[id], s = qs(id);
           if (s === 'done') return;
           if (!s) { if (!available(id)) return; out.push({ label: `รับภารกิจ: ${q.title}, ${q.goal}, รางวัล ${q.reward}`, action: () => { qset(id, 'active'); sfx('quest_new'); if (id === 't6') hireCompanion(true); refresh(); speak(`รับภารกิจ ${q.title}, ${q.goal}`); checkReady(); } }); }
+          else if (s === 'ready' && id === 't2') out.push({ label: `มอบดาบไม้ ${swordsNeed()} เล่ม (บท 2 ดาบไม้ของเด็กๆ)`, action: () => { if (swordsInBag() < swordsNeed()) { qset('t2', 'active'); AudioSys.playSound('error'); refresh(); speak(`ดาบไม้ในกระเป๋าไม่พอ มี ${swordsInBag()} เล่ม ต้องใช้ ${swordsNeed()} เล่ม`); return; } const m = completeQuest(id); refresh(); speak(m); } });
           else if (s === 'ready') out.push({ label: `ส่งภารกิจ: ${q.title}`, action: () => { const m = completeQuest(id); refresh(); speak(m); } });
+          else if (id === 't2') out.push({ label: `ภารกิจ ${q.title}, ดาบไม้ ${progress(id)} จาก 5 เล่ม`, action: () => { const lack = swordsNeed() - swordsInBag(); speak(`${q.title}, ดาบไม้ ${progress(id)} จาก 5 เล่ม` + (lack > 0 ? `, ต้องซื้ออีก ${lack} เล่ม ที่ร้านอาวุธ เล่มละ 20 เหรียญ` + (state.gold < lack * 20 ? `, น้องต้นบอกว่า เงินพี่ไม่พอใช่ไหม ลองช่วยงานไปรษณีย์ เก็บสมุนไพรขาย หรือตกปลาขายลุงคำก่อนนะ` : '') : '')); } });
           else out.push({ label: `ภารกิจ ${q.title}, ทำได้ ${Math.min(progress(id), q.need)} จาก ${q.need}`, action: () => speak(`${q.title}, ${q.goal}, ทำได้ ${Math.min(progress(id), q.need)} จาก ${q.need}, รางวัล ${q.reward}`) });
         });
         return out;
@@ -6938,6 +6939,7 @@
         const t = T(), out = [], add = (label, action) => out.push({ label, action });
         switch (id) {
           case 'guild':
+            if (qs('t1') === 'done' && qs('t2') !== 'done') add('ถามหาน้องต้น (บท 2)', () => speak(`น้องต้นชอบเดินเล่นแถวลานรูปปั้นผู้กล้า ทางเหนือของบ่อน้ำกลางเมือง ตอนนี้อยู่${relWord(tonNpc().x - state.x, tonNpc().y - state.y)} ${formatDistanceText(tonNpc().x - state.x, tonNpc().y - state.y)}, น้องต้นหัวเราะคิกคักเป็นระยะ เดินตามเสียงไปได้ หรือกด P เลือกแทร็กแผนที่ แล้วเลือกน้องต้นเด็กหาย เรดาร์จะตามตัวน้องต้นให้`));
             add('ถามเรื่องงานในเมือง', () => speak('งานในเมือง: ส่งพัสดุที่ไปรษณีย์, ช่วยครัวที่โรงครัว, เก็บและปลูกสมุนไพรที่สวนทางตะวันตกเฉียงเหนือ, ตกปลาที่สระทางตะวันออกเฉียงเหนือ, จัดหนังสือที่ห้องสมุด, เล่นดนตรีที่โรงละคร, ฝึกต่อสู้ที่ลานฝึกซ้อม, ดูงานประจำวันที่กระดานประกาศข้างจุดเกิด'));
             add(`โหมดผ่อนคลาย ตอนนี้${t.relaxed ? 'เปิด' : 'ปิด'} (กดเพื่อสลับ)`, () => { toggleRelaxed(); popMenu(true); openNpc('guild', 'กิลด์นักผจญภัยฝึกหัด, ครูบุญหัวหน้ากิลด์'); });
             break;
@@ -6959,9 +6961,14 @@
             add('ซื้อเมล็ดสมุนไพร (10 เหรียญ) และบัวรดน้ำ (40 เหรียญ)', () => openBuy('ของจากยายเพ็ญ', [['herb_seed', 10], ['watering_can', 40]]));
             add('ถามวิธีปลูก', () => speak('ปลูก: ยืนบนแปลงทางใต้สุดของสวนแล้วกด Enter ใส่เมล็ด, เอาบัวไปเติมน้ำที่บ่อกลางเมือง, กลับมากด Enter รดน้ำ, รอ 2 นาทีแล้วเก็บได้ 3 ต้น'));
             break;
-          case 'ton':
+          case 'ton': {
+            const tq = t.toyQ || '', tn = Object.keys(t.toys).length;
+            if (!tq && qs('t1') === 'done') add('ภารกิจเสริม (ไม่บังคับ): ของเล่นหาย 5 ชิ้น', () => { t.toyQ = 'active'; t.toys = {}; unsavedDirty = true; sfx('quest_new'); popMenu(true); speak('รับภารกิจเสริม ของเล่นหาย: น้องต้นทำของเล่นหาย 5 ชิ้นทั่วเมือง เมื่อเข้าใกล้ 8 ก้าวจะได้ยินเสียงกรุ๊งกริ๊ง ยืนบนจุดแล้วกด Enter เก็บ รางวัล 50 เหรียญ ค่าประสบการณ์ 300'); });
+            else if (tq === 'active' && tn >= 5) add('ส่งของเล่น 5 ชิ้นคืนน้องต้น', () => { t.toyQ = 'done'; state.gold += 50; const parts = ['ภารกิจเสริม ของเล่นหาย สำเร็จ, ได้รับ 50 เหรียญ']; gainExp(300, parts); sfx('pgive'); sfx('kid_laugh', { delay: 0.4 }); sfx('quest_done', { delay: 0.6 }); unsavedDirty = true; popMenu(true); renderAll(); speak(parts.join(', ')); });
+            else if (tq === 'active') add(`ภารกิจเสริม ของเล่นหาย, เก็บได้ ${tn} จาก 5 ชิ้น`, () => speak(`เก็บของเล่นได้ ${tn} จาก 5 ชิ้น ฟังเสียงกรุ๊งกริ๊งในระยะ 8 ก้าว กด R จะบอกของเล่นที่อยู่ใกล้`));
             if (qs('t2') === 'done') add('เล่นซ่อนแอบกับน้องต้น', () => { state.menuStack = []; renderAll(); startHide(); });
             break;
+          }
           case 'ek':
             [1, 2, 3].forEach(n => add(`เริ่มด่าน ${n}: ${['', 'ตีหุ่นไม้ 3 ตัวให้ล้ม', 'ฝึกหลบหุ่นเหวี่ยงไม้ 5 ครั้ง', 'ไล่ตีหุ่นที่เดินได้ 10 ครั้ง'][n]}${t.train['s' + n] ? ' (ผ่านแล้ว)' : ''}`, () => { state.menuStack = []; renderAll(); startTraining(n); }));
             add(companionActive() ? `ผู้ติดตาม: พี่เอกกำลังติดตามอยู่ เหลือ ${Math.ceil((t.companion.until - Date.now()) / 60000)} นาที` : 'จ้างพี่เอกเป็นผู้ติดตาม 30 นาที (100 เหรียญ วันละครั้ง)', () => { if (companionActive()) { speak('พี่เอกติดตามอยู่แล้ว'); return; } hireCompanion(false); });
@@ -7020,13 +7027,13 @@
       function claimDaily(id) {
         const t = T(), d = t.daily, parts = [`รับรางวัล ${DAILY[id].title}`];
         d.claimed[id] = true;
-        const gold = (n) => { state.gold += n; parts.push(`${n} เหรียญ`); };
+        const gold = (n) => { state.gold += n; parts.push(`${n} เหรียญ`); sfx('coin_get', { delay: 0.3 }); };
         if (id === 'dd1') { gold(150); gainExp(400, parts); }
         if (id === 'dd2') { give('hp_mid', 2); parts.push('น้ำยาเลือดระดับกลาง 2 ขวด'); gainExp(300, parts); }
         if (id === 'dd3') { gold(120); gainExp(350, parts); }
         if (id === 'dd4') { give('hero_soup', 1); parts.push('ซุปผู้กล้า 1'); gainExp(300, parts); }
         if (id === 'dd5') { gold(100); gainExp(250, parts); }
-        if (Object.keys(d.claimed).length === 5 && !d.box) { d.box = true; give('gift_box', 1); parts.push('ทำครบ 5 งาน ได้กล่องของขวัญเมือง!'); sfx('gong', { delay: 0.4 }); }
+        if (Object.keys(d.claimed).length === 5 && !d.box) { d.box = true; give('gift_box', 1); parts.push('ทำครบ 5 งาน ได้กล่องของขวัญเมือง!'); sfx('gong', { delay: 0.4 }); const g = Gear.onDailyBox(); if (g) parts.push(g); }
         sfx('quest_done'); unsavedDirty = true;
         const m = currentMenu(); if (m && m.rebuild) m.items = m.rebuild(); renderAll(); speak(parts.join(', '));
       }
@@ -7249,7 +7256,7 @@
         if (state.x !== m.sx || state.y !== m.sy) { endMini(); speak('เดินออกจากริมสระ เก็บเบ็ดแล้ว'); return; }
         if (m.phase === 'wait') {
           if (now >= m.bobAt && now < m.biteAt - 300) { m.bobAt = now + ri(900, 1800); sfx('drip', { ...rel(m.x, m.y), gain: 0.6 }); }
-          if (now >= m.biteAt) { m.phase = 'bite'; m.until = now + (600 + rodTier() * 100) * TIMING.mul + TIMING.lat; sfx('fish_bite', rel(m.x, m.y)); sfx('splash', { ...rel(m.x, m.y), gain: 0.4 }); }
+          if (now >= m.biteAt) { m.phase = 'bite'; m.until = now + (600 + rodTier() * 100 + Gear.biteMs()) * TIMING.mul + TIMING.lat; sfx('fish_bite', rel(m.x, m.y)); sfx('splash', { ...rel(m.x, m.y), gain: 0.4 }); }
         } else if (m.phase === 'bite' && now > m.until) { endMini(); sfx('swoop_miss'); speak('ปลากินเบ็ดแล้วหลุดไป ตวัดเบ็ดช้าไป ลองใหม่'); }
         else if (m.phase === 'fight') {
           if (m.cue && now > m.cue.until) { m.cue = null; m.fail++; sfx('clank', { gain: 0.5 }); if (m.fail >= 2) { endMini(); speak(`สายเบ็ดหย่อน ${nm(m.fish)}ดิ้นหลุดไป`); return; } m.next = now + 700; }
@@ -7264,8 +7271,8 @@
         const m = mini, now = Date.now();
         if (m.phase === 'wait') { endMini(); speak('ดึงเบ็ดขึ้นเร็วไป ยังไม่มีปลา'); return true; }
         if (m.phase === 'bite') {
-          const tier = rodTier(), r = Math.random() * 100;
-          const fish = r < 3 + tier * 2 ? 'fish_gold' : (r < 10 + tier * 4 ? 'fish_snakehead' : (r < 28 + tier * 3 ? 'fish_tilapia' : (r < 55 ? 'fish_barb' : 'fish_minnow')));
+          const tier = rodTier(), r = Math.random() * 100, k = Gear.bigFishMul(), gTh = (3 + tier * 2) * k, sTh = gTh + (7 + tier * 2) * k;   // แหวนสายน้ำ: ปลาใหญ่ ปลาทอง 2 เท่า
+          const fish = r < gTh ? 'fish_gold' : (r < sTh ? 'fish_snakehead' : (r < 28 + tier * 3 ? 'fish_tilapia' : (r < 55 ? 'fish_barb' : 'fish_minnow')));
           sfx('fish_reel');
           if (ITEMS[fish].fish >= 4) { m.phase = 'fight'; m.fish = fish; m.pulls = fish === 'fish_gold' ? 5 : 4; m.fail = 0; m.cue = null; m.next = now + 1500; speak(`ปลาใหญ่ติดเบ็ด! ฟังเสียงน้ำแตกซ้ายหรือขวา แล้วกดลูกศรไปทางตรงข้าม`); }
           else landFish(fish);
@@ -7341,9 +7348,10 @@
       function attackTraining(range) {
         if (!train || (train.n !== 1 && train.n !== 3)) return;
         const targets = train.n === 1 ? DUMMIES.filter(o => train.hp[o.id] > 0) : [{ id: 'mv', x: train.x, y: train.y }];
-        let best = null, bd = 99;
-        targets.forEach(o => { const dx = o.x - state.x, dy = o.y - state.y, d = Math.max(Math.abs(dx), Math.abs(dy)); if (d <= range && d < bd && (d === 0 || AudioSys.calcRelativePanAndFront(dx, dy, state.dir).diffDeg <= 45)) { bd = d; best = o; } });
-        if (!best) return;
+        const wId = getEquippedWeaponSlot() ? state.equipped[getEquippedWeaponSlot()] : null;
+        const picks = Gear.pick(targets.map(o => ({ o, dx: o.x - state.x, dy: o.y - state.y, name: 'หุ่น' })), Gear.spec(wId), () => false);
+        if (!picks.length) { Gear.miss(targets.map(o => ({ o, dx: o.x - state.x, dy: o.y - state.y })), Gear.spec(wId), () => false); return; }
+        const best = picks[0].o;
         const w = getEquippedWeaponSlot(), ws = w ? (WEAPON_SET[state.equipped[w]] || FIST_SET) : FIST_SET;
         setTimeout(() => { AudioSys.playSet(ws.hit || ws.set, 'hit', { ...rel(best.x, best.y), rate: ws.hitRate || ws.rate }) || AudioSys.playSound('hit_enemy'); if (ws.layer) AudioSys.playSet(ws.layer[0], 'hit', { ...rel(best.x, best.y), rate: ws.layer[1], gain: ws.layer[2] }); }, 60);
         if (train.n === 1) {
@@ -7412,7 +7420,9 @@
       }
       function castTick(now) {
         if (!castUntil || now < castUntil) return;
-        castUntil = 0;
+        castUntil = 0; warpHome();
+      }
+      function warpHome() {
         if (Mine.isMineZone(state.zoneId)) Mine.cleanup();
         stopRunning(); stopRadarTimer(); state.trackingId = null;
         state.zoneId = 'city'; state.insideBuildingId = null; state.x = 100; state.y = 106; state.dir = 4;
@@ -7421,7 +7431,7 @@
       }
 
       // ==================== เชื่อมกับเกม ====================
-      let tickTimer = null, indoorAt = 0, slowAt = 0, jingleAt = 0, rustleAt = 0, tonAt = 0, lastRegion = '';
+      let tickTimer = null, indoorAt = 0, slowAt = 0, jingleAt = 0, rustleAt = 0, tonAt = 0, lastRegion = '', laughAt = 0, kidsAt = 0, lastSw = -1, continueWander = true;
       function onGameStart() {
         T(); stop();
         tickTimer = setInterval(() => { try { tick(); } catch (e) { console.error('town tick', e); } }, 50);
@@ -7455,11 +7465,18 @@
         // พัสดุเลยเวลา
         if (!inCity()) return;
         // เสียงของเล่นที่ซ่อน (บท 2)
-        if (qs('t2') === 'active' && now >= jingleAt) { jingleAt = now + 2500; TOYS.forEach((o, i) => { if (!t.toys[i] && cheb(o.x, o.y, state.x, state.y) <= 8) sfx('jingle', { ...rel(o.x, o.y), gain: 0.8 }); }); }
+        if (t.toyQ === 'active' && now >= jingleAt) { jingleAt = now + 2500; TOYS.forEach((o, i) => { if (!t.toys[i] && cheb(o.x, o.y, state.x, state.y) <= 8) sfx('jingle', { ...rel(o.x, o.y), gain: 0.8 }); }); }
         // เสียงใบไม้ไหวของสมุนไพรใกล้ 3 ก้าว
         if (now >= rustleAt) { rustleAt = now + 1800; const h = HERBS.find(h => herbReady(h) && cheb(h.x, h.y, state.x, state.y) <= 3); if (h) sfx('town_rustle', { ...rel(h.x, h.y), gain: 0.8 }); }
         // น้องต้นเดินเล่น
-        if (now >= tonAt && !mini) { tonAt = now + 3000; const ton = NPCS.find(n => n.id === 'ton'); const d = DIRS[ri(0, 7)], nx = ton.x + d.dx, ny = ton.y + d.dy; if (inR(nx, ny, ton.wander) && !blocks(nx, ny, true) && !(nx === state.x && ny === state.y)) { ton.x = nx; ton.y = ny; if (cheb(nx, ny, state.x, state.y) <= 8) sfx('kid_step', rel(nx, ny)); } }
+        // น้องต้นหัวเราะทุก 6-8 วินาที ตอนมีภารกิจให้รับหรือรอส่ง (ได้ยินไกล 20 ก้าว)
+        { const ton = tonNpc(), want = (qs('t2') === '' && available('t2')) || qs('t2') === 'ready' || (t.toyQ === 'active' && Object.keys(t.toys).length >= 5);
+          if (want && !ton.hidden && now >= laughAt) { laughAt = now + ri(6000, 8000); if (cheb(ton.x, ton.y, state.x, state.y) <= 20) sfx('kid_laugh', { ...rel(ton.x, ton.y), gain: 0.9 }); } }
+        // หลังบท 2: เด็กๆ เล่นฟันดาบไม้กันที่ลานรูปปั้นผู้กล้า
+        if (qs('t2') === 'done' && now >= kidsAt) { kidsAt = now + ri(1600, 3200); const kx = 100 + ri(-2, 2), ky = 142 + ri(0, 2); if (cheb(kx, ky, state.x, state.y) <= 15) { AudioSys.playSet('club', 'hit', { ...rel(kx, ky), rate: 1.25 + Math.random() * 0.3, gain: 0.45 }); if (Math.random() < 0.5) AudioSys.playSet('club', 'hit', { ...rel(kx + 1, ky), rate: 1.3 + Math.random() * 0.3, gain: 0.4, delay: 0.22 }); if (Math.random() < 0.3) sfx('kid_laugh', { ...rel(kx, ky), gain: 0.6, delay: 0.5 }); } }
+        // บท 2: นับดาบไม้ในกระเป๋า
+        if (qs('t2') === 'active' || qs('t2') === 'ready') { const sw = progress('t2'); if (sw !== lastSw) { const up = sw > lastSw && lastSw >= 0; lastSw = sw; if (qs('t2') === 'ready' && swordsInBag() < swordsNeed()) qset('t2', 'active'); if (up && qs('t2') === 'active') setTimeout(() => speak(`ดาบไม้ ${sw} จาก 5 เล่ม`), 1400); checkReady(); } }
+        if (now >= tonAt && !mini) { tonAt = now + 3000; const ton = NPCS.find(n => n.id === 'ton'); if (cheb(ton.x, ton.y, state.x, state.y) <= 3) continueWander = false; else continueWander = true; const d = DIRS[ri(0, 7)], nx = ton.x + d.dx, ny = ton.y + d.dy; if (continueWander && inR(nx, ny, ton.wander) && !blocks(nx, ny, true) && !(nx === state.x && ny === state.y)) { ton.x = nx; ton.y = ny; if (cheb(nx, ny, state.x, state.y) <= 8) sfx('kid_step', rel(nx, ny)); } }
       }
       const herbReady = (h) => (T().herbs[h.id] || 0) <= Date.now();
       function npcAt(x, y) { return NPCS.find(n => !n.hidden && n.x === x && n.y === y) || null; }
@@ -7483,10 +7500,11 @@
         return '';
       }
       function onStep(x, y) {
+        if (state.trackingId === 'town:ton' && !tonNpc().hidden && cheb(tonNpc().x, tonNpc().y, x, y) <= 1) { stopRadarTimer(); state.trackingId = null; AudioSys.playSound('arrive'); sfx('kid_laugh', { ...rel(tonNpc().x, tonNpc().y), gain: 0.7 }); speak(`ถึงน้องต้นแล้ว อยู่${relWord(tonNpc().x - x, tonNpc().y - y)} หันหน้าเข้าหาแล้วกด Enter เพื่อคุย`); return; }
         const r = regionName(x, y);
         if (r !== lastRegion) { lastRegion = r; if (r) speak(`เข้าสู่${r}`); }
         const t = T();
-        if (qs('t2') === 'active') { const i = TOYS.findIndex(o => o.x === x && o.y === y); if (i >= 0 && !t.toys[i]) speak('มีของเล่นตกอยู่ตรงนี้ กด Enter เพื่อเก็บ'); }
+        if (t.toyQ === 'active') { const i = TOYS.findIndex(o => o.x === x && o.y === y); if (i >= 0 && !t.toys[i]) speak('มีของเล่นตกอยู่ตรงนี้ กด Enter เพื่อเก็บ'); }
         const p = PLOTS.find(p2 => p2.x === x && p2.y === y); if (p) speak(plotText(p));
         if (t.parcels && t.parcels.length) { const b = BUILDINGS.find(b2 => b2.frontY === y && b2.doors.includes(x)); if (b && t.parcels.some(pp => pp.id === b.id)) speak(`ประตู${b.name} มีพัสดุส่งที่นี่ กด Enter`); }
       }
@@ -7521,7 +7539,7 @@
         const n = ns.find(n2 => n2.x === f.x && n2.y === f.y) || ns[0];
         if (n) { openNpc(n.id, `${n.name}, ${n.place}`); return true; }
         // ของเล่น
-        if (qs('t2') === 'active') { const i = TOYS.findIndex((o, j) => !t.toys[j] && cheb(o.x, o.y, x, y) <= 0); if (i >= 0) { sfx('pduck'); setTimeout(() => sfx('punduck'), 600); t.toys[i] = true; unsavedDirty = true; sfx('jingle'); AudioSys.playGet('accessory', 0.3); speak(`เก็บของเล่นได้ ${Object.keys(t.toys).length} จาก 5`); checkReady(); return true; } }
+        if (t.toyQ === 'active') { const i = TOYS.findIndex((o, j) => !t.toys[j] && cheb(o.x, o.y, x, y) <= 0); if (i >= 0) { sfx('pduck'); setTimeout(() => sfx('punduck'), 600); t.toys[i] = true; unsavedDirty = true; sfx('jingle'); AudioSys.playGet('accessory', 0.3); speak(`เก็บของเล่นได้ ${Object.keys(t.toys).length} จาก 5` + (Object.keys(t.toys).length >= 5 ? ' ครบแล้ว กลับไปคืนน้องต้น' : '')); return true; } }
         // จุดกลางแจ้ง
         const o = OBJS.find(o2 => cheb(o2.x, o2.y, x, y) <= 1);
         if (o && o.id === 'board') { openBoard(); return true; }
@@ -7589,7 +7607,7 @@
           BUILDINGS.forEach(b => add(b.doors[0], b.frontY, `ประตู${b.name}`, 1));
           HERBS.forEach(h => { if (herbReady(h)) add(h.x, h.y, 'สมุนไพรเมือง', 0); });
           PLOTS.forEach(p => add(p.x, p.y, 'แปลงปลูก', 0));
-          if (qs('t2') === 'active') TOYS.forEach((o, i) => { if (!T().toys[i] && cheb(o.x, o.y, state.x, state.y) <= 8) add(o.x, o.y, 'ของเล่นที่ซ่อน', 3); });
+          if (T().toyQ === 'active') TOYS.forEach((o, i) => { if (!T().toys[i] && cheb(o.x, o.y, state.x, state.y) <= 8) add(o.x, o.y, 'ของเล่นที่ซ่อน', 3); });
           DUMMIES.forEach(d => add(d.x, d.y, train && train.n === 1 && train.hp[d.id] <= 0 ? 'หุ่นไม้ที่ล้มแล้ว' : 'หุ่นไม้ฝึก', 1)); add(SWING.x, SWING.y, 'หุ่นเหวี่ยงไม้', 1);
           if (train && train.n === 3) add(train.x, train.y, 'หุ่นเดินได้', 3);
           if (cheb(167, 147, state.x, state.y) <= 15) add(Math.max(POND[0], Math.min(POND[1], state.x)), Math.max(POND[2], Math.min(POND[3], state.y)), 'สระปลา', 1);
@@ -7605,7 +7623,9 @@
         ['garden', 'สวนสมุนไพรเมือง (ยายเพ็ญ)', 60, 162], ['pond', 'สระปลาเมือง (ลุงคำ)', 159, 147], ['training', 'ลานฝึกซ้อม (พี่เอก)', 155, 72]
       ];
       TRACK.forEach(([id, name]) => CITY_TRACK_LOCATIONS.push({ id: 'town:' + id, name, type: 'gate' }));
-      function trackTarget(id) { const r = TRACK.find(t => 'town:' + t[0] === id); return r ? { x: r[2], y: r[3], label: r[1] } : null; }
+      CITY_TRACK_LOCATIONS.push({ id: 'town:ton', name: 'น้องต้นเด็กหาย (เดินไปมา เรดาร์ตามตัว)', type: 'gate' });
+      function trackTarget(id) {
+        if (id === 'town:ton') { const n = tonNpc(), x = n.hidden ? n.hideX : n.x, y = n.hidden ? n.hideY : n.y; return { x, y, label: 'น้องต้นเด็กหาย' }; } const r = TRACK.find(t => 'town:' + t[0] === id); return r ? { x: r[2], y: r[3], label: r[1] } : null; }
       // ---------- แผนที่ย่อ ----------
       function renderMap(c, ox, oy) {
         const P = (x, y, w = 3, h = 3) => c.fillRect(ox + x - 1, oy + (200 - y) - 1, w, h);
@@ -7621,7 +7641,7 @@
         const it = ITEMS[id]; if (!it || !it.town) return false;
         const t = T(), now = Date.now();
         if (id === 'return_scroll') { useScroll(); return true; }
-        if (id === 'gift_box') { openGift(); return true; }
+        if (id === 'gift_box' || id === 'golden_box') { Gear.openBox(id); return true; }
         if (id === 'forest_map') { sfx('paper'); speak('แผนที่ป่า 4 ทิศ: ' + Object.values(GUARD_INFO).join(', ')); return true; }
         if (it.cat === 'consumable' && (it.food || it.buffAtk)) {
           if (it.food && !it.buffAtk && state.hp >= getMaxHp() && !(it.food.sp && state.sp < getMaxSp())) { sfx('full'); speak('เลือดเต็มแล้ว'); return true; }
@@ -7635,13 +7655,7 @@
         if (it.cat === 'tool' || it.cat === 'quest' || (it.cat === 'material' && it.town)) { speak(`${it.name}, ${it.desc}`); return true; }
         return false;
       }
-      function openGift() {
-        removeInv('gift_box', 1);
-        const r = Math.random(), pool = r < 0.5 ? ['hunter_ring', 'thunder_bangle', 'tiger_fang', 'fighter_band'] : (r < 0.75 ? ['rage_potion'] : ['warrior_rice']);
-        const id = pool[ri(0, pool.length - 1)], n = ITEMS[id].cat === 'consumable' ? 2 : 1;
-        give(id, n); sfx('chest_open'); sfx('gong', { delay: 0.6, gain: 0.7 });
-        refreshBagMenu(`เปิดกล่องของขวัญเมือง ได้${nm(id)} ${n}, ${ITEMS[id].desc}`);
-      }
+      function buyNote(id) { return id === 'wood_sword' && (qs('t2') === 'active' || qs('t2') === 'ready') ? `, ดาบไม้ ${progress('t2')} จาก 5 เล่ม` : ''; }
       // ---------- ตัวคูณที่เกมหลักเรียกใช้ ----------
       const relaxed = () => !!(state.town && state.town.relaxed);
       function expMul(n) { return relaxed() ? Math.round(n * 0.75) : n; }
@@ -7668,7 +7682,7 @@
       const defeatTip = () => `, คำแนะนำ: ${TIPS[ri(0, TIPS.length - 1)]}`;
       function cityLoops() {
         const L = (key, src, x, y, range, gain) => ({ key, src, x, y, range, gain });
-        return [L('well', 'amb:amb_mine_water', 100, 120, 10, 0.6), L('pond', 'amb:amb_lake', 167, 147, 18, 0.7), L('garden', 'amb:amb_north_morning', 75, 162, 20, 0.6)];
+        return [L('well', 'amb:amb_mine_water', 100, 120, 10, 0.6), L('pond', 'amb:amb_lake', 167, 147, 18, 0.5), L('pond_river', 'amb:amb_river', 167, 147, 20, 0.6), L('training', 'amb:amb_training', 155, 60, 22, 0.55), L('garden', 'amb:amb_north_morning', 75, 162, 20, 0.6)];
       }
       function openQuestLog() {
         sfx('paper');
@@ -7682,9 +7696,653 @@
       return {
         onGameStart, stop, blocks, onStep, onStepInside, onEnterInside, onService, onEnterOutside, onCtrlPre, onAttack, handleKey, scan,
         trackTarget, renderMap, onBagActivate, relaxed, expMul, dmgMul, atkSpeedMul, atkBonus, defBonus, onPlayerHurt, onMonsterAlert,
-        onForestKill, defeatTip, cityLoops, openQuestLog, openBook, toggleRelaxed, learn, openSell, miniActive,
+        onForestKill, defeatTip, cityLoops, openQuestLog, openBook, toggleRelaxed, learn, openSell, miniActive, warpHome, buyNote, relWord,
         debug: { T, NPCS, OBJS, HERBS, PLOTS, TOYS, DUMMIES, SWING, QUESTS, completeQuest, qs, qset, checkReady, startCook, startMusicGame, startSort, startGuess, startTraining, startHide, startDelivery, tryFish, mini: () => mini, train: () => train, hireCompanion, BUILDINGS: NEW_BUILDINGS }
       };
+    })();
+
+    // ==================== ระบบต่อสู้ทิศเดียว อาวุธยิง และของพิเศษจากกล่องของขวัญ ====================
+    // ตีได้เฉพาะช่องข้างหน้าตามระยะอาวุธ (ตรงหน้า + เฉียงหน้าข้างละ 1) ซ้ายขวาตรงๆ และข้างหลังตีไม่โดน
+    // แรงตีต่อครั้ง = แต้มอาวุธ (+อัปเกรดที่ดอร์น) + แรงตีเสริมจากของที่สวม + บัฟ · ของพิเศษ 27 ชนิด ได้จากกล่องเท่านั้น
+    const Gear = (() => {
+      const now = () => Date.now();
+      const ri = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+      const sfx = (n, o = {}) => AudioSys.mineSfx(n, o);
+      const cheb = (dx, dy) => Math.max(Math.abs(dx), Math.abs(dy));
+      const RW = { common: 'ธรรมดา', rare: 'หายาก', legend: 'ตำนาน' };
+      const r1 = (n) => Math.round(n * 10) / 10;
+
+      // ---------- สถานะ (เก็บในเซฟของเมือง) ----------
+      function G() {
+        if (!state.town || typeof state.town !== 'object') state.town = {};
+        const t = state.town;
+        if (!t.gift || typeof t.gift !== 'object') t.gift = {};
+        const d = { lv: {}, seen: {}, opened: 0, pity: 0, guardAt: 0, seerUntil: 0, repelUntil: 0, levels: {}, bosses: {}, streak: { last: '', n: 0 }, opt: { far: true, hunter: false } };
+        for (const k of Object.keys(d)) if (t.gift[k] === undefined) t.gift[k] = d[k];
+        return t.gift;
+      }
+      const opt = () => G().opt;
+      const lv = (id) => G().lv[id] || 0;
+      const eq = (id) => Object.values(state.equipped).includes(id);
+      const up = (id, base, mul = 1.2) => lv(id) >= 1 ? base * mul : base;   // +1 ความสามารถแรงขึ้นราว 20%
+
+      // ---------- อาวุธ: ระยะ ตีกวาด ทำให้เซ ยิงเป็นแนว ----------
+      const SPEC = {
+        fist: { reach: 1 },
+        iron_knife: { reach: 1 }, iron_dagger: { reach: 1 }, wood_sword: { reach: 1 },
+        iron_shortsword: { reach: 2 }, bronze_sword: { reach: 2 }, iron_sword: { reach: 2 }, silver_sword: { reach: 2 },
+        iron_axe: { reach: 1, sweep: true }, bronze_axe: { reach: 1, sweep: true }, dw_iron_axe: { reach: 2, sweep: true },
+        bronze_hammer: { reach: 1, sweep: true, stagger: 600 },
+        iron_warhammer: { reach: 2, sweep: true, stagger: 600 }, silver_hammer: { reach: 2, sweep: true, stagger: 600 }, crystal_hammer: { reach: 2, sweep: true, stagger: 600 },
+        slingshot: { line: 4 }, short_bow: { line: 6, ammo: 'arrow' },
+        hawk_bow: { line: 6, hawk: true }, gale_spear: { line: 3, pierce: 2 }, moon_knife: { reach: 1, sneak: 3 },
+        thunder_hammer: { reach: 2, sweep: true, stagger: 600, thunder: 0.25 }, echo_blade: { reach: 2, echo: true }, traveler_staff: { reach: 2 }
+      };
+      function spec(wId) {
+        const b = Object.assign({}, SPEC[wId || 'fist'] || { reach: 1 }); b.id = wId || null;
+        if (wId === 'hawk_bow' && setOn('ranger')) b.line = 8;
+        if (wId === 'moon_knife') b.sneak = setOn('shadow') ? 4 : (lv('moon_knife') >= 1 ? 3.5 : 3);
+        if (b.thunder) b.thunder = setOn('rock') ? 0.4 : up('thunder_hammer', 0.25);
+        return b;
+      }
+      // ตำแหน่งเทียบทิศที่หัน: d = ห่างกี่ก้าว, s = เยื้องจากแนวตรงกี่ช่อง, dot > 0 = อยู่ครึ่งหน้า
+      function geom(dx, dy) {
+        const v = DIRS[state.dir], d = cheb(dx, dy);
+        return { d, s: Math.max(Math.abs(dx - d * v.dx), Math.abs(dy - d * v.dy)), dot: dx * v.dx + dy * v.dy };
+      }
+      function pick(cands, sp, blocked) {
+        if (sp.line) {
+          const v = DIRS[state.dir], out = [];
+          for (let k = 1; k <= sp.line; k++) {
+            const x = v.dx * k, y = v.dy * k, here = cands.find(c => c.dx === x && c.dy === y);
+            if (here) { out.push(here); if (out.length >= (sp.pierce || 1)) break; continue; }
+            if (blocked(x, y)) break;   // ต้นไม้ กำแพง หินบังลูก
+          }
+          return out;
+        }
+        const ok = cands.map(c => Object.assign({ g: geom(c.dx, c.dy) }, c)).filter(c => c.g.d >= 1 && c.g.d <= sp.reach && c.g.s <= 1 && c.g.dot > 0);
+        ok.sort((a, b) => (a.g.s - b.g.s) || (a.g.d - b.g.d));   // ตรงหน้าก่อน แล้วค่อยเฉียง ใกล้ก่อนไกล
+        return ok.slice(0, sp.sweep ? 3 : 1);
+      }
+      let pending = [];
+      function miss(cands, sp, blocked) {
+        const msgs = pending; pending = [];
+        if (sp.line) {
+          const v = DIRS[state.dir];
+          for (let k = 1; k <= sp.line; k++) if (blocked(v.dx * k, v.dy * k)) { sfx('arrow_block', { dx: v.dx * k, dy: v.dy * k, delay: 0.05 + k * 0.04 }); msgs.push('ลูกโดนสิ่งกีดขวาง'); break; }
+        }
+        if (opt().far && !msgs.length) {
+          const lim = sp.line || sp.reach;
+          const far = cands.some(c => { const g = geom(c.dx, c.dy); return g.dot > 0 && g.d > lim && g.d <= Math.max(4, lim + 2) && g.s <= (sp.line ? 0 : 1); });
+          if (far) msgs.push('ไกลเกินไป');
+        }
+        if (msgs.length) speak(msgs.join(', '));
+      }
+      // เก็บข้อความที่เกิดระหว่างฟันหลายตัว แล้วพูดรวมครั้งเดียว
+      function capture(fn) {
+        const buf = [], orig = speak;
+        speak = (t) => { const s = String(t || '').trim(); if (s) buf.push(s); };
+        try { fn(); } finally { speak = orig; }
+        return buf;
+      }
+      function swing(picks, sp, cands, hitFn) {
+        let hits = 0, thunderSaid = false, echoed = false;
+        const msgs = capture(() => {
+          picks.forEach(c => {
+            const r = hitFn(c, mods(sp, c));
+            if (!r) return;
+            hits++;
+            const a = c.o, t = now();
+            if (!r.dead && !r.boss) {
+              if (sp.thunder && Math.random() < sp.thunder) {
+                a.stunUntil = t + 1500; a.windAt = 0;
+                sfx('shockwave', { dx: c.dx, dy: c.dy, gain: 0.7, delay: 0.08 }); sfx('spellhit', { dx: c.dx, dy: c.dy, gain: 0.6, delay: 0.12 });
+                if (!thunderSaid) { thunderSaid = true; speak(`สายฟ้าฟาด! ${c.name || a.name}ชะงัก`); }
+              } else if (sp.stagger) { a.stunUntil = Math.max(a.stunUntil || 0, t + sp.stagger); a.windAt = 0; }
+            }
+            if (eq('tiger_fang') && state.hp < getMaxHp()) state.hp = Math.min(getMaxHp(), state.hp + Math.max(1, Math.round(getMaxHp() * up('tiger_fang', 0.03))));   // ดูดพลัง
+            if (sp.echo && !echoed) { echoed = true; cands.filter(o => !picks.some(p => p.o === o.o) && cheb(o.dx, o.dy) <= 8).slice(0, 4).forEach((o, i) => setTimeout(() => AudioSys.playAnimalFile(o.snd, 'idle', o.dx, o.dy), 350 + i * 260)); }
+          });
+        });
+        const pre = pending; pending = [];
+        if (sp.sweep && hits >= 2) pre.push(`กวาดโดน ${hits} ตัว`);
+        const all = pre.concat(msgs);
+        if (all.length) speak(all.join(', '));
+        return hits;
+      }
+      function mods(sp, c) {
+        return {
+          pts: (a, unaware) => {
+            let p = strike(sp.id);
+            if (unaware && sp.sneak) { p *= sp.sneak; speak(`ลอบโจมตี แรง ${sp.sneak} เท่า`); }
+            else if (unaware && sp.hawk) { p *= 2; speak('ตาเหยี่ยว แรง 2 เท่า'); }
+            if (eq('hunter_ring') && Math.random() < up('hunter_ring', 0.15)) { p *= 2; sfx('sword_clash', { dx: c.dx, dy: c.dy, gain: 0.55, delay: 0.07 }); sfx('pgrunt', { gain: 0.5 }); speak('ตีจุดตาย'); }
+            return p;
+          },
+          keepHidden: (a, unaware) => {
+            if (!(unaware && sp.sneak && setOn('shadow'))) return false;
+            a.sneakUntil = now() + 1000; a.alerted = false; a.provoked = false;
+            setTimeout(() => { if (a.hp > 0) a.provoked = true; }, 1000);
+            return true;
+          }
+        };
+      }
+      const hidden = (a) => (a.sneakUntil || 0) > now();
+      // มอนสเตอร์สังเกตเห็นผู้เล่นไหม (ผงไล่สัตว์ เข็มขัดเงาพราง ถุงเท้าย่องเบา)
+      function notice(a, d, sight) {
+        if (a.provoked) return true;
+        if (hidden(a)) return false;
+        if (repelOn()) return false;
+        if (a.alerted) return true;
+        if (eq('quiet_socks') && d > (lv('quiet_socks') >= 1 ? 1 : 2)) return false;
+        if (eq('shadow_belt') && d > Math.max(1, Math.floor(sight * (lv('shadow_belt') >= 1 ? 0.52 : 0.6)))) return false;
+        return true;
+      }
+
+      // ---------- แรงตี ----------
+      function basePts(wId) {
+        if (!wId) return 1;
+        const it = ITEMS[wId]; const upg = state.mine && state.mine.upg ? (state.mine.upg[wId] || 0) : 0;
+        return (it.hitPts || 2) + 0.5 * upg;
+      }
+      function itemStrike() { let s = 0; ORGANS.forEach(o => { const id = state.equipped[o.id]; if (id && ITEMS[id] && ITEMS[id].cat !== 'weapon') s += ITEMS[id].strike || 0; }); return s; }
+      function buffStrike() { let s = Town.atkBonus(); const mb = state.mine && state.mine.buffs; if (mb && (mb.songUntil || 0) > now() && mb.songType !== 'legend') s += 1; return s; }
+      function strike(wId) { return r1(basePts(wId) + itemStrike() + buffStrike()); }
+      function curStrike() { const w = getEquippedWeaponSlot(); return strike(w ? state.equipped[w] : null); }
+
+      // ---------- ชุดไอเทม ----------
+      const SETS = {
+        shadow: { name: 'ชุดนักล่าเงา', items: ['moon_knife', 'shadow_belt', 'quiet_socks'], text: 'ลอบโจมตีแรง 4 เท่า และตีครั้งแรกแล้วมอนสเตอร์ยังไม่รู้ตัวต่ออีก 1 วินาที' },
+        ranger: { name: 'ชุดพรานป่า', items: ['hawk_bow', 'owl_ring', 'wind_boots'], text: 'ธนูนกเหยี่ยวยิงได้ไกล 8 ก้าว และหลังยิงก้าวถอยได้ทันทีโดยไม่โดนท่าง้าง' },
+        rock: { name: 'ชุดนักรบภูผา', items: ['thunder_hammer', 'stone_shins', 'dragon_scale'], text: 'พลังป้องกันเพิ่มอีก 8 และสายฟ้าฟาดเพิ่มเป็น 40%' }
+      };
+      const setOn = (k) => SETS[k].items.every(eq);
+      let lastSets = '';
+      function checkSets(announce) {
+        const on = Object.keys(SETS).filter(setOn), key = on.join(',');
+        if (key !== lastSets) {
+          const added = on.filter(k => !lastSets.split(',').includes(k));
+          lastSets = key;
+          if (announce && added.length) { sfx('badge', { gain: 0.9, delay: 0.2 }); sfx('crystal_bells', { gain: 0.5, delay: 0.6 }); return added.map(k => `ครบ${SETS[k].name}! ${SETS[k].text}`).join(', '); }
+        }
+        return '';
+      }
+
+      // ---------- ของพิเศษ 27 ชนิด ----------
+      // [id, ระดับ, ชื่อ, หมวด, ช่อง, ค่าพื้นฐาน, คำอธิบายความสามารถ(lv)]
+      const P = (n, l) => Math.round(n * (l >= 1 ? 1.2 : 1));
+      const GI = [
+        ['hawk_bow', 'legend', 'ธนูนกเหยี่ยว', 'weapon', 'hand', { hitPts: 3 }, (l) => `ยิงตรงไปข้างหน้าแนวเดียว ไกล ${setOn('ranger') ? 8 : 6} ก้าว ไม่ต้องใช้ลูกศร, ตาเหยี่ยว: ยิงมอนสเตอร์ที่ยังไม่รู้ตัว แรง 2 เท่า, ต้นไม้ กำแพง หินบังลูกได้, ความเร็ว 1 วินาที`],
+        ['gale_spear', 'rare', 'หอกลมกรด', 'weapon', 'hand', { hitPts: 3 }, (l) => 'แทงตรงไปข้างหน้าแนวเดียว ไกล 3 ก้าว, แทงทะลุ: โดน 2 ตัวที่อยู่เรียงกันในแนวเดียว, ความเร็ว 0.85 วินาที'],
+        ['moon_knife', 'rare', 'มีดเงาจันทร์', 'weapon', 'hand', { hitPts: 2 }, (l) => `ระยะ 1 ก้าว ตีทีละตัว เร็วที่สุดในเกม 0.4 วินาที, ลอบโจมตี: ตีมอนสเตอร์ที่ยังไม่รู้ตัว แรง ${l >= 1 ? 3.5 : 3} เท่า`],
+        ['thunder_hammer', 'legend', 'ค้อนฟ้าคำราม', 'weapon', 'hand', { hitPts: 5 }, (l) => `ระยะ 2 ก้าว ตีกวาดโดนได้ถึง 3 ตัวในพัดข้างหน้า ทำให้มอนสเตอร์เซ, สายฟ้าฟาด: โอกาส ${P(25, l)}% มอนสเตอร์ที่โดนชะงัก 1.5 วินาที ยกเลิกท่าง้าง, ความเร็ว 1.1 วินาที`],
+        ['echo_blade', 'rare', 'ดาบเสียงสะท้อน', 'weapon', 'hand', { hitPts: 3 }, (l) => 'ระยะ 2 ก้าว ตีทีละตัว ความเร็ว 0.7 วินาที, สะท้อนเสียง: ตีโดนแล้วมอนสเตอร์ตัวอื่นใน 8 ก้าวส่งเสียงร้องบอกตำแหน่ง'],
+        ['traveler_staff', 'common', 'ไม้เท้านักเดินทาง', 'weapon', 'hand', { hitPts: 2 }, (l) => 'ระยะ 2 ก้าว ตีทีละตัว ความเร็ว 0.8 วินาที, เคาะทาง: ข้างหน้ามีกำแพงหรือสิ่งกีดขวาง จะได้ยินเสียงไม้เท้าเคาะบอกล่วงหน้า 1 ก้าว'],
+        ['dragon_scale', 'legend', 'เสื้อเกราะเกล็ดมังกร', 'armor', 'body', { def: 12 }, (l) => `เกล็ดทนไฟ: ไฟ ลาวา กรด ลดความเสียหาย ${l >= 1 ? 60 : 50}%`],
+        ['fighter_band', 'rare', 'ผ้าคาดหัวนักสู้', 'armor', 'head', { def: 2, strike: 1 }, (l) => 'แรงตีเสริมใช้ได้กับทุกอาวุธรวมหมัด'],
+        ['sage_hat', 'common', 'หมวกปราชญ์', 'armor', 'head', {}, (l) => `ใฝ่รู้: ค่าประสบการณ์เพิ่ม ${P(20, l)}% จากทุกอย่าง, ชนะมอนสเตอร์ชนิดใหม่ครั้งแรก ได้แผ่นความรู้สมุดมอนสเตอร์และค่าประสบการณ์พิเศษ 100`],
+        ['shadow_belt', 'rare', 'เข็มขัดเงาพราง', 'armor', 'waist', {}, (l) => `พรางตัว: มอนสเตอร์สังเกตเห็นในระยะสั้นลง ${l >= 1 ? 48 : 40}% เดินผ่านง่ายขึ้นและลอบโจมตีได้`],
+        ['stone_shins', 'common', 'สนับแข้งหินผา', 'armor', 'shins', { def: 6 }, (l) => `ยืนมั่น: แพะชน คลื่นกระแทก หินถล่ม ลดความเสียหาย ${l >= 1 ? 36 : 30}%`],
+        ['quiet_socks', 'common', 'ถุงเท้าย่องเบา', 'armor', 'socks', {}, (l) => `ย่องเบา: มอนสเตอร์ที่ยังไม่รู้ตัวไม่ได้ยินเสียงเท้า จนกว่าจะเข้าใกล้ ${l >= 1 ? 1 : 2} ก้าว`],
+        ['wind_boots', 'rare', 'รองเท้าลมพัด', 'armor', 'shoes', {}, (l) => `เท้าไว: วิ่งเร็วขึ้น ${l >= 1 ? 36 : 30}% และมีเวลาก้าวหลบท่าง้างเพิ่ม ${l >= 1 ? 0.18 : 0.15} วินาที`],
+        ['hunter_ring', 'rare', 'แหวนนักล่า', 'accessory', 'finger', {}, (l) => `จุดตาย: โอกาส ${P(15, l)}% ตีแรง 2 เท่า`],
+        ['thunder_bangle', 'rare', 'กำไลสายฟ้า', 'accessory', 'wrist', {}, (l) => `มือไว: โจมตีเร็วขึ้น ${P(15, l)}% ซ้อนกับรางวัลบท 5 ได้`],
+        ['tiger_fang', 'legend', 'สร้อยเขี้ยวพยัคฆ์', 'accessory', 'neck', { strike: 1 }, (l) => `ดูดพลัง: ตีโดนแล้วฟื้นเลือด ${l >= 1 ? 3.6 : 3}% ของเลือดสูงสุด`],
+        ['guardian_ring', 'legend', 'แหวนพิทักษ์ชีวิต', 'accessory', 'finger', {}, (l) => `รอดหวุดหวิด: ถูกโจมตีจนเลือดจะหมด รอดด้วยเลือด 1 แต้ม ใช้ได้ 1 ครั้งทุก ${l >= 1 ? 8 : 10} นาที`],
+        ['keen_brooch', 'common', 'เข็มกลัดหูทิพย์', 'accessory', 'brooch', {}, (l) => `หูทิพย์: ปุ่ม R ได้ยินมอนสเตอร์ไกล ${l >= 1 ? 24 : 20} ก้าว และบอกเลือดของแต่ละตัว`],
+        ['owl_ring', 'common', 'แหวนนกฮูก', 'accessory', 'finger', {}, (l) => `ตาราตรี: ในเหมืองมองเห็นไกลขึ้น ${l >= 1 ? 3 : 2} ช่อง เสียงเท้ามอนสเตอร์ดังชัดขึ้น ${P(30, l)}%`],
+        ['goldhand_bangle', 'rare', 'กำไลนักขุดทอง', 'accessory', 'wrist', {}, (l) => `มือทอง: ขุดแร่ได้เพิ่ม 1 ก้อน โอกาส ${P(30, l)}%, ช่วงจังหวะกังวานทองกว้างขึ้น ${P(50, l)}%`],
+        ['river_ring', 'common', 'แหวนสายน้ำ', 'accessory', 'finger', {}, (l) => `ลูกรักแม่น้ำ: ปลาใหญ่และปลาทองติดเบ็ดง่ายขึ้น ${l >= 1 ? 2.4 : 2} เท่า, ปลากินเบ็ดแล้วตวัดได้นานขึ้น ${l >= 1 ? 0.36 : 0.3} วินาที`],
+        ['rage_potion', 'rare', 'น้ำยาโทสะ', 'consumable', null, {}, () => 'แรงตี +2 ทุกครั้ง นาน 5 นาที'],
+        ['warrior_rice', 'common', 'ข้าวปั้นนักรบ', 'consumable', null, {}, () => 'ฟื้นเลือด 30% และแรงตี +1 นาน 10 นาที'],
+        ['phoenix_feather', 'legend', 'ขนนกฟีนิกซ์', 'consumable', null, {}, () => 'ใช้อัตโนมัติเมื่อพ่ายแพ้: ฟื้นทันทีที่เดิมด้วยเลือด 50% ไม่ถูกส่งกลับ'],
+        ['quick_warp', 'common', 'ม้วนวาร์ปทันใจ', 'consumable', null, {}, () => 'กลับกลางเมืองทันที ไม่ต้องร่าย โดนตีก็ไม่ยกเลิก'],
+        ['seer_potion', 'rare', 'น้ำยาตาทิพย์', 'consumable', null, {}, () => '3 นาที: มอนสเตอร์ทุกตัวในพื้นที่ส่งเสียงจากตำแหน่งจริงทุก 4 วินาที'],
+        ['repel_powder', 'common', 'ผงไล่สัตว์', 'consumable', null, {}, () => '3 นาที: มอนสเตอร์ไม่เข้ามาไล่ (ยกเว้นตัวที่ถูกตีก่อนและบอส)']
+      ];
+      const GMAP = {}; GI.forEach(r => { GMAP[r[0]] = r; });
+      const isGear = (id) => !!GMAP[id] && GMAP[id][3] !== 'consumable';
+      function applyItem(id) {
+        const [, rar, base, cat, slot, o, abil] = GMAP[id], l = lv(id);
+        const it = ITEMS[id] || (ITEMS[id] = { id });
+        Object.assign(it, { id, cat, price: 0, atk: 0, def: o.def || 0, special: true, rarity: rar, slotType: slot || undefined });
+        if (o.hitPts) it.hitPts = o.hitPts + (l >= 2 ? 1 : 0);
+        if (cat !== 'weapon') { it.strike = o.strike || 0; if (l >= 2 && cat !== 'consumable') { if (o.def) it.def = o.def + 1; else it.strike += 1; } }   // +2: พลังป้องกันหรือแรงตี +1
+        if (id === 'thunder_bangle') it.atkSpeed = l >= 1 ? 0.18 : 0.15;
+        it.name = `${RW[rar]}: ${l >= 3 ? 'ยอดเยี่ยม ' : ''}${base}${l ? ' +' + l : ''}`;
+        const sp = cat === 'weapon' ? `แรงตี ${it.hitPts} แต้ม, ` : '';
+        const st = cat !== 'weapon' && it.strike ? `แรงตี +${it.strike} ต่อครั้ง, ` : '';
+        const df = it.def ? `พลังป้องกัน ${it.def}, ` : '';
+        it.desc = `ของพิเศษระดับ${RW[rar]}, ${sp}${st}${df}${abil(l)}${cat === 'consumable' ? '' : ', ขายไม่ได้'}`;
+      }
+      // ไอเทมร้านอาวุธ: อาวุธยิง + ลูกศร
+      ITEMS.slingshot = { id: 'slingshot', name: 'หนังสติ๊ก', cat: 'weapon', shop: 'weapon_armor', price: 60, atk: 0, def: 0, slotType: 'hand', style: 'slash', material: 'wood', hitPts: 2, desc: '' };
+      ITEMS.short_bow = { id: 'short_bow', name: 'ธนูสั้น', cat: 'weapon', shop: 'weapon_armor', price: 150, atk: 0, def: 0, slotType: 'hand', style: 'slash', material: 'wood', hitPts: 3, desc: '' };
+      ITEMS.arrow_pack = { id: 'arrow_pack', name: 'ชุดลูกศร 10 ดอก', cat: 'consumable', shop: 'weapon_armor', price: 20, atk: 0, def: 0, desc: 'ลูกศรสำหรับธนูสั้น 10 ดอก ซื้อแล้วรวมเข้ากองลูกศรในกระเป๋า' };
+      ITEMS.arrow = { id: 'arrow', name: 'ลูกศร', cat: 'tool', price: 2, atk: 0, def: 0, desc: 'ใช้กับธนูสั้น ยิง 1 ครั้งใช้ 1 ดอก' };
+      if (SHOP_STOCK.weapon_armor) { const i = SHOP_STOCK.weapon_armor.indexOf('iron_shortsword'); SHOP_STOCK.weapon_armor.splice(i + 1, 0, 'slingshot', 'short_bow', 'arrow_pack'); }
+      BAG_CATS.push({ id: 'special', name: 'ของพิเศษ (จากกล่องของขวัญ)' });
+      // คำอธิบายอาวุธ: แรงตี ระยะ ตีทีละตัว/กวาด ความเร็ว
+      function weaponDesc(id) {
+        const it = ITEMS[id], sp = SPEC[id], ws = WEAPON_SET[id]; if (!it || !sp || it.special) return;
+        if (!it.baseDesc) it.baseDesc = it.desc || '';
+        const keep = it.baseDesc.split(', ').filter(p => p && !/พลังโจมตี|ตีมอนสเตอร์ในเหมือง|ระยะโจมตี|ระยะ \d/.test(p));
+        const sec = ws ? `${r1(ws.cd / 1000)} วินาที` : '';
+        let how;
+        if (sp.line) how = `ยิงตรงไปข้างหน้าแนวเดียว ไกล ${sp.line} ก้าว โดนตัวแรกในแนว ต้นไม้ กำแพง หินบังได้${sp.ammo ? ', ใช้ลูกศร 1 ดอกต่อการยิง' : ''}`;
+        else how = `ระยะ ${sp.reach} ก้าว ${sp.sweep ? 'ตีกวาดโดนได้ถึง 3 ตัวในพัดข้างหน้า' : 'ตีทีละตัว'}${sp.stagger ? ' ทำให้มอนสเตอร์เซ' : ''}`;
+        it.range = sp.line || sp.reach;
+        it.desc = [`แรงตี ${it.hitPts || 2} แต้ม`, how, sec ? `ความเร็ว ${sec}` : ''].concat(keep).filter(Boolean).join(', ');
+      }
+      function applyAll() {
+        GI.forEach(r => applyItem(r[0]));
+        Object.keys(SPEC).forEach(weaponDesc);
+        // ของเดิมที่บอก "พลังโจมตี" เป็นตัวเลขโชว์: เอาออก แหวนทับทิมได้แรงตี +1 จริง
+        Object.values(ITEMS).forEach(it => { if (it.cat !== 'weapon' && !it.special && it.desc && /พลังโจมตี/.test(it.desc)) it.desc = it.desc.replace(/,? ?พลังโจมตี \d+,? ?/g, (m) => /^,/.test(m) && /,\s?$/.test(m) ? ', ' : '').replace(/^, |, $/g, '') || it.name; });
+        if (ITEMS.ruby_ring) { ITEMS.ruby_ring.strike = 1; ITEMS.ruby_ring.desc = 'แรงตี +1 ต่อครั้ง'; }
+        if (ITEMS.gift_box) ITEMS.gift_box.desc = 'เปิดแล้วได้ของพิเศษ 1 ใน 27 ชนิด ที่ไม่มีขายในร้าน (ธรรมดา 55% หายาก 35% ตำนาน 10% เปิดครบ 10 กล่องได้ตำนานแน่นอน)';
+      }
+      applyAll();
+
+      // ---------- กล่องของขวัญ ----------
+      const POOL = { common: GI.filter(r => r[1] === 'common').map(r => r[0]), rare: GI.filter(r => r[1] === 'rare').map(r => r[0]), legend: GI.filter(r => r[1] === 'legend').map(r => r[0]) };
+      const owned = (id) => (state.inventory[id] || 0) > 0 || eq(id);
+      let lastGot = null;
+      function openBox(boxId) {
+        const g = G();
+        removeInv(boxId, 1); unsavedDirty = true;
+        g.opened++; g.pity++;
+        let rar;
+        if (g.pity >= 10) rar = 'legend';
+        else if (boxId === 'golden_box') rar = Math.random() < 0.2 ? 'legend' : 'rare';
+        else { const r = Math.random(); rar = r < 0.10 ? 'legend' : (r < 0.45 ? 'rare' : 'common'); }
+        if (rar === 'legend') g.pity = 0;
+        const id = POOL[rar][ri(0, POOL[rar].length - 1)], base = GMAP[id][2];
+        const parts = [`เปิด${boxId === 'golden_box' ? 'กล่องทองคำ' : 'กล่องของขวัญ'} ได้ ${RW[rar]}: ${base}`];
+        let canEquip = false;
+        const first = !g.seen[id]; g.seen[id] = true;
+        if (!isGear(id)) { addInv(id, 2); parts.push('2 ชิ้น'); }
+        else if (owned(id)) {
+          if (lv(id) < 3) { g.lv[id] = lv(id) + 1; applyItem(id); parts.push(`ได้ซ้ำ ${base}ขึ้นเป็น +${g.lv[id]}`); }
+          else { const gold = { common: 300, rare: 600, legend: 1500 }[rar]; state.gold += gold; parts.push(`ได้ซ้ำแต่ครบ +3 แล้ว เปลี่ยนเป็นเงิน ${gold} เหรียญ`); }
+        } else { addInv(id, 1); canEquip = true; }
+        parts.push(ITEMS[id].desc.replace(/^ของพิเศษระดับ[^,]*, /, ''));
+        if (g.pity === 9) parts.push('กล่องถัดไปได้ระดับตำนานแน่นอน');
+        // เสียง: เขย่ากล่อง → เปิดหีบ → เสียงตามระดับ
+        sfx('jingle', { gain: 0.9 }); sfx('jingle', { gain: 0.7, delay: 0.35, rate: 1.1 }); sfx('jingle', { gain: 0.8, delay: 0.7, rate: 0.95 });
+        sfx('chest_open', { delay: 1.05 });
+        if (rar === 'common') setTimeout(() => AudioSys.playGet('accessory', 0), 1500);
+        if (first && isGear(id)) sfx('badge', { delay: 2.3, gain: 0.7 });   // ได้ของพิเศษชิ้นใหม่เข้าสมุด
+        if (rar !== 'legend' && /เปลี่ยนเป็นเงิน/.test(parts.join())) sfx('coin_get', { delay: 2.0 });
+        if (rar === 'rare') { sfx('bell', { delay: 1.5, rate: 1.25 }); sfx('bell', { delay: 1.85, rate: 1.25 }); }
+        if (rar === 'legend') { sfx('gong', { delay: 1.5 }); sfx('cheer', { delay: 1.7, gain: 0.8 }); }
+        lastGot = id;
+        setTimeout(() => {
+          renderAll();
+          if (canEquip && state.screen === 'game') {
+            pushMenu({ type: 'gift_equip', title: 'สวมใส่เลยไหม', idx: 0, items: [
+              { label: `สวมใส่${ITEMS[id].name}เลย`, action: () => { popMenu(true); if ((state.inventory[id] || 0) > 0) activateBagItem(id); } },
+              { label: 'เก็บไว้ในกระเป๋าก่อน', action: () => { popMenu(true); speak('เก็บไว้ในกระเป๋า หมวดของพิเศษ'); } }
+            ] });
+            speak(parts.join(', ') + ', สวมใส่เลยไหม, Enter สวมใส่, Escape เก็บไว้ก่อน');
+          } else { const m = currentMenu(); if (m && m.type === 'bag') refreshBagMenu(parts.join(', ')); else speak(parts.join(', ')); }
+        }, 1650);
+        return id;
+      }
+      function giveBox(id, why) { addInv(id, 1); unsavedDirty = true; return `${why} ได้${ITEMS[id].name}`; }
+      function onLevel(level) {
+        const g = G();
+        if (level % 5 === 0 && level <= 25 && !g.levels[level]) { g.levels[level] = true; return giveBox('gift_box', `ถึงเลเวล ${level}`); }
+        return '';
+      }
+      function bossBox(type) {
+        const g = G(); if (g.bosses[type]) return '';
+        g.bosses[type] = true; const m = giveBox('gift_box', 'ชนะบอสครั้งแรก');
+        setTimeout(() => { sfx('gong', { gain: 0.6 }); speak(m); }, 7000);
+        return m;
+      }
+      function onDailyBox() {
+        const g = G(), s = g.streak, d = new Date(), key = (x) => `${x.getFullYear()}-${x.getMonth() + 1}-${x.getDate()}`;
+        const today = key(d), y = new Date(d.getTime() - 86400000), yest = key(y);
+        if (s.last === today) return '';
+        s.n = s.last === yest ? s.n + 1 : 1; s.last = today;
+        if (s.n % 7 === 0) { addInv('golden_box', 1); return `ทำงานประจำวันครบ 7 วันติดต่อกัน ได้กล่องทองคำ`; }
+        return `ทำงานประจำวันต่อเนื่อง ${s.n} วัน ครบ 7 วันได้กล่องทองคำ`;
+      }
+
+      // ---------- ใช้ของพิเศษจากกระเป๋า ----------
+      function onBagActivate(id) {
+        const it = ITEMS[id]; if (!it) return false;
+        const t = Town.debug.T(), n = now();
+        if (id === 'arrow') { speak(`ลูกศร ${state.inventory.arrow || 0} ดอก ใช้กับธนูสั้น`); return true; }
+        if (!it.special || it.cat !== 'consumable') return false;
+        if (id === 'rage_potion') { removeInv(id, 1); t.buffs.atk = Math.max(t.buffs.atkUntil > n ? t.buffs.atk : 0, 2); t.buffs.atkUntil = n + 5 * 60000; sfx('drink_sp'); sfx('power_up', { delay: 0.4 }); unsavedDirty = true; refreshBagMenu(`ดื่มน้ำยาโทสะ แรงตี +2 นาน 5 นาที, ตอนนี้แรงตีต่อครั้ง ${curStrike()} แต้ม`); return true; }
+        if (id === 'warrior_rice') { removeInv(id, 1); state.hp = Math.min(getMaxHp(), state.hp + Math.round(getMaxHp() * 0.3)); if (!(t.buffs.atkUntil > n && t.buffs.atk > 1)) { t.buffs.atk = 1; t.buffs.atkUntil = n + 10 * 60000; } sfx('gulp'); sfx('power_up', { delay: 0.5, gain: 0.8 }); unsavedDirty = true; refreshBagMenu(`กินข้าวปั้นนักรบ เลือด ${state.hp}เต็ม${getMaxHp()}, แรงตี +1 นาน 10 นาที`); return true; }
+        if (id === 'phoenix_feather') { speak('ขนนกฟีนิกซ์ ใช้อัตโนมัติเมื่อพ่ายแพ้ เก็บไว้ในกระเป๋าก็พอ'); return true; }
+        if (id === 'quick_warp') { if (state.zoneId === 'city') { speak('อยู่ในเมืองเริ่มต้นแล้ว'); return true; } removeInv(id, 1); state.menuStack = []; sfx('tele_use'); Town.warpHome(); return true; }
+        if (id === 'seer_potion') { removeInv(id, 1); G().seerUntil = n + 180000; seerAt = 0; sfx('drink_sp'); sfx('spellcast', { delay: 0.3, gain: 0.6 }); refreshBagMenu('ดื่มน้ำยาตาทิพย์ 3 นาที มอนสเตอร์ทุกตัวในพื้นที่จะส่งเสียงจากตำแหน่งจริงทุก 4 วินาที'); return true; }
+        if (id === 'repel_powder') { removeInv(id, 1); G().repelUntil = n + 180000; sfx('dust'); unsavedDirty = true; refreshBagMenu('โรยผงไล่สัตว์ 3 นาที มอนสเตอร์จะไม่เข้ามาไล่ ยกเว้นตัวที่ถูกตีก่อนและบอส'); return true; }
+        return false;
+      }
+      // ทิ้งของพิเศษต้องยืนยัน 2 ครั้ง
+      let dropAsk = { id: null, n: 0, at: 0 };
+      function dropGuard(id) {
+        const it = ITEMS[id]; if (!it || !it.special) return false;
+        const t = now();
+        if (dropAsk.id !== id || t - dropAsk.at > 5000) dropAsk = { id, n: 0, at: t };
+        dropAsk.n++; dropAsk.at = t;
+        if (dropAsk.n === 1) { AudioSys.playSound('error'); speak(`${it.name} เป็นของพิเศษ ขายไม่ได้ และหาซื้อไม่ได้ ถ้าจะทิ้ง กด Backspace อีกครั้ง`); return true; }
+        if (dropAsk.n === 2) { AudioSys.playSound('error'); speak('ยืนยันครั้งสุดท้าย กด Backspace อีกครั้งเพื่อทิ้งจริง'); return true; }
+        dropAsk = { id: null, n: 0, at: 0 }; return false;
+      }
+
+      // ---------- เสียงยิง / เหวี่ยง ----------
+      function canFire(wId) {
+        const sp = spec(wId);
+        if (sp.ammo && !(state.inventory[sp.ammo] > 0)) { AudioSys.playSound('error'); speak('ลูกศรหมด ซื้อชุดลูกศรได้ที่ร้านอาวุธ'); return false; }
+        if (sp.ammo) { removeInv(sp.ammo, 1); unsavedDirty = true; const left = state.inventory[sp.ammo] || 0; if (left <= 3) pending.push(left ? `ลูกศรเหลือ ${left} ดอก` : 'ลูกศรดอกสุดท้าย'); }
+        return true;
+      }
+      function fireSound(wId, ws, dir) {
+        const sp = spec(wId);
+        if (sp.line && ws && ws.ranged) {
+          const v = DIRS[state.dir], fx = (k) => AUDIO_OPTS.absolute ? { dx: v.dx * k, dy: v.dy * k } : { dx: 0, dy: k };
+          sfx(ws.ranged === 'bow' ? 'bow_shot' : 'sling_shot', Object.assign({ gain: 0.9, rate: ws.rate || 1 }, dir));
+          sfx('arrow_fly', Object.assign({ delay: 0.08, gain: 0.55 }, fx(Math.min(3, sp.line))));
+          sfx('arrow_fly', Object.assign({ delay: 0.2, gain: 0.3, rate: 0.9 }, fx(sp.line)));
+          if (wId === 'hawk_bow' && setOn('ranger')) G().safeUntil = now() + 900;   // ชุดพรานป่า: ก้าวถอยได้โดยไม่โดนท่าง้าง
+          return true;
+        }
+        if (ws && (ws.set === 'hammer' || ws.set === 'bat' || ws.set === 'gsword') && Math.random() < 0.3) sfx('pgrunt', { gain: 0.55, delay: 0.01 });   // เสียงฮึดตอนเหวี่ยงอาวุธหนัก
+        return false;
+      }
+      const safeNow = () => (G().safeUntil || 0) > now();
+
+      // ---------- ป่า 4 ทิศ: ตีมอนสเตอร์ ----------
+      function forestAttack(wId) {
+        const sp = spec(wId), arr = zoneAnimals[state.zoneId] || [];
+        const cands = arr.map(a => ({ o: a, dx: a.x - state.x, dy: a.y - state.y, snd: a.typeId, name: a.name }));
+        const blocked = (dx, dy) => { const x = state.x + dx, y = state.y + dy; return x < 1 || y < 1 || x > MAP_SIZE || y > MAP_SIZE; };
+        const picks = pick(cands, sp, blocked);
+        if (!picks.length) { miss(cands, sp, blocked); return; }
+        swing(picks, sp, cands, (c, m) => {
+          const a = c.o; if (!arr.includes(a)) return null;
+          const unaware = !a.alerted && !a.provoked;
+          if (!m.keepHidden(a, unaware)) a.provoked = true;
+          if (Math.random() < (ZONE_DODGE_CHANCE[state.zoneId] || 0) && monsterSidestep(a)) {
+            const hx = a.x - state.x, hy = a.y - state.y;
+            setTimeout(() => { AudioSys.playHitFile('dodge', { dx: hx, dy: hy }); AudioSys.playMonsterStep(a.typeId, hx, hy); }, 60);
+            renderAll(); speak(`${a.name}หลบ`); return null;
+          }
+          const pts = m.pts(a, unaware);
+          a.hp -= pts;
+          const hx = a.x - state.x, hy = a.y - state.y, tp = a.typeId, dead = a.hp <= 0;
+          setTimeout(() => { if (!AudioSys.playHit(tp, wId, hx, hy)) AudioSys.playSound('hit_enemy'); }, 60);
+          if (dead) setTimeout(() => AudioSys.playBodyFall(tp, hx, hy, 0), 600);
+          setTimeout(() => AudioSys.playAnimalFile(tp, dead ? 'death' : 'hurt', hx, hy), 110);
+          if (dead) {
+            const z = ZONES[state.zoneId], dropId = a.drops[Math.floor(Math.random() * a.drops.length)];
+            addInv(dropId, 1); AudioSys.playFx('kill', { delay: 0.12, gain: 0.9 }); AudioSys.playGet(dropId, 0.9); unsavedDirty = true;
+            arr.splice(arr.indexOf(a), 1);
+            setTimeout(() => { if (zoneAnimals[z.id]) zoneAnimals[z.id].push(spawnSingleAnimal(z.id, false)); }, 4000);
+            const gExp = Town.expMul(z.exp), lvMsg = addExp(gExp);
+            const fresh = Town.learn(a.typeId); Town.onForestKill(a); const sage = sageKill(fresh);
+            renderAll();
+            speak(`สังหาร${a.name}, ได้รับ ${gExp} ค่าประสบการณ์, ได้รับ ${ITEMS[dropId].name} 1 ชิ้น` + sage + (lvMsg ? `, ${lvMsg}` : ''));
+          }
+          return { pts, dead, boss: false, dx: hx, dy: hy };
+        });
+      }
+      // หมวกปราชญ์: ชนะมอนสเตอร์ชนิดใหม่ครั้งแรก ได้ค่าประสบการณ์พิเศษ
+      function sageKill(fresh) { if (!fresh || !eq('sage_hat')) return ''; const lvMsg = addExp(100); return ', หมวกปราชญ์จดบันทึกลงสมุดมอนสเตอร์ ได้ค่าประสบการณ์พิเศษ 100' + (lvMsg ? `, ${lvMsg}` : ''); }
+
+      // ---------- R: แบบละเอียด / แบบนักล่า ----------
+      const REL8 = ['ข้างหน้า', 'หน้าขวา', 'ขวา', 'หลังขวา', 'ข้างหลัง', 'หลังซ้าย', 'ซ้าย', 'หน้าซ้าย'];
+      function roughDir(dx, dy) {
+        let ang = Math.atan2(dx, dy) * 180 / Math.PI; if (ang < 0) ang += 360;
+        if (AUDIO_OPTS.absolute) return `ทิศ${DIRS[Math.round(ang / 45) % 8].name}`;
+        const rel = (ang - state.dir * 45 + 720) % 360; return REL8[Math.round(rel / 45) % 8];
+      }
+      function distText(dx, dy) {
+        if (!opt().hunter) return formatDistanceText(dx, dy);
+        const d = cheb(dx, dy); return `${roughDir(dx, dy)} ${d <= 3 ? 'ใกล้' : (d <= 8 ? 'ปานกลาง' : 'ไกล')}`;
+      }
+      const keen = () => eq('keen_brooch');
+      const scanRange = (R) => keen() ? Math.max(R, lv('keen_brooch') >= 1 ? 24 : 20) : R;
+      const hpTag = (a) => keen() ? ` เลือด ${Math.max(0, Math.ceil(a.hp))} จาก ${a.maxHp}` : '';
+      function scanForest() {
+        const R = scanRange(12), arr = zoneAnimals[state.zoneId] || [];
+        const near = arr.map(a => [a, cheb(a.x - state.x, a.y - state.y)]).filter(([, d]) => d <= R).sort((p, q) => p[1] - q[1]).slice(0, 5);
+        AudioSys.mineSfx('scan');
+        near.slice(0, 3).forEach(([a], i) => AudioSys.mineSfx('ping', { dx: a.x - state.x, dy: a.y - state.y, delay: 0.25 + i * 0.22 }));
+        speak(near.length ? `มอนสเตอร์ในระยะ ${R} ก้าว: ` + near.map(([a]) => `${a.name}${hpTag(a)} ${distText(a.x - state.x, a.y - state.y)}`).join(', ') : `ไม่มีมอนสเตอร์ในระยะ ${R} ก้าว`);
+      }
+
+      // ---------- ค่าที่ส่วนอื่นของเกมเรียกใช้ ----------
+      function reduce(dmg, why) {
+        const w = String(why || '');
+        if (eq('dragon_scale') && /ไฟ|ลาวา|กรด|ร้อน|ลวก/.test(w)) dmg = Math.round(dmg * (lv('dragon_scale') >= 1 ? 0.4 : 0.5));
+        if (eq('stone_shins') && /ชน|คลื่นกระแทก|หินถล่ม|หินจากเพดาน|ทุบ/.test(w)) dmg = Math.round(dmg * (lv('stone_shins') >= 1 ? 0.64 : 0.7));
+        return Math.max(1, dmg);
+      }
+      function cheatDeath() {
+        const g = G(), t = now();
+        if (eq('guardian_ring') && t >= (g.guardAt || 0)) {
+          g.guardAt = t + (lv('guardian_ring') >= 1 ? 8 : 10) * 60000; state.hp = 1; unsavedDirty = true;
+          sfx('bell', { gain: 1 }); sfx('bell', { delay: 0.4, rate: 1.2 });
+          setTimeout(() => speak(`แหวนพิทักษ์ช่วยไว้! รอดด้วยเลือด 1 แต้ม แหวนจะช่วยได้อีกใน ${lv('guardian_ring') >= 1 ? 8 : 10} นาที รีบถอยหรือดื่มน้ำยา`), 40);
+          return true;
+        }
+        if ((state.inventory.phoenix_feather || 0) > 0) {
+          removeInv('phoenix_feather', 1); state.hp = Math.round(getMaxHp() * 0.5); unsavedDirty = true;
+          sfx('fire', { gain: 0.9 }); sfx('respawn', { delay: 0.4 }); sfx('plife', { delay: 0.8, gain: 0.7 });
+          setTimeout(() => speak(`ขนนกฟีนิกซ์ลุกเป็นไฟ ช่วยชีวิตไว้! ฟื้นทันทีที่เดิม เลือด ${state.hp}เต็ม${getMaxHp()}`), 40);
+          return true;
+        }
+        return false;
+      }
+      const repelOn = () => (G().repelUntil || 0) > now();
+      const defBonus = () => setOn('rock') ? 8 : 0;
+      const expMul = (n) => eq('sage_hat') ? Math.round(n * (lv('sage_hat') >= 1 ? 1.24 : 1.2)) : n;
+      const dodgeMs = () => eq('wind_boots') ? (lv('wind_boots') >= 1 ? 180 : 150) : 0;
+      const runMul = () => eq('wind_boots') ? (lv('wind_boots') >= 1 ? 0.735 : 0.77) : 1;
+      const visBonus = () => eq('owl_ring') ? (lv('owl_ring') >= 1 ? 3 : 2) : 0;
+      const stepGain = () => eq('owl_ring') ? up('owl_ring', 1.3, 1.06) : 1;
+      const oreBonus = () => eq('goldhand_bangle') && Math.random() < up('goldhand_bangle', 0.3) ? 1 : 0;
+      const goldWin = () => eq('goldhand_bangle') ? (lv('goldhand_bangle') >= 1 ? 1.6 : 1.5) : 1;
+      const biteMs = () => eq('river_ring') ? (lv('river_ring') >= 1 ? 360 : 300) : 0;
+      const bigFishMul = () => eq('river_ring') ? (lv('river_ring') >= 1 ? 2.4 : 2) : 1;
+
+      // ---------- ตัวจับเวลา: ไม้เท้าเคาะทาง น้ำยาตาทิพย์ ผงไล่สัตว์ ชุดไอเทม ----------
+      let tickTimer = null, lastPos = '', seerAt = 0, tapPos = '';
+      function frontBlocked() {
+        const v = DIRS[state.dir], nx = state.x + v.dx, ny = state.y + v.dy;
+        if (Mine.isMineZone(state.zoneId)) return Mine.frontIsWall();
+        if (state.insideBuildingId) { const b = BUILDINGS.find(x => x.id === state.insideBuildingId); return !!b && (nx < b.x1 || nx > b.x2 || ny < b.y1 || (ny > b.y2 && !b.doors.includes(state.x))); }
+        if (state.zoneId === 'city') { if ((nx < 1 || nx > MAP_SIZE || ny < 1 || ny > MAP_SIZE)) return !((nx < 1 || nx > MAP_SIZE) ? (state.y >= 100 && state.y <= 110) : (state.x >= 100 && state.x <= 110)); return !!getBuildingAt(nx, ny) || Town.blocks(nx, ny, true); }
+        const z = ZONES[state.zoneId]; if (!z) return false;
+        if (nx < 1 || nx > MAP_SIZE || ny < 1 || ny > MAP_SIZE) { const rg = z.returnGate; if (rg && ((rg.y !== undefined) ? (state.x >= rg.x1 && state.x <= rg.x2) : (state.y >= rg.y1 && state.y <= rg.y2))) return false; if (state.zoneId === 'north_zone' && ny > MAP_SIZE && state.x >= 91 && state.x <= 111) return false; return true; }
+        return false;
+      }
+      function tick() {
+        if (state.screen !== 'game') return;
+        const g = G(), t = now();
+        // ไม้เท้านักเดินทาง: เคาะบอกล่วงหน้าเมื่อข้างหน้าเป็นกำแพง
+        const pos = `${state.zoneId}:${state.insideBuildingId || ''}:${state.x}:${state.y}:${state.dir}`;
+        if (pos !== lastPos) {
+          lastPos = pos;
+          const w = getEquippedWeaponSlot();
+          if (w && state.equipped[w] === 'traveler_staff' && !state.menuStack.length) {
+            let bl = false; try { bl = frontBlocked(); } catch (e) { bl = false; }
+            if (bl && tapPos !== pos) { tapPos = pos; const v = DIRS[state.dir], d = AUDIO_OPTS.absolute ? { dx: v.dx, dy: v.dy } : { dx: 0, dy: 1 }; sfx('knock_solid', Object.assign({ gain: 0.45, rate: 1.7 }, d)); sfx('knock_solid', Object.assign({ gain: 0.35, rate: 1.8, delay: 0.14 }, d)); }
+          }
+        }
+        // น้ำยาตาทิพย์
+        if (g.seerUntil) {
+          if (t >= g.seerUntil) { g.seerUntil = 0; speak('ฤทธิ์น้ำยาตาทิพย์หมดแล้ว'); }
+          else if (t >= seerAt && !state.menuStack.length) {
+            seerAt = t + 4000;
+            let list = [];
+            if (Mine.isMineZone(state.zoneId)) list = Mine.mobsRel();
+            else if (state.zoneId !== 'city') list = (zoneAnimals[state.zoneId] || []).map(a => ({ dx: a.x - state.x, dy: a.y - state.y, snd: a.typeId }));
+            list.filter(o => cheb(o.dx, o.dy) <= 30).sort((p, q) => cheb(p.dx, p.dy) - cheb(q.dx, q.dy)).slice(0, 6).forEach((o, i) => setTimeout(() => AudioSys.playAnimalFile(o.snd, 'idle', o.dx, o.dy), i * 180));
+          }
+        }
+        if (g.repelUntil && t >= g.repelUntil) { g.repelUntil = 0; speak('ฤทธิ์ผงไล่สัตว์หมดแล้ว มอนสเตอร์กลับมาไล่ได้ตามปกติ'); }
+        const sm = checkSets(true); if (sm) speak(sm);
+      }
+      function onGameStart() {
+        G(); applyAll(); lastSets = Object.keys(SETS).filter(setOn).join(',');
+        const b = state.town && state.town.buffs; if (b && b.atk > 2) b.atk = b.atk >= 30 ? 2 : 1;   // เซฟเก่า: บัฟพลังโจมตี 30/15 เป็นแรงตี 2/1
+        if (tickTimer) clearInterval(tickTimer);
+        tickTimer = setInterval(() => { try { tick(); } catch (e) { console.error('gear tick', e); } }, 120);
+      }
+
+      // ---------- เมนู: สมุดของพิเศษ ตั้งค่าการต่อสู้ ----------
+      function openBook() {
+        const g = G(), n = GI.filter(r => g.seen[r[0]]).length;
+        const items = [{ label: `สะสมของพิเศษแล้ว ${n} จาก ${GI.length} ชนิด, เปิดกล่องไปแล้ว ${g.opened} กล่อง, อีก ${10 - g.pity} กล่องได้ตำนานแน่นอน`, action: () => {} }];
+        ['legend', 'rare', 'common'].forEach(rar => GI.filter(r => r[1] === rar).forEach(r => {
+          const id = r[0], seen = g.seen[id];
+          const label = seen ? `${ITEMS[id].name}${isGear(id) ? (owned(id) ? ', มีอยู่' : ', ไม่ได้อยู่กับตัว') : `, มี ${state.inventory[id] || 0} ชิ้น`}, ${ITEMS[id].desc}` : `${RW[rar]}: ยังไม่เคยได้`;
+          items.push({ label, action: () => speak(label) });
+        }));
+        Object.values(SETS).forEach(s => { const have = s.items.filter(id => g.seen[id]).length; items.push({ label: `${s.name}: ${s.items.map(id => GMAP[id][2]).join(' + ')}, ${s.text}, สะสมแล้ว ${have} จาก 3${s.items.every(eq) ? ', สวมครบอยู่' : ''}`, action: () => {} }); });
+        items.push({ label: 'ที่มาของกล่อง: ทำงานประจำวันครบ 5 อย่าง, เลเวล 5 10 15 20 25, จบบท 3 และบท 6 ในเมือง, ชนะบอสเหมืองแต่ละตัวครั้งแรก, ทำงานประจำวันครบ 7 วันติดต่อกันได้กล่องทองคำ', action: () => {} });
+        AudioSys.mineSfx('paper');
+        pushMenu({ type: 'gift_book', title: 'สมุดของพิเศษ', idx: 0, items });
+      }
+      function openSettings() {
+        const build = () => [
+          { label: `บอก "ไกลเกินไป" เมื่อมอนสเตอร์อยู่ข้างหน้าแต่เกินระยะอาวุธ: ${opt().far ? 'เปิด' : 'ปิด'}`, action: () => { opt().far = !opt().far; unsavedDirty = true; AudioSys.playSound(opt().far ? 'toggle_on' : 'toggle_off'); rebuild(); } },
+          { label: `ปุ่ม R บอกมอนสเตอร์: ${opt().hunter ? 'แบบนักล่า บอกชื่อ ทิศคร่าวๆ ใกล้ ปานกลาง ไกล' : 'แบบละเอียด บอกชื่อ ทิศ และระยะเป็นก้าว'}`, action: () => { opt().hunter = !opt().hunter; unsavedDirty = true; AudioSys.playSound(opt().hunter ? 'toggle_on' : 'toggle_off'); rebuild(); } },
+          { label: 'วิธีตี: ตีได้เฉพาะข้างหน้าและเฉียงหน้า ซ้ายขวาตรงๆ และข้างหลังตีไม่โดน ต้องหันเข้าหาก่อน, มีด กริช ดาบไม้ หมัด ระยะ 1 ก้าว, ดาบเหล็ก ระยะ 2 ก้าว, ขวานและค้อนตีกวาดได้ถึง 3 ตัว ค้อนทำให้เซ, หนังสติ๊กและธนูยิงตรงแนวเดียว', action: () => {} },
+          { label: 'กลับ', action: () => popMenu() }
+        ];
+        const rebuild = () => { const m = currentMenu(); if (m && m.type === 'combat_opts') { m.items = build(); renderAll(); speak(m.items[m.idx].label); } };
+        pushMenu({ type: 'combat_opts', title: 'ตั้งค่าการต่อสู้', idx: 0, items: build() });
+      }
+      function charItems() { return [{ label: `แรงตีต่อครั้ง ${curStrike()} แต้ม (อาวุธ ${r1(basePts((getEquippedWeaponSlot() && state.equipped[getEquippedWeaponSlot()]) || null))} + ของที่สวม ${itemStrike()} + บัฟ ${buffStrike()})`, action: () => {} }, { label: 'สมุดของพิเศษ', action: openBook }].concat(Object.keys(SETS).filter(setOn).map(k => ({ label: `สวม${SETS[k].name}ครบ: ${SETS[k].text}`, action: () => {} }))); }
+
+      return {
+        spec, pick, miss, swing, hidden, notice, strike, curStrike, cheatDeath, reduce, repelOn, defBonus, expMul, dodgeMs, runMul, visBonus, stepGain,
+        oreBonus, goldWin, biteMs, bigFishMul, safeNow, scanRange, hpTag, distText, scanForest, forestAttack, canFire, fireSound,
+        openBox, onLevel, bossBox, onDailyBox, onBagActivate, dropGuard, onGameStart, openBook, openSettings, charItems, sageKill,
+        debug: { G, GI, SETS, SPEC, applyAll, setOn, geom, lastGot: () => lastGot, tick }
+      };
+    })();
+
+    const GAME_VERSION = {"build": 1, "name": "รุ่น 1.0", "date": "2026-11-23", "notes": ["เริ่มระบบแจ้งเตือนเมื่อเกมมีรุ่นใหม่", "โทรศัพท์: หน้าเลือกวิธีเล่น เล่นกับโปรแกรมอ่านหน้าจอหรือท่าทางนิ้ว และหน้าตรวจเสียง", "เสียงฟันดาบ ธนู หอก ชุดเกราะ และบรรยากาศใหม่จากชุด sounds1", "การต่อสู้ทิศเดียว อาวุธยิง บท 2 ดาบไม้ของเด็กๆ และของพิเศษ 27 ชนิดจากกล่องของขวัญ"]};
+    // ==================== แจ้งเตือนเมื่อเกมมีรุ่นใหม่ (version.json บน GitHub) ====================
+    // เช็กทุก 3 นาที (และทันทีเมื่อกลับมาที่หน้าเกม) เจอรุ่นใหม่ รอจังหวะปลอดภัยแล้วแจ้ง ผู้เล่นเลือกโหลดเอง เกมบันทึกให้ก่อน
+    const Updater = (() => {
+      const CUR = GAME_VERSION;   // { build, name, notes }
+      const SEEN_KEY = 'starter-town-seen-build', EXPECT_KEY = 'starter-town-expect-build';
+      const native = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+      const host = location.hostname || '';
+      const onWeb = /^https?:$/.test(location.protocol) && (/github\.io$/i.test(host) || /^(localhost|127\.0\.0\.1)$/.test(host));
+      const enabled = native || onWeb;
+      const URL_JSON = native ? 'https://lunmar01.github.io/gamesnew/version.json' : 'version.json';
+      let latest = null, announced = false, snoozed = false, nextRemind = 0, pending = false, timer = null, safeTimer = null;
+      const isNew = () => !!latest && latest.build > CUR.build;
+      const urgent = () => isNew() && (latest.important || (latest.minBuild || 0) > CUR.build);
+      const ls = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, String(v)); } catch { return null; } };
+
+      async function check() {
+        if (!enabled || (typeof navigator !== 'undefined' && navigator.onLine === false)) return;
+        try {
+          const r = await fetch(URL_JSON + (URL_JSON.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store' });
+          if (!r.ok) return;
+          const j = await r.json();
+          if (!j || typeof j.build !== 'number') return;
+          const was = isNew(); latest = j;
+          if (isNew() && !was) { pending = true; waitSafe(); }
+        } catch { /* เน็ตหลุด หรือไม่มีไฟล์: เงียบ ลองใหม่รอบหน้า */ }
+      }
+      // ---------- จังหวะปลอดภัย ----------
+      function safeNow() {
+        if (state.screen === 'main_menu') return true;
+        if (state.screen !== 'game' || state.menuStack.length) return false;
+        if (Town.miniActive() || Town.debug.train()) return false;
+        if (Mine.isMineZone(state.zoneId)) { if (Mine.busy()) return false; if (Mine.mobsRel().some(o => Math.max(Math.abs(o.dx), Math.abs(o.dy)) <= 6 || o.o.alerted)) return false; }
+        else if (state.zoneId !== 'city') { if ((zoneAnimals[state.zoneId] || []).some(a => Math.max(Math.abs(a.x - state.x), Math.abs(a.y - state.y)) <= 6 || a.windAt)) return false; }
+        if (Date.now() - lastSpeakAt < 2500) return false;   // กำลังพูดข้อความอยู่
+        return true;
+      }
+      function waitSafe() {
+        clearTimeout(safeTimer);
+        if (!pending) return;
+        if (!safeNow()) { safeTimer = setTimeout(waitSafe, 5000); return; }
+        pending = false; announce();
+      }
+      const menuHow = () => (typeof Mobile !== 'undefined' && Mobile.active()) ? (Mobile.mode() === 'gesture' ? 'แตะ 3 นิ้วเปิดเมนูเกม' : 'กดปุ่ม เมนูเกม') : 'กด Escape';
+      function announce() {
+        AudioSys.mineSfx('bell', { rate: 1.5, gain: 0.8 }); AudioSys.mineSfx('bell', { rate: 1.75, gain: 0.7, delay: 0.3 });
+        let t;
+        if (native) t = `เกมมีรุ่นใหม่ ${latest.name}, ติดตั้งแอปรุ่นล่าสุดเพื่อเล่นรุ่นใหม่`;
+        else if (state.screen === 'main_menu') t = `เกมมีรุ่นใหม่ ${latest.name}, เลือก โหลดเกมรุ่นใหม่ ในเมนูหลัก`;
+        else if (!announced) t = `เกมมีรุ่นใหม่ ${latest.name}, ${menuHow()} แล้วเลือก โหลดเกมรุ่นใหม่ เกมจะบันทึกให้ก่อน`;
+        else t = urgent() ? 'รุ่นที่เล่นอยู่มีข้อผิดพลาดสำคัญที่แก้แล้วในรุ่นใหม่ ควรโหลดเกมรุ่นใหม่' : 'อย่าลืม เกมมีรุ่นใหม่';
+        if (!announced && urgent()) t += ', รุ่นนี้แก้ข้อผิดพลาดสำคัญ ควรโหลดใหม่';
+        announced = true;
+        nextRemind = Date.now() + (urgent() ? 5 : 15) * 60000;
+        setTimeout(() => speak(t), 650);
+      }
+      function remindTick() {
+        if (!isNew() || snoozed || pending || !nextRemind || Date.now() < nextRemind) return;
+        nextRemind = 0; pending = true; waitSafe();
+      }
+      // ---------- โหลดรุ่นใหม่ ----------
+      function reload() {
+        if (native) { speak('แอปโหลดรุ่นใหม่เองไม่ได้ ติดตั้งไฟล์แอปรุ่นล่าสุดแทน'); return; }
+        const inGame = state.screen === 'game' || state.screen === 'paused';
+        if (inGame) { try { saveGame(); } catch {} }
+        ls(EXPECT_KEY, latest ? latest.build : CUR.build + 1);
+        AudioSys.playSound('confirm');
+        speak(inGame ? 'บันทึกเกมแล้ว กำลังโหลดเกมรุ่นใหม่' : 'กำลังโหลดเกมรุ่นใหม่');
+        setTimeout(() => { location.replace(location.pathname + '?v=' + (latest ? latest.build : Date.now())); }, 1800);
+      }
+      const notesText = (v) => `${v.name}${v.date ? ', วันที่ ' + v.date : ''}, สิ่งที่เปลี่ยน: ` + (v.notes || []).map((n, i) => `${i + 1}. ${n}`).join(', ');
+      // ---------- เมนู ----------
+      function gameMenuItems() {
+        if (!isNew()) return [];
+        return [
+          { label: `เกมมีรุ่นใหม่ ${latest.name}, ${native ? 'ติดตั้งแอปรุ่นล่าสุด' : 'โหลดเกมรุ่นใหม่ตอนนี้ (บันทึกให้ก่อน)'}`, action: () => { if (native) speak('ติดตั้งไฟล์แอปรุ่นล่าสุดเพื่อเล่นรุ่นใหม่'); else { state.menuStack = []; renderAll(); reload(); } } },
+          { label: 'ฟังว่ารุ่นใหม่มีอะไรเปลี่ยน', action: () => speak(notesText(latest)) },
+          { label: snoozed ? 'ปิดเตือนซ้ำแล้ว จะเตือนอีกครั้งตอนเข้าเกมครั้งหน้า' : 'เตือนอีกครั้งตอนเข้าเกมครั้งหน้า (ปิดเตือนซ้ำ)', action: () => { snoozed = true; AudioSys.playSound('toggle_off'); speak('ปิดเตือนซ้ำแล้ว จะเตือนอีกครั้งตอนเข้าเกมครั้งหน้า'); } }
+        ];
+      }
+      function mainLabel() { return isNew() && !native ? `โหลดเกมรุ่นใหม่ ${latest.name}` : null; }
+      function statusItem() {
+        return { label: 'รุ่นของเกมและสิ่งที่เปลี่ยน', action: () => {
+          const items = [{ label: `รุ่นที่เล่นอยู่ ${CUR.name}`, action: () => speak(`รุ่นที่เล่นอยู่ ${CUR.name}`) }];
+          (CUR.notes || []).forEach((n, i) => items.push({ label: `${i + 1}. ${n}`, action: () => speak(n) }));
+          if (isNew()) items.push({ label: `มีรุ่นใหม่ ${latest.name}: ${(latest.notes || []).join(', ')}`, action: () => speak(notesText(latest)) });
+          else if (enabled) items.push({ label: 'นี่คือรุ่นล่าสุดแล้ว', action: () => speak('นี่คือรุ่นล่าสุดแล้ว') });
+          items.push({ label: 'ปิด', action: () => popMenu() });
+          pushMenu({ type: 'version_info', title: 'รุ่นของเกมและสิ่งที่เปลี่ยน', idx: 0, items });
+        } };
+      }
+      // ---------- เข้าเกมรุ่นใหม่ครั้งแรก ----------
+      let greeted = false;
+      function onGameStart() {
+        if (greeted) return; greeted = true;
+        const seen = +(ls(SEEN_KEY) || 0), expect = +(ls(EXPECT_KEY) || 0);
+        let t = '';
+        if (expect && expect > CUR.build && !native) t = `GitHub ยังส่งเกมรุ่นเก่ามา ตอนนี้ยังเป็น ${CUR.name}, รอประมาณ 5 ถึง 10 นาทีแล้วลองโหลดเกมรุ่นใหม่อีกครั้ง`;
+        else if (seen && seen < CUR.build) t = `อัปเดตเป็น${CUR.name}แล้ว, สิ่งใหม่: ${(CUR.notes || []).slice(0, 2).join(', ')}, ฟังทั้งหมดที่หน้าต่างสถานะ เมนูรุ่นของเกม`;
+        if (!expect || expect <= CUR.build) { try { localStorage.removeItem(EXPECT_KEY); } catch {} }
+        ls(SEEN_KEY, Math.max(seen, CUR.build));
+        if (t) setTimeout(() => { AudioSys.mineSfx('badge', { gain: 0.6 }); speak(t); }, 4500);
+      }
+      function start() {
+        if (!enabled || timer) return;
+        setTimeout(check, 30000);
+        timer = setInterval(() => { check(); }, 3 * 60000);
+        setInterval(remindTick, 20000);
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
+      }
+      return { start, check, onGameStart, gameMenuItems, mainLabel, statusItem, reload, isNew, CUR, debug: { setLatest: (j) => { latest = j; announced = false; if (isNew()) { pending = true; waitSafe(); } }, safeNow, state: () => ({ latest, announced, snoozed, nextRemind, pending, enabled }) } };
     })();
 
 
@@ -7708,6 +8366,12 @@
       const S = Object.assign({}, DEF);
       try { Object.assign(S, JSON.parse(localStorage.getItem(SKEY)) || {}); } catch {}
       const save = () => { try { localStorage.setItem(SKEY, JSON.stringify(S)); } catch {} };
+      // เว็บบนมือถือ: เซฟตั้งค่าเก่าที่บังคับโหมดท่าทางไว้ ทำให้ชนกับโปรแกรมอ่านหน้าจอ ล้างเป็นอัตโนมัติ 1 ครั้ง
+      if (!native && !S.v2) { S.mode = 'auto'; S.output = 'auto'; S.v2 = true; save(); }
+      const IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      // srWeb = เว็บเดาว่าโปรแกรมอ่านหน้าจอเปิดอยู่ (เริ่มต้น: เปิด) · ปัดนิ้วจริง = ปิดแล้ว · แตะ 2 ครั้งบนพื้นที่ท่าทาง (คลิกจากโปรแกรมอ่านหน้าจอ) = เปิดอยู่
+      let srWeb = true, startVisible = false, lastActAt = 0, needWarm = false, pendingSay = null;
+      const DIAG = { swipes: 0, srClicks: 0, bell: null, voice: null, realTaps: 0 };
       let srOn = platform === 'android';   // ผู้อ่านหน้าจอเปิดอยู่ไหม (รู้ได้เฉพาะในแอป) Android ถือว่าเปิดไว้ก่อนจนกว่าจะถามระบบเสร็จ
       const SWIPE_PX = { short: 20, mid: 30, long: 45 };
 
@@ -7716,6 +8380,7 @@
         if (S.mode === 'gesture' || S.mode === 'buttons') return S.mode;
         if (platform === 'ios') return 'gesture';                  // iOS: สัมผัสโดยตรง VoiceOver เปิดค้างได้
         if (platform === 'android') return srOn ? 'buttons' : 'gesture';   // Android: TalkBack เปิด = ปุ่มบนจอ, พักแล้ว = ท่าทาง
+        if (!native) return (S.webStyle === 'gesture' && !srWeb) ? 'gesture' : 'buttons';   // เว็บ: ท่าทางเฉพาะตอนปิดโปรแกรมอ่านหน้าจอแล้ว
         return 'buttons';                                          // เว็บบนมือถือ: ผู้อ่านหน้าจอมักเปิดอยู่
       }
       function ttsOn() {
@@ -7743,23 +8408,53 @@
           TTS.stop().catch(() => {}).finally(() => TTS.speak({ text, lang: 'th-TH', rate: S.rate, pitch: 1, volume: 1, category: 'playback', queueStrategy: 0 }).catch(() => {}));
           return;
         }
-        if ('speechSynthesis' in window) {
+        if ('speechSynthesis' in window) webSpeak(text);
+      }
+      // เสียงพูดของเบราว์เซอร์: แบ่งท่อนสั้น (Chrome ตัดเสียงยาว) และหน่วงหลังหยุดพูด (iPhone สั่งพูดทันทีหลังหยุดจะเงียบ)
+      function chunks(text) {
+        const out = []; let cur = '';
+        String(text).split(/,\s*/).map((p, i, arr) => i < arr.length - 1 ? p + ',' : p).forEach(p => { if ((cur + ' ' + p).length > 140 && cur) { out.push(cur); cur = p; } else cur = cur ? cur + ' ' + p : p; });
+        if (cur) out.push(cur);
+        return out;
+      }
+      let speakGen = 0;
+      function webSpeak(text) {
+        const ss = window.speechSynthesis; if (!ss) return;
+        const gen = ++speakGen;
+        const go = () => {
+          if (gen !== speakGen) return;
           try {
-            speechSynthesis.cancel();
-            const u = new SpeechSynthesisUtterance(text); u.lang = 'th-TH'; u.rate = S.rate;
-            webVoice = webVoice || pickWebVoice(); if (webVoice) u.voice = webVoice;
-            speechSynthesis.speak(u);
+            webVoice = webVoice || pickWebVoice();
+            chunks(text).forEach(c => { const u = new SpeechSynthesisUtterance(c); u.lang = 'th-TH'; u.rate = S.rate; if (webVoice) u.voice = webVoice; ss.speak(u); });
+            if (ss.paused) ss.resume();
           } catch {}
-        }
+        };
+        if (ss.speaking || ss.pending) { try { ss.cancel(); } catch {} setTimeout(go, 110); } else go();
+      }
+      // ข้อความถึงโปรแกรมอ่านหน้าจอ: รวมข้อความที่มาติดกัน และรอให้อ่านชื่อปุ่มจบก่อน (0.3 วินาทีหลังกดปุ่ม)
+      let srQ = [], srT = null, srCh = 0;
+      function srWrite(t) {
+        srCh = 1 - srCh;
+        const a = document.getElementById(srCh ? 'sr1' : 'sr2'), b = document.getElementById(srCh ? 'sr2' : 'sr1');
+        if (!a || !b) return;
+        b.textContent = ''; a.textContent = '';
+        setTimeout(() => { a.textContent = t; }, 25);
+      }
+      function srSay(t) {
+        srQ.push(t); clearTimeout(srT);
+        srT = setTimeout(() => { const all = srQ.join(', '); srQ = []; srWrite(all); }, Math.max(60, lastActAt + 320 - Date.now()));
       }
       // speak() ของเกมเรียกตรงนี้: คืน true = พูดด้วยเสียงอ่านของเครื่องแล้ว ไม่ต้องส่ง aria-live
       function say(text) {
-        if (!ttsOn()) return false;
+        if (!enabled) return false;
+        if (startVisible && !native) return true;   // หน้าเลือกวิธีเล่น: ไม่ส่งข้อความเกมแทรก
+        if (!ttsOn()) { if (!native && mode() === 'buttons') { srSay(text); return true; } return false; }
+        if (!unlocked && !TTS) { pendingSay = text; return true; }   // ยังไม่ได้แตะจอ เบราว์เซอร์ยังไม่ยอมพูด เก็บไว้พูดหลังแตะ
         q.push(text);
         if (!qTimer) qTimer = setTimeout(() => { qTimer = null; const t = q.join(', '); q = []; sayNow(t); }, 30);   // ข้อความในจังหวะเดียวกันพูดต่อกัน
         return true;
       }
-      function stopSpeech() { q = []; try { if (TTS) TTS.stop(); else if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch {} }
+      function stopSpeech() { q = []; speakGen++; try { if (TTS) TTS.stop(); else if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch {} }
 
       // ---------- การสั่น ----------
       function buzz(kind) {
@@ -7911,6 +8606,10 @@
       function holdFire() {
         if (!G || G.decided || G.ignored) return;
         const [dx, dy] = centroid(); if (Math.hypot(dx, dy) > 14) return;
+        if (G.maxN >= 3 && !native) {   // 3 นิ้วค้าง: รอดูว่าค้างถึง 2 วินาทีไหม (ท่าออกฉุกเฉิน) ถ้ายกก่อน = ดื่มน้ำยาปุ่มลัด 2
+          const g0 = G; g0.h3 = setTimeout(() => { if (G === g0 && !g0.decided) { g0.decided = 'escape'; emergencySr(); } }, Math.max(0, 2000 - S.holdMs));
+          return;
+        }
         G.decided = 'hold';
         onGesture({ kind: 'hold', n: Math.min(3, G.maxN), at: Date.now() });
       }
@@ -7936,19 +8635,20 @@
       function tEnd(e) {
         e.preventDefault();
         if (!unlocked) {
-          unlocked = true; firstUnlock(); if (G) clearTimeout(G.hold); G = null;
+          unlockAll(true); if (G) clearTimeout(G.hold); G = null;
           speak(state.screen === 'main_menu' ? `เปิดเสียงแล้ว, เมนูหลัก, ปัดขึ้นลงเพื่อเลือก แตะ 1 นิ้วเพื่อตกลง, ${mainOpts()[state.mainMenuIdx]}` : 'เปิดเสียงแล้ว');
           return;
         }
-        AudioSys.init();
+        if (needWarm) unlockAll(true); else AudioSys.init();
         if (!G) return;
         const now = evNow(e);
         for (const t of e.changedTouches) G.pts.delete(t.identifier);
         if (e.type === 'touchcancel') G.pts.clear();
         if (G.pts.size) return;
-        clearTimeout(G.hold);
+        clearTimeout(G.hold); clearTimeout(G.h3);
         const g = G; G = null;
-        if (g.ignored) return;
+        if (g.ignored || g.decided === 'escape') return;
+        if (!g.decided && g.h3) { onGesture({ kind: 'hold', n: 3, at: g.t0 }); return; }
         if (!g.decided && now - g.t0 < Math.max(350, S.holdMs)) onGesture({ kind: 'tap', n: Math.min(3, g.maxN), at: g.t0 });
         if (g.decided === 'swipe') {
           if (g.maxN === 1 && ctxName() === 'gesture_practice') onGesture({ kind: 'swipe', n: 1, dir: g.dir, long: Date.now() - g.swAt > 500, phase: 'end', at: now });
@@ -7957,7 +8657,7 @@
       }
 
       // ---------- ชั้นรับท่าทาง และปุ่มบนจอ ----------
-      let layer = null, pad = null, padKey = '';
+      let layer = null, pad = null, padKey = '', padShape = '', startEl = null;
       function injectCss() {
         const st = document.createElement('style');
         st.textContent = `
@@ -7971,29 +8671,69 @@
           #mPad .items { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
           #mPad .items button { text-align: left; min-height: 52px; font-weight: 500; font-size: 16px; }
           #mPad h2 { color: #fcd34d; font: 700 16px system-ui; margin: 4px 2px 8px; }
-          body.m-active { overscroll-behavior: none; }`;
+          body.m-active { overscroll-behavior: none; }
+          #mStart { position: fixed; inset: 0; z-index: 9100; background: #0b1220; color: #f8fafc; padding: 16px; box-sizing: border-box; overflow-y: auto; display: none; font: 17px/1.5 system-ui, sans-serif; }
+          #mStart h1 { font: 700 24px system-ui; color: #fcd34d; margin: 4px 0 8px; }
+          #mStart p { margin: 6px 0 12px; }
+          #mStart button { display: block; width: 100%; text-align: left; font: 600 19px/1.3 system-ui, sans-serif; color: #f8fafc; background: #1e293b; border: 2px solid #475569; border-radius: 14px; min-height: 64px; padding: 10px 14px; margin: 0 0 10px; }
+          #mStart button.main { background: #1d4ed8; border-color: #93c5fd; }
+          #mStart ul { margin: 6px 0 12px; padding-left: 20px; }`;
         document.head.appendChild(st);
       }
       function buildLayers() {
         layer = document.createElement('div'); layer.id = 'mTouch';
-        layer.setAttribute('role', 'application'); layer.setAttribute('aria-label', 'พื้นที่เล่นเกม ปัดเพื่อเดิน แตะเพื่อโจมตี แตะค้างเพื่อใช้');
+        if (native) { layer.setAttribute('role', 'application'); layer.setAttribute('aria-label', 'พื้นที่เล่นเกม ปัดเพื่อเดิน แตะเพื่อโจมตี แตะค้างเพื่อใช้'); }
+        else {
+          // เว็บ: ถ้าโปรแกรมอ่านหน้าจออ่านป้ายนี้ได้ แปลว่ายังเปิดอยู่ แตะ 2 ครั้ง = กลับไปใช้ปุ่มบนจอ
+          layer.setAttribute('role', 'button'); layer.setAttribute('aria-label', 'พื้นที่ท่าทางนิ้ว ถ้าได้ยินข้อความนี้ แสดงว่าโปรแกรมอ่านหน้าจอยังเปิดอยู่ แตะ 2 ครั้งเพื่อกลับไปใช้ปุ่มบนจอ');
+          layer.addEventListener('click', () => { DIAG.srClicks++; srBack('โปรแกรมอ่านหน้าจอเปิดอยู่ เปลี่ยนเป็นปุ่มบนจอแล้ว ถ้าจะเล่นท่าทางนิ้ว ปิดโปรแกรมอ่านหน้าจอแล้วปัดนิ้วบนจอ 1 ครั้ง'); });
+        }
         ['touchstart', 'touchmove', 'touchend', 'touchcancel'].forEach(t => layer.addEventListener(t, t === 'touchstart' ? tStart : (t === 'touchmove' ? tMove : tEnd), { passive: false }));
         pad = document.createElement('div'); pad.id = 'mPad';
         document.body.appendChild(layer); document.body.appendChild(pad);
       }
+      // เรียงตามลำดับที่ปัดผ่านด้วยโปรแกรมอ่านหน้าจอ: เดิน 4 ทิศ, โจมตี, ใช้, ฟังรอบตัว, กระเป๋า, เมนู แล้วค่อยปุ่มเสริม
       const WORLD_PAD = [
-        ['กระเป๋า', 'KeyI'], ['เดินเหนือ', 'ArrowUp', 'mv'], ['ฟังรอบตัว', 'KeyR'],
-        ['เดินตะวันตก', 'ArrowLeft', 'mv'], ['ใช้ คุย เข้าออก', 'Enter', 'on'], ['เดินตะวันออก', 'ArrowRight', 'mv'],
-        ['กระโดด', 'Space'], ['เดินใต้', 'ArrowDown', 'mv'], ['โจมตี', 'Ctrl', 'on'],
-        ['เมนูเกม', 'Escape'], ['ข้อมูลด่วน', 'info'], ['น้ำยา', 'potion']
+        ['เดินเหนือ', 'ArrowUp', 'mv'], ['เดินใต้', 'ArrowDown', 'mv'], ['เดินตะวันออก', 'ArrowRight', 'mv'],
+        ['เดินตะวันตก', 'ArrowLeft', 'mv'], ['โจมตี', 'Ctrl', 'on'], ['ใช้ คุย เข้าออก', 'Enter', 'on'],
+        ['ฟังรอบตัว', 'KeyR'], ['กระเป๋า', 'KeyI'], ['เมนูเกม', 'Escape'],
+        ['เดินเหนือ 5 ก้าว', 'walk5:ArrowUp', 'mv'], ['เดินใต้ 5 ก้าว', 'walk5:ArrowDown', 'mv'], ['เดินตะวันออก 5 ก้าว', 'walk5:ArrowRight', 'mv'],
+        ['เดินตะวันตก 5 ก้าว', 'walk5:ArrowLeft', 'mv'], ['กระโดด', 'Space'], ['ข้อมูลด่วน', 'info'],
+        ['น้ำยา', 'potion'], ['อ่านข้อความล่าสุดซ้ำ', 'repeat'], ['หน้าเลือกวิธีเล่น', 'start']
       ];
+      let walkT = null;
+      function walk5(key) {
+        clearTimeout(walkT); let n = 0;
+        const stepOnce = () => {
+          if (ctxName() !== 'world' || state.screen !== 'game') return;
+          const before = `${state.zoneId}:${state.insideBuildingId}:${state.x}:${state.y}`;
+          press(key);
+          n++; const after = `${state.zoneId}:${state.insideBuildingId}:${state.x}:${state.y}`;
+          if (n < 5 && before !== after) walkT = setTimeout(stepOnce, 260);
+        };
+        stepOnce();
+      }
       function bindBtn(b, act) {
-        let touchedAt = 0;
-        const down = () => { if (act === 'info') return openInfo(); if (act === 'potion') return openPotion(); if (act.startsWith('item:')) return pickItem(+act.slice(5)); press(act, { hold: ARROWS.includes(act) && ctxName() === 'world' }); };
-        b.addEventListener('touchstart', () => { touchedAt = Date.now(); if (!unlocked) { unlocked = true; firstUnlock(); } else AudioSys.init(); down(); }, { passive: true });
-        b.addEventListener('touchend', (e) => { e.preventDefault(); release(); }, { passive: false });
-        b.addEventListener('touchcancel', () => release());
-        b.addEventListener('click', () => { if (Date.now() - touchedAt < 900) return; if (!unlocked) { unlocked = true; firstUnlock(); } AudioSys.init(); down(); release(); });   // TalkBack / VoiceOver แตะ 2 ครั้ง
+        let touchedAt = 0, deferred = false, tx = 0, ty = 0, moved = false;
+        const down = () => {
+          lastActAt = Date.now();
+          if (act === 'info') return openInfo(); if (act === 'potion') return openPotion(); if (act === 'repeat') return srWrite(recentMsgs[0] || 'ยังไม่มีข้อความ');
+          if (act === 'start') return showStart('choose');
+          if (act.startsWith('walk5:')) return walk5(act.slice(6));
+          if (act.startsWith('item:')) return pickItem(+act.slice(5));
+          press(act, { hold: ARROWS.includes(act) && ctxName() === 'world' });
+        };
+        b.addEventListener('touchstart', (e) => {
+          touchedAt = Date.now(); const t = e.touches[0]; tx = t ? t.clientX : 0; ty = t ? t.clientY : 0; moved = false;
+          unlockAll();
+          // รอปิดโปรแกรมอ่านหน้าจอเพื่อเล่นท่าทาง: กดตอนยกนิ้ว (ปัดผ่านปุ่มจะไม่กดโดยไม่ตั้งใจ)
+          deferred = S.webStyle === 'gesture' && srWeb && !native;
+          if (!deferred) down();
+        }, { passive: true });
+        b.addEventListener('touchmove', (e) => { const t = e.touches[0]; if (t && Math.hypot(t.clientX - tx, t.clientY - ty) > 20) moved = true; }, { passive: true });
+        b.addEventListener('touchend', (e) => { if (e.cancelable) e.preventDefault(); if (deferred) { deferred = false; if (!moved) { down(); release(); } return; } release(); }, { passive: false });
+        b.addEventListener('touchcancel', () => { deferred = false; release(); });
+        b.addEventListener('click', () => { if (Date.now() - touchedAt < 900) return; unlockAll(); down(); release(); });   // TalkBack / VoiceOver แตะ 2 ครั้ง
       }
       function mk(label, act, cls) { const b = document.createElement('button'); b.type = 'button'; b.textContent = label; if (cls) b.className = cls; bindBtn(b, act); return b; }
       function renderPad() {
@@ -8005,6 +8745,13 @@
         if (c === 'sound') key += '|' + soundIdx + SOUND_ITEMS.map(it => it.k in { master: 1, music: 1, amb: 1, fx: 1, ui: 1 } ? AudioSys.getVol(it.k) : '').join(',');
         if (MSCREENS.includes(c)) key += '|' + ctlIdx + JSON.stringify(S);
         if (key === padKey) return;   // ไม่สร้างปุ่มใหม่ถ้าไม่มีอะไรเปลี่ยน โฟกัสของผู้อ่านหน้าจอจะไม่หลุด
+        // โครงเดิม (หน้าเดิม จำนวนรายการเท่าเดิม): เปลี่ยนแค่ชื่อปุ่มในที่เดิม โฟกัสไม่หลุด
+        const shape = `${c}|${(m && m.title) || state.screen}|${items.length}`;
+        if (shape === padShape && pad.querySelector('.items')) {
+          padKey = key; const bs = pad.querySelectorAll('.items button'); items.forEach((t, i) => { if (bs[i] && bs[i].textContent !== t) bs[i].textContent = t; });
+          return;
+        }
+        padShape = shape;
         padKey = key; pad.innerHTML = '';
         pad.classList.toggle('list', c !== 'world');
         const grid = document.createElement('div'); grid.className = 'g';
@@ -8031,8 +8778,9 @@
       function refresh() {
         if (!enabled || !layer) return;
         const md = mode();
-        layer.style.display = md === 'gesture' ? 'block' : 'none';
-        pad.style.display = md === 'buttons' ? 'block' : 'none';
+        layer.style.display = md === 'gesture' && !startVisible ? 'block' : 'none';
+        pad.style.display = md === 'buttons' && !startVisible ? 'block' : 'none';
+        if (startEl) startEl.style.display = startVisible ? 'block' : 'none';
         const wrap = document.querySelector('.wrap');
         if (wrap) { if (md === 'off') wrap.removeAttribute('aria-hidden'); else wrap.setAttribute('aria-hidden', 'true'); }
         document.body.classList.toggle('m-active', md !== 'off');
@@ -8047,7 +8795,7 @@
           if (platform === 'ios') GA.setDirectTouch({ on: md === 'gesture' }).catch(() => {});
           if (platform === 'android') GA.setGestureExclusion({ on: md === 'gesture' }).catch(() => {});
         }
-        if (lastMode && lastMode !== md) speak(md === 'gesture' ? 'เปลี่ยนเป็นโหมดท่าทางนิ้ว เกมพูดเองด้วยเสียงอ่านของเครื่อง' : 'เปลี่ยนเป็นโหมดปุ่มบนจอ ใช้กับผู้อ่านหน้าจอ');
+        if (lastMode && lastMode !== md && native) speak(md === 'gesture' ? 'เปลี่ยนเป็นโหมดท่าทางนิ้ว เกมพูดเองด้วยเสียงอ่านของเครื่อง' : 'เปลี่ยนเป็นโหมดปุ่มบนจอ ใช้กับผู้อ่านหน้าจอ');
         lastMode = md;
       }
 
@@ -8095,6 +8843,7 @@
         { k: 'gsound', name: 'เสียงยืนยันท่าทาง', vals: [true, false], show: onoff },
         { k: 'panBoost', name: 'เสียงทิศชัดขึ้น (ลำโพงโทรศัพท์)', vals: [false, true], show: onoff },
         { k: 'practice', name: 'ฝึกท่าทางนิ้ว', enter: startPractice },
+        { k: 'start', name: 'หน้าเลือกวิธีเล่น และตรวจเสียงกับเสียงพูด', enter: () => showStart('choose') },
         { k: 'export', name: 'ส่งออกรหัสเซฟ (คัดลอก)', enter: exportSave },
         { k: 'import', name: 'นำเข้ารหัสเซฟ (จากที่คัดลอกไว้)', enter: importSave },
         { k: 'reset', name: 'คืนค่าเริ่มต้นการควบคุม', enter: () => { Object.assign(S, DEF); save(); apply(); AudioSys.playSound('confirm'); speak('คืนค่าเริ่มต้นแล้ว'); } },
@@ -8179,7 +8928,7 @@
       ];
       let pr = null;
       function startPractice() {
-        if (mode() !== 'gesture') { AudioSys.playSound('error'); speak('ฝึกท่าทางนิ้วได้ในโหมดท่าทางนิ้ว เปลี่ยนโหมดควบคุมก่อน'); return; }
+        if (mode() !== 'gesture') { AudioSys.playSound('error'); speak(native ? 'ฝึกท่าทางนิ้วได้ในโหมดท่าทางนิ้ว เปลี่ยนโหมดควบคุมก่อน' : 'ฝึกท่าทางนิ้วได้ในวิธีเล่นด้วยท่าทางนิ้ว เลือกที่หน้าเลือกวิธีเล่น แล้วปิดโปรแกรมอ่านหน้าจอ'); return; }
         pr = { i: 0, last3: 0 }; state.screen = 'gesture_practice'; renderAll();
         speak(`ฝึกท่าทางนิ้ว ${LESSONS.length} ท่า, แตะ 3 นิ้ว 2 ครั้งติดกันเพื่อออก, ท่าที่ 1: ${LESSONS[0][3]}`);
       }
@@ -8257,7 +9006,8 @@
       }
       function onShow() {
         if (!enabled) return;
-        AudioSys.resume(); keepAwake();
+        AudioSys.resume(); keepAwake(); needWarm = true;   // กลับจากแอปอื่น: ปลดล็อกเสียงพูดใหม่ในการแตะครั้งถัดไป
+        if (silentEl) silentEl.play().catch(() => {});
         if (pausedFrom === 'game' && state.screen === 'paused') {
           state.screen = 'game'; pausedFrom = null; renderAll();
           const z = ZONES[state.zoneId];
@@ -8265,11 +9015,134 @@
           scheduleRadar();
         }
       }
-      function firstUnlock() {
-        AudioSys.init(); keepAwake();
+      // iPhone: เล่นเสียงเงียบผ่านตัวเล่นเสียงของหน้าเว็บ ให้ระบบมองเป็นการเล่นสื่อ เสียงเกมดังแม้เปิดสวิตช์เงียบ
+      let silentEl = null;
+      function silentAudio() {
+        if (silentEl) { silentEl.play().catch(() => {}); return; }
+        try {
+          const n = 8000, buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf), w = (o, s2) => { for (let i = 0; i < s2.length; i++) v.setUint8(o + i, s2.charCodeAt(i)); };
+          w(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+          v.setUint32(24, 8000, true); v.setUint32(28, 16000, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, 'data'); v.setUint32(40, n * 2, true);
+          silentEl = new Audio(URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }))); silentEl.loop = true; silentEl.setAttribute('playsinline', ''); silentEl.volume = 0.01;
+          silentEl.play().catch(() => {});
+        } catch {}
+      }
+      // ปลดล็อกเสียงเกม (และเสียงพูด) จากการกดจริงของผู้เล่น เรียกได้ทุกครั้งที่กด ถ้าเสียงถูกระงับจะเปิดกลับ
+      function unlockAll(warmTts = false) {
+        const first = !unlocked; unlocked = true;
+        try { AudioSys.init(); AudioSys.resume(); } catch {}
         try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
-        if (!TTS && ttsOn() && 'speechSynthesis' in window) { try { speechSynthesis.speak(new SpeechSynthesisUtterance(' ')); } catch {} }
-        if (state.screen === 'main_menu') AudioSys.startMusic('menu');
+        if (IOS && !native) silentAudio();
+        if ((warmTts || needWarm) && !TTS && 'speechSynthesis' in window) {
+          try { const u = new SpeechSynthesisUtterance('ก'); u.volume = 0; u.lang = 'th-TH'; speechSynthesis.speak(u); if (speechSynthesis.paused) speechSynthesis.resume(); } catch {}
+          needWarm = false;
+        }
+        if (first) { keepAwake(); if (state.screen === 'main_menu') AudioSys.startMusic('menu'); }
+        if (pendingSay && ttsOn()) { const p = pendingSay; pendingSay = null; setTimeout(() => say(p), 160); }
+      }
+      function firstUnlock() { unlockAll(true); }
+      // กลับไปใช้โปรแกรมอ่านหน้าจอ (ปุ่มบนจอ)
+      function srBack(msg) { srWeb = true; stopSpeech(); release(); apply(); lastActAt = Date.now(); srSay(msg); }
+      function emergencySr() {
+        S.webStyle = 'sr'; save(); stopSpeech(); AudioSys.playSound('menu_close');
+        sayNow('กลับไปใช้โปรแกรมอ่านหน้าจอแล้ว เปิด VoiceOver หรือ TalkBack ได้เลย');
+        setTimeout(() => srBack('วิธีเล่นกับโปรแกรมอ่านหน้าจอ ปุ่มบนจอ'), 2500);
+      }
+      // ได้รับการปัดนิ้วจริง = โปรแกรมอ่านหน้าจอปิดแล้ว (ตอนเปิดอยู่ หน้าเว็บจะไม่ได้รับการปัด)
+      function realSwipe() {
+        DIAG.swipes++;
+        if (native || startVisible || S.webStyle !== 'gesture' || !srWeb) return;
+        srWeb = false; unlockAll(true); apply();
+        sayNow('เกมพูดเองแล้ว โหมดท่าทางนิ้ว, ปัดเพื่อเดิน แตะ 1 นิ้วโจมตี แตะค้างใช้หรือคุย แตะ 3 นิ้วเปิดเมนู, แตะค้าง 3 นิ้ว 2 วินาทีเพื่อกลับไปใช้โปรแกรมอ่านหน้าจอ, ' + (state.screen === 'main_menu' ? `เมนูหลัก ${mainOpts()[state.mainMenuIdx]}` : 'พร้อมเล่น'));
+        setTimeout(checkThaiVoice, 1500);
+      }
+      function checkThaiVoice() {
+        if (TTS || !('speechSynthesis' in window)) return;
+        const vs = speechSynthesis.getVoices();
+        if (vs.length && !pickWebVoice()) {
+          [0, 350, 700].forEach(d => setTimeout(() => AudioSys.playSound('error'), d));
+          srWrite('เครื่องนี้ไม่มีเสียงอ่านภาษาไทย ' + THAI_HELP);
+        }
+      }
+      const THAI_HELP = IOS ? 'ติดตั้งที่ ตั้งค่า > การช่วยการเข้าถึง > เนื้อหาที่พูด > เสียง > ไทย แล้วดาวน์โหลดเสียง' : 'ติดตั้งที่ ตั้งค่า > การช่วยการเข้าถึง > เอาต์พุตการอ่านออกเสียง > บริการของ Google > ภาษาไทย แล้วดาวน์โหลด';
+
+      // ---------- หน้าเลือกวิธีเล่น และหน้าตรวจเสียง (เว็บบนมือถือ) ----------
+      const STY = { sr: 'เล่นกับโปรแกรมอ่านหน้าจอ (ปุ่มบนจอ)', gesture: 'เล่นด้วยท่าทางนิ้ว (เกมพูดเอง)' };
+      let tapStart = 0, tapDur = 0;
+      function sBtn(label, fn, cls) {
+        const b = document.createElement('button'); b.type = 'button'; b.textContent = label; if (cls) b.className = cls;
+        b.addEventListener('touchstart', () => { tapStart = Date.now(); }, { passive: true });
+        b.addEventListener('touchend', () => { tapDur = Date.now() - tapStart; }, { passive: true });
+        b.addEventListener('click', () => { const real = Date.now() - tapStart < 1200 && tapDur >= 40; if (real) DIAG.realTaps++; unlockAll(); fn(real); tapDur = 0; });
+        return b;
+      }
+      function showStart(view) {
+        if (!startEl) return;
+        if (state.screen === 'control_menu') { state.screen = ctlReturn === 'game' ? 'game' : 'main_menu'; }
+        startVisible = true; stopSpeech(); release(); refresh();
+        startEl.innerHTML = '';
+        const h = document.createElement('h1'), p = document.createElement('p');
+        const add = (el) => startEl.appendChild(el);
+        if (view === 'choose') {
+          h.textContent = 'โลกฝึกหัด, เลือกวิธีเล่น'; add(h);
+          p.textContent = 'เล่นกับโปรแกรมอ่านหน้าจอ: ไม่ต้องปิด VoiceOver หรือ TalkBack ปัดซ้ายขวาเลือกปุ่ม แตะ 2 ครั้งเพื่อกด. เล่นด้วยท่าทางนิ้ว: ต้องปิดโปรแกรมอ่านหน้าจอชั่วคราว เกมจะพูดเอง. ' + (IOS ? 'iPhone: ถ้าเสียงเกมเบาลงตอน VoiceOver พูด ให้ปิด ลดเสียงสื่อ ที่ ตั้งค่า > การช่วยการเข้าถึง > VoiceOver > เสียง. ถ้าไม่มีเสียงเกม ให้ปิดสวิตช์ปิดเสียงข้างเครื่อง.' : '');
+          add(p);
+          const order = S.webStyle === 'gesture' ? ['gesture', 'sr'] : ['sr', 'gesture'];
+          order.forEach((k, i) => add(sBtn((S.webStyle === k ? 'เล่นต่อ: ' : '') + STY[k] + (k === 'gesture' ? ', ต้องปิดโปรแกรมอ่านหน้าจอ' : ''), (real) => choose(k, real), i === 0 ? 'main' : '')));
+          add(sBtn('ตรวจเสียงและเสียงพูด', () => showStart('diag')));
+        } else {
+          h.textContent = 'ตรวจเสียงและเสียงพูด'; add(h);
+          p.textContent = 'ทำทีละขั้น: กดเล่นเสียงกริ่ง แล้วตอบว่าได้ยินไหม, กดทดสอบเสียงพูด แล้วตอบว่าได้ยินไหม, จากนั้นฟังผลตรวจ หรือคัดลอกผลตรวจส่งให้ผู้ทำเกม';
+          add(p);
+          add(sBtn('1. เล่นเสียงกริ่ง', () => { AudioSys.playSound('confirm'); AudioSys.mineSfx('bell', { gain: 1.2, delay: 0.2 }); }, 'main'));
+          add(sBtn('ได้ยินเสียงกริ่ง', () => { DIAG.bell = true; srWrite('บันทึกแล้ว ได้ยินเสียงกริ่ง'); }));
+          add(sBtn('ไม่ได้ยินเสียงกริ่ง', () => { DIAG.bell = false; srWrite('บันทึกแล้ว ไม่ได้ยินเสียงกริ่ง' + (IOS ? ' ลองปิดสวิตช์ปิดเสียงข้างเครื่อง เพิ่มเสียง แล้วกดเล่นใหม่' : ' ลองเพิ่มเสียงสื่อของเครื่อง แล้วกดเล่นใหม่')); }));
+          add(sBtn('2. ทดสอบเสียงพูดของเกม', () => { if (TTS) sayNow('ทดสอบเสียงพูด หนึ่ง สอง สาม'); else webSpeak('ทดสอบเสียงพูด หนึ่ง สอง สาม'); }, 'main'));
+          add(sBtn('ได้ยินเสียงพูด', () => { DIAG.voice = true; srWrite('บันทึกแล้ว ได้ยินเสียงพูด'); }));
+          add(sBtn('ไม่ได้ยินเสียงพูด', () => { DIAG.voice = false; srWrite('บันทึกแล้ว ไม่ได้ยินเสียงพูด, ' + THAI_HELP); }));
+          const rep = document.createElement('ul'); rep.setAttribute('aria-label', 'ผลตรวจ');
+          add(sBtn('3. ฟังผลตรวจ', () => { const L = diagLines(); rep.innerHTML = ''; L.forEach(t => { const li = document.createElement('li'); li.textContent = t; rep.appendChild(li); }); srWrite(L.join(', ')); }, 'main'));
+          add(rep);
+          add(sBtn('คัดลอกผลตรวจ', async () => { try { await clipWrite('ผลตรวจโลกฝึกหัด\n' + diagLines().join('\n')); srWrite('คัดลอกผลตรวจแล้ว นำไปวางส่งให้ผู้ทำเกมได้'); } catch { srWrite('คัดลอกไม่ได้ ให้ฟังผลตรวจแล้วจดไว้แทน'); } }));
+          add(sBtn('กลับไปหน้าเลือกวิธีเล่น', () => showStart('choose')));
+        }
+        lastActAt = Date.now();
+        setTimeout(() => { try { h.setAttribute('tabindex', '-1'); h.focus(); } catch {} }, 50);
+      }
+      function diagLines() {
+        const ss = 'speechSynthesis' in window ? speechSynthesis.getVoices() : [], th = ss.filter(v => /^th/i.test(v.lang));
+        const dec = AUDIO_OPTS.decode || { done: 0, total: 0 };
+        const ua = navigator.userAgent;
+        const br = /CriOS|Chrome/.test(ua) ? 'Chrome' : (/Safari/.test(ua) ? 'Safari' : 'อื่นๆ');
+        const os = IOS ? 'iOS ' + ((ua.match(/OS (\d+[_\d]*)/) || [])[1] || '').replace(/_/g, '.') : (/Android ([\d.]+)/.test(ua) ? 'Android ' + ua.match(/Android ([\d.]+)/)[1] : 'ไม่ทราบ');
+        const L = [
+          `ระบบ ${os}, เบราว์เซอร์ ${br}`,
+          `วิธีเล่นที่เลือก ${S.webStyle ? STY[S.webStyle] : 'ยังไม่เลือก'}, ตอนนี้ใช้ ${mode() === 'gesture' ? 'ท่าทางนิ้ว เกมพูดเอง' : 'ปุ่มบนจอ'}`,
+          `เสียงเกม ${AudioSys.ctxState ? AudioSys.ctxState() : 'ไม่ทราบ'}, เตรียมเสียงแล้ว ${dec.done} จาก ${dec.total} ไฟล์`,
+          `ได้ยินเสียงกริ่ง ${DIAG.bell === null ? 'ยังไม่ทดสอบ' : (DIAG.bell ? 'ได้ยิน' : 'ไม่ได้ยิน')}`,
+          `เสียงพูดของเบราว์เซอร์ ${'speechSynthesis' in window ? 'มี' : 'ไม่มี'}, เสียงทั้งหมด ${ss.length} เสียง, เสียงไทย ${th.length} เสียง${th.length ? ' ชื่อ ' + th.map(v => v.name).join(' และ ') : ''}`,
+          `ได้ยินเสียงพูด ${DIAG.voice === null ? 'ยังไม่ทดสอบ' : (DIAG.voice ? 'ได้ยิน' : 'ไม่ได้ยิน')}`,
+          `ได้รับการปัดนิ้วจริง ${DIAG.swipes} ครั้ง, แตะจริง ${DIAG.realTaps} ครั้ง, คลิกจากโปรแกรมอ่านหน้าจอบนพื้นที่ท่าทาง ${DIAG.srClicks} ครั้ง`,
+          `หน่วยความจำเครื่อง ${navigator.deviceMemory ? navigator.deviceMemory + ' GB' : 'ไม่ทราบ'}, จอ ${screen.width} คูณ ${screen.height}`,
+          `ตัวควบคุมเสียงสื่อของ iPhone ${navigator.audioSession ? 'มี' : 'ไม่มี'}`
+        ];
+        if (DIAG.bell === false) L.push(IOS ? 'คำแนะนำ: ปิดสวิตช์ปิดเสียงข้างเครื่อง เพิ่มเสียงสื่อ แล้วโหลดหน้าเกมใหม่' : 'คำแนะนำ: เพิ่มเสียงสื่อ แล้วโหลดหน้าเกมใหม่');
+        if (DIAG.voice === false || !th.length) L.push('คำแนะนำ: ' + THAI_HELP);
+        return L;
+      }
+      function choose(k, real) {
+        S.webStyle = k; save();
+        startVisible = false; lastActAt = Date.now();
+        if (k === 'gesture') {
+          srWeb = !real;   // เลือกด้วยการแตะจริง (ไม่ใช่แตะ 2 ครั้งของโปรแกรมอ่านหน้าจอ) = ปิดโปรแกรมอ่านหน้าจอไว้แล้ว
+          unlockAll(true); apply();
+          if (!srWeb) { sayNow('โหมดท่าทางนิ้ว เกมพูดเองแล้ว, ปัดขึ้นลงเลือก แตะ 1 นิ้วตกลง, แตะค้าง 3 นิ้ว 2 วินาทีกลับไปใช้โปรแกรมอ่านหน้าจอ, ' + (state.screen === 'main_menu' ? `เมนูหลัก ${mainOpts()[state.mainMenuIdx]}` : '')); setTimeout(checkThaiVoice, 1500); }
+          else srSay('เลือกเล่นด้วยท่าทางนิ้วแล้ว ขั้นต่อไปปิดโปรแกรมอ่านหน้าจอชั่วคราว ' + (IOS ? 'iPhone: กดปุ่มข้างเครื่อง 3 ครั้ง ถ้าตั้งปุ่มลัด VoiceOver ไว้' : 'Android: กดปุ่มเพิ่มเสียงและลดเสียงค้างพร้อมกัน 3 วินาที') + ' แล้วปัดนิ้วบนจอ 1 ครั้ง เกมจะเริ่มพูดเอง, ระหว่างนี้ยังใช้ปุ่มบนจอได้');
+        } else {
+          srWeb = true; unlockAll(); apply();
+          srSay('เล่นกับโปรแกรมอ่านหน้าจอ, ปัดซ้ายขวาเลือกปุ่ม แตะ 2 ครั้งเพื่อกด, ' + (state.screen === 'main_menu' ? `เมนูหลัก, ${mainOpts()[state.mainMenuIdx]}` : 'กลับเข้าเกม'));
+        }
+        renderAll();
       }
       function onQuit() {
         stopSpeech();
@@ -8280,6 +9153,7 @@
       }
       function welcome() {
         const md = mode();
+        if (!native) return;   // เว็บ: หน้าเลือกวิธีเล่นทำหน้าที่ต้อนรับ
         if (md === 'gesture') speak('โลกฝึกหัด, แตะหน้าจอ 1 ครั้งเพื่อเปิดเสียง, ครั้งแรกแนะนำให้เข้า ตั้งค่าการควบคุม แล้วเลือก ฝึกท่าทางนิ้ว');
         else if (md === 'buttons') speak(platform === 'android'
           ? 'โลกฝึกหัด, โหมดปุ่มบนจอ, ถ้าต้องการเล่นด้วยท่าทางนิ้ว ให้พัก TalkBack โดยกดปุ่มเพิ่มเสียงและลดเสียงค้างพร้อมกัน 3 วินาที หรือเลือกพัก TalkBack ในเมนู TalkBack เกมจะเปลี่ยนเป็นโหมดท่าทางและพูดเอง'
@@ -8290,6 +9164,16 @@
       async function init() {
         if (!enabled) return;
         injectCss(); buildLayers(); hookHaptics();
+        if (!native) {
+          startEl = document.createElement('div'); startEl.id = 'mStart'; document.body.appendChild(startEl);
+          // ตรวจการปัดนิ้วจริงทั้งหน้า (ตอนโปรแกรมอ่านหน้าจอเปิด หน้าเว็บไม่ได้รับการปัด)
+          let rt = null;
+          document.addEventListener('touchstart', (e) => { const t = e.touches[0]; rt = t && e.touches.length === 1 ? { x: t.clientX, y: t.clientY, moved: false } : null; }, { passive: true, capture: true });
+          document.addEventListener('touchmove', (e) => { const t = e.touches[0]; if (rt && t && Math.hypot(t.clientX - rt.x, t.clientY - rt.y) > 40) rt.moved = true; }, { passive: true, capture: true });
+          document.addEventListener('touchend', () => { if (rt && rt.moved) realSwipe(); rt = null; }, { passive: true, capture: true });
+          showStart('choose');
+          setTimeout(() => srWrite('โหลดเกมเสร็จแล้ว, โลกฝึกหัด, เลือกวิธีเล่น, ปุ่มแรกคือ ' + (S.webStyle ? 'เล่นต่อ: ' + STY[S.webStyle] : STY.sr)), 400);
+        }
         if (GA) {
           try { const r = await GA.isScreenReaderOn(); srOn = !!(r && r.on); } catch {}
           GA.addListener('screenReaderChanged', (r) => { srOn = !!(r && r.on); apply(); });
@@ -8309,7 +9193,8 @@
       return {
         enabled, platform, native, say, refresh, renderScreen, handleKey, openControl, onQuit, buzz,
         active: () => mode() !== 'off', mode, ttsOn, press, init,
-        debug: { S, onGesture, ctxName, mapGesture, save, apply, LESSONS, setSr: (v) => { srOn = v; apply(); } }
+        showStart, srSay,
+        debug: { S, onGesture, ctxName, mapGesture, save, apply, LESSONS, setSr: (v) => { srOn = v; apply(); }, DIAG, diagLines, choose, realSwipe, srState: () => ({ srWeb, startVisible, unlocked }), setSrWeb: (v) => { srWeb = v; apply(); } }
       };
     })();
 
@@ -8343,6 +9228,7 @@
           if (mmLab === 'เริ่มเกม') applySavedDataAndEnterGame();
           else if (mmLab === 'ตั้งค่าเสียง') openSoundSettings('main_menu');
           else if (mmLab === 'ตั้งค่าการควบคุม') Mobile.openControl('main_menu');
+          else if (mmLab && mmLab.startsWith('โหลดเกมรุ่นใหม่')) Updater.reload();
           else openExitConfirm('main_menu');
           return;
         }
@@ -8459,6 +9345,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       Mobile.init();
+      Updater.start();   // เช็ก version.json บน GitHub
       renderAll();
       focusGameBox();
       speak('หน้าเมนูหลัก, เริ่มเกม');
