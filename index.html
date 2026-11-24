@@ -162,11 +162,11 @@
   </div>
 
   <script>window.__lfLoad=function(p){var e=document.getElementById("sr1");if(!e)return;e.textContent="";setTimeout(function(){e.textContent=p>0?"กำลังโหลดเกม "+p+" เปอร์เซ็นต์":"กำลังโหลดเกม ไฟล์ใหญ่ประมาณ 20 เมกะไบต์ กรุณารอสักครู่"},30)};__lfLoad(0);</script>
-<script src="data-music.js?v=13"></script>
+<script src="data-music.js?v=14"></script>
 <script>__lfLoad(25)</script>
-<script src="data-music2.js?v=13"></script>
+<script src="data-music2.js?v=14"></script>
 <script>__lfLoad(50)</script>
-<script src="data-sfx.js?v=13"></script>
+<script src="data-sfx.js?v=14"></script>
 <script>__lfLoad(75)</script>
 <script>
     // ==================== CONSTANTS ====================
@@ -8523,7 +8523,7 @@
       };
     })();
 
-    const GAME_VERSION = {"build": 13, "name": "รุ่น 1.12", "date": "2026-11-24", "notes": ["iPhone บนเว็บ: ให้ระบบเลือกเสียงพูดภาษาไทยเอง", "ผลตรวจเสียงบันทึกการพูดละเอียดขึ้น และจำไว้ข้ามการโหลดหน้าใหม่"]};
+    const GAME_VERSION = {"build": 14, "name": "รุ่น 1.13", "date": "2026-11-24", "notes": ["iPhone บนเว็บ: แก้เสียงพูดของเกมเงียบหลังพูดประโยคแรก (เกมสั่งพูดทีละท่อนเอง และสั่งใหม่ถ้าเครื่องไม่เริ่มพูด)"]};
     // ==================== แจ้งเตือนเมื่อเกมมีรุ่นใหม่ (version.json บน GitHub) ====================
     // เช็กทุก 3 นาที (และทันทีเมื่อกลับมาที่หน้าเกม) เจอรุ่นใหม่ รอจังหวะปลอดภัยแล้วแจ้ง ผู้เล่นเลือกโหลดเอง เกมบันทึกให้ก่อน
     const Updater = (() => {
@@ -8711,34 +8711,37 @@
       }
       let speakGen = 0, speechStartAt = 0, speechOk = false;
       // บันทึกเหตุการณ์เสียงพูด (ดูในผลตรวจ) ช่วยหาสาเหตุเมื่อ iPhone ไม่ยอมพูด
-      function slog(t) { DIAG.speech.push(((Date.now() / 1000) % 1000).toFixed(1) + ' ' + t); if (DIAG.speech.length > 14) DIAG.speech.shift(); try { localStorage.setItem('lf_slog', JSON.stringify(DIAG.speech)); } catch {} }
+      function slog(t) { DIAG.speech.push(((Date.now() / 1000) % 1000).toFixed(1) + ' ' + t); if (DIAG.speech.length > 30) DIAG.speech.shift(); try { localStorage.setItem('lf_slog', JSON.stringify(DIAG.speech)); } catch {} }
       // now = เรียกจากในการแตะ/ปัดของผู้เล่น: พูดทันทีในจังหวะเดียวกัน (iPhone ยอมให้เริ่มพูดเฉพาะในจังหวะที่นิ้วแตะจอ)
+      // พูดทีละท่อนเอง (ท่อนถัดไปเริ่มเมื่อท่อนก่อนจบ) ไม่ฝากคิวของ iPhone ซึ่งค้างหลังท่อนแรก · เก็บตัวแปรเสียงไว้ไม่ให้ถูกล้างทิ้ง · ไม่เริ่มใน 1.5 วินาที = สั่งใหม่
+      let liveUtts = [], nLog = 0;
       function webSpeak(text, now) {
         const ss = window.speechSynthesis; if (!ss) return;
-        const gen = ++speakGen;
-        const go = () => {
-          if (gen !== speakGen) return;
+        const gen = ++speakGen, parts = chunks(text);
+        if (nLog++ < 30) slog('สั่งพูด ' + (now || 'เกม') + ' ' + String(text).length + ' ตัวอักษร' + (ss.speaking ? ' กำลังพูดอยู่' : '') + (ss.pending ? ' มีคิว' : '') + (ss.paused ? ' หยุดชั่วคราว' : ''));
+        const one = (i, retry) => {
+          if (gen !== speakGen || i >= parts.length) return;
           try {
             webVoice = webVoice || pickWebVoice();
-            chunks(text).forEach(c => {
-              const u = new SpeechSynthesisUtterance(c); u.lang = 'th-TH'; u.rate = S.rate; u.volume = 1;
-              if (webVoice && !IOS) u.voice = webVoice;   // iPhone: ให้ระบบเลือกเสียงไทยเอง (เลือกเสียงที่ยังดาวน์โหลดไม่ครบ จะเงียบ)
-              let st = 0;
-              u.onstart = () => { st = speechStartAt = Date.now(); if (DIAG.speech.length < 12 || !speechOk) slog('เริ่มพูด ' + c.length + ' ตัวอักษร'); speechOk = true; };
-              u.onend = () => { if (st) slog('พูดจบใน ' + (Date.now() - st) + ' มิลลิวินาที'); };
-              u.onerror = (ev) => slog('ผิดพลาด ' + (ev && ev.error));
-              ss.speak(u);
-            });
-            if (ss.paused) ss.resume();
-          } catch {}
+            const c = parts[i], u = new SpeechSynthesisUtterance(c); u.lang = 'th-TH'; u.rate = S.rate; u.volume = 1;
+            if (webVoice && !IOS) u.voice = webVoice;   // iPhone: ให้ระบบเลือกเสียงไทยเอง
+            let st = 0, done = false;
+            const next = () => { if (done) return; done = true; liveUtts = liveUtts.filter(x => x !== u); if (gen === speakGen) setTimeout(() => one(i + 1), 30); };
+            u.onstart = () => { st = speechStartAt = Date.now(); if (nLog < 30 || !speechOk) slog('เริ่มพูดท่อน ' + (i + 1) + (retry ? ' (สั่งซ้ำ)' : '')); speechOk = true; };
+            u.onend = () => { if (st && nLog < 30) slog('จบท่อน ' + (i + 1) + ' ใน ' + (Date.now() - st) + ' มิลลิวินาที'); if (st) next(); };
+            u.onerror = (ev) => { slog('ผิดพลาด ' + (ev && ev.error)); if (st) next(); };
+            liveUtts.push(u); if (liveUtts.length > 8) liveUtts.shift();
+            ss.speak(u); if (ss.paused) ss.resume();
+            setTimeout(() => {
+              if (st || done || gen !== speakGen) return;
+              slog('ท่อน ' + (i + 1) + ' ไม่เริ่ม' + (retry ? ' ข้าม' : ' สั่งใหม่'));
+              done = true; try { ss.cancel(); } catch {}
+              if (!retry) setTimeout(() => { if (gen === speakGen) one(i, true); }, 150); else setTimeout(() => one(i + 1), 150);
+            }, 1500);
+          } catch (e) { slog('สั่งพูดไม่ได้ ' + e); }
         };
-        if (now) {
-          slog('สั่งพูด ' + now + (ss.speaking ? ' กำลังพูดอยู่' : '') + (ss.pending ? ' มีคิว' : '') + (ss.paused ? ' หยุดชั่วคราว' : ''));
-          // iPhone: หยุดแล้วสั่งพูดทันทีในจังหวะเดียวกัน เสียงใหม่จะหาย → ถ้ายังไม่เคยพูดได้ ไม่ต้องหยุด ใส่คิวเลย
-          if ((ss.speaking || ss.pending) && speechOk) { try { ss.cancel(); } catch {} setTimeout(go, 110); return; }
-          go(); return;
-        }
-        if (ss.speaking || ss.pending) { try { ss.cancel(); } catch {} setTimeout(go, 110); } else go();
+        if (now && !speechOk) { one(0); return; }   // ยังไม่เคยพูดได้: ไม่หยุดเสียงก่อน (iPhone หยุดแล้วสั่งทันที เสียงหาย)
+        if (ss.speaking || ss.pending) { try { ss.cancel(); } catch {} setTimeout(() => one(0), 110); } else one(0);
       }
       // ข้อความถึงโปรแกรมอ่านหน้าจอ: รวมข้อความที่มาติดกัน และรอให้อ่านชื่อปุ่มจบก่อน (0.3 วินาทีหลังกดปุ่ม)
       let srQ = [], srT = null, srCh = 0;
@@ -9398,9 +9401,9 @@
       let switchedAt = 0, retries = 0;
       // คลิกที่ตามหลังการแตะจริง: iPhone บางรุ่นยอมเริ่มเสียงพูดจากคลิกเท่านั้น ถ้ายังไม่เคยพูดได้ ลองพูดซ้ำจากคลิก
       function clickRetry() {
-        if (speechOk || !lastGText || TTS || !ttsOn() || retries >= 2) return false;   // ลองซ้ำได้ 2 ครั้ง จากนั้นคลิก = โปรแกรมอ่านหน้าจอยังเปิดอยู่ (กลับไปปุ่มบนจอ)
+        if (speechOk || !lastGText || TTS || !ttsOn() || retries >= 1) return false;   // ลองซ้ำได้ 1 ครั้ง จากนั้นคลิก = โปรแกรมอ่านหน้าจอยังเปิดอยู่ (กลับไปปุ่มบนจอ)
         retries++;
-        if (Date.now() - lastGAt < 1500 && speechStartAt >= lastGAt) return true;
+        if (Date.now() - lastGAt < 1500) { retries--; return true; }   // เพิ่งสั่งพูดจากการแตะครั้งนี้: รอดูผลก่อน ไม่สั่งซ้อน
         pendingSay = null; gestureSay(lastGText, 'คลิก'); return true;
       }
       function realSwipe() {
