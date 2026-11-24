@@ -162,11 +162,11 @@
   </div>
 
   <script>window.__lfLoad=function(p){var e=document.getElementById("sr1");if(!e)return;e.textContent="";setTimeout(function(){e.textContent=p>0?"กำลังโหลดเกม "+p+" เปอร์เซ็นต์":"กำลังโหลดเกม ไฟล์ใหญ่ประมาณ 20 เมกะไบต์ กรุณารอสักครู่"},30)};__lfLoad(0);</script>
-<script src="data-music.js?v=12"></script>
+<script src="data-music.js?v=13"></script>
 <script>__lfLoad(25)</script>
-<script src="data-music2.js?v=12"></script>
+<script src="data-music2.js?v=13"></script>
 <script>__lfLoad(50)</script>
-<script src="data-sfx.js?v=12"></script>
+<script src="data-sfx.js?v=13"></script>
 <script>__lfLoad(75)</script>
 <script>
     // ==================== CONSTANTS ====================
@@ -8523,7 +8523,7 @@
       };
     })();
 
-    const GAME_VERSION = {"build": 12, "name": "รุ่น 1.11", "date": "2026-11-24", "notes": ["iPhone บนเว็บ: แก้เสียงพูดของเกมไม่ออกหลังปิด VoiceOver (ลองพูดได้ทั้งจากการแตะและการคลิก)", "ผลตรวจเสียงมีบันทึกการทำงานของเสียงพูดเพิ่ม"]};
+    const GAME_VERSION = {"build": 13, "name": "รุ่น 1.12", "date": "2026-11-24", "notes": ["iPhone บนเว็บ: ให้ระบบเลือกเสียงพูดภาษาไทยเอง", "ผลตรวจเสียงบันทึกการพูดละเอียดขึ้น และจำไว้ข้ามการโหลดหน้าใหม่"]};
     // ==================== แจ้งเตือนเมื่อเกมมีรุ่นใหม่ (version.json บน GitHub) ====================
     // เช็กทุก 3 นาที (และทันทีเมื่อกลับมาที่หน้าเกม) เจอรุ่นใหม่ รอจังหวะปลอดภัยแล้วแจ้ง ผู้เล่นเลือกโหลดเอง เกมบันทึกให้ก่อน
     const Updater = (() => {
@@ -8663,6 +8663,7 @@
       // srWeb = เว็บเดาว่าโปรแกรมอ่านหน้าจอเปิดอยู่ (เริ่มต้น: เปิด) · ปัดนิ้วจริง = ปิดแล้ว · แตะ 2 ครั้งบนพื้นที่ท่าทาง (คลิกจากโปรแกรมอ่านหน้าจอ) = เปิดอยู่
       let srWeb = true, startVisible = false, lastActAt = 0, needWarm = false, pendingSay = null;
       const DIAG = { swipes: 0, srClicks: 0, bell: null, voice: null, realTaps: 0, speech: [] };
+      try { const o = JSON.parse(localStorage.getItem('lf_slog') || '[]'); if (Array.isArray(o) && o.length) DIAG.speech = ['รอบก่อน:'].concat(o.slice(-8), ['รอบนี้:']); } catch {}
       let srOn = platform === 'android';   // ผู้อ่านหน้าจอเปิดอยู่ไหม (รู้ได้เฉพาะในแอป) Android ถือว่าเปิดไว้ก่อนจนกว่าจะถามระบบเสร็จ
       const SWIPE_PX = { short: 20, mid: 30, long: 45 };
 
@@ -8710,7 +8711,7 @@
       }
       let speakGen = 0, speechStartAt = 0, speechOk = false;
       // บันทึกเหตุการณ์เสียงพูด (ดูในผลตรวจ) ช่วยหาสาเหตุเมื่อ iPhone ไม่ยอมพูด
-      function slog(t) { DIAG.speech.push(((Date.now() / 1000) % 1000).toFixed(1) + ' ' + t); if (DIAG.speech.length > 12) DIAG.speech.shift(); }
+      function slog(t) { DIAG.speech.push(((Date.now() / 1000) % 1000).toFixed(1) + ' ' + t); if (DIAG.speech.length > 14) DIAG.speech.shift(); try { localStorage.setItem('lf_slog', JSON.stringify(DIAG.speech)); } catch {} }
       // now = เรียกจากในการแตะ/ปัดของผู้เล่น: พูดทันทีในจังหวะเดียวกัน (iPhone ยอมให้เริ่มพูดเฉพาะในจังหวะที่นิ้วแตะจอ)
       function webSpeak(text, now) {
         const ss = window.speechSynthesis; if (!ss) return;
@@ -8719,7 +8720,15 @@
           if (gen !== speakGen) return;
           try {
             webVoice = webVoice || pickWebVoice();
-            chunks(text).forEach(c => { const u = new SpeechSynthesisUtterance(c); u.lang = 'th-TH'; u.rate = S.rate; if (webVoice) u.voice = webVoice; u.onstart = () => { speechStartAt = Date.now(); if (!speechOk) slog('เริ่มพูดได้'); speechOk = true; }; u.onerror = (ev) => slog('ผิดพลาด ' + (ev && ev.error)); ss.speak(u); });
+            chunks(text).forEach(c => {
+              const u = new SpeechSynthesisUtterance(c); u.lang = 'th-TH'; u.rate = S.rate; u.volume = 1;
+              if (webVoice && !IOS) u.voice = webVoice;   // iPhone: ให้ระบบเลือกเสียงไทยเอง (เลือกเสียงที่ยังดาวน์โหลดไม่ครบ จะเงียบ)
+              let st = 0;
+              u.onstart = () => { st = speechStartAt = Date.now(); if (DIAG.speech.length < 12 || !speechOk) slog('เริ่มพูด ' + c.length + ' ตัวอักษร'); speechOk = true; };
+              u.onend = () => { if (st) slog('พูดจบใน ' + (Date.now() - st) + ' มิลลิวินาที'); };
+              u.onerror = (ev) => slog('ผิดพลาด ' + (ev && ev.error));
+              ss.speak(u);
+            });
             if (ss.paused) ss.resume();
           } catch {}
         };
@@ -9466,7 +9475,7 @@
           `วิธีเล่นที่เลือก ${S.webStyle ? STY[S.webStyle] : 'ยังไม่เลือก'}, ตอนนี้ใช้ ${mode() === 'gesture' ? 'ท่าทางนิ้ว เกมพูดเอง' : 'ปุ่มบนจอ'}`,
           `เสียงเกม ${AudioSys.ctxState ? AudioSys.ctxState() : 'ไม่ทราบ'}, เตรียมเสียงแล้ว ${dec.done} จาก ${dec.total} ไฟล์`,
           `ได้ยินเสียงกริ่ง ${DIAG.bell === null ? 'ยังไม่ทดสอบ' : (DIAG.bell ? 'ได้ยิน' : 'ไม่ได้ยิน')}`,
-          `เสียงพูดของเบราว์เซอร์ ${'speechSynthesis' in window ? 'มี' : 'ไม่มี'}, เสียงทั้งหมด ${ss.length} เสียง, เสียงไทย ${th.length} เสียง${th.length ? ' ชื่อ ' + th.map(v => v.name).join(' และ ') : ''}`,
+          `เสียงพูดของเบราว์เซอร์ ${'speechSynthesis' in window ? 'มี' : 'ไม่มี'}, เสียงทั้งหมด ${ss.length} เสียง, เสียงไทย ${th.length} เสียง${th.length ? ' ชื่อ ' + th.map(v => v.name + ' ' + v.lang + (v.localService ? '' : ' ออนไลน์')).join(' และ ') : ''}, ความเร็ว ${S.rate}`,
           `ได้ยินเสียงพูด ${DIAG.voice === null ? 'ยังไม่ทดสอบ' : (DIAG.voice ? 'ได้ยิน' : 'ไม่ได้ยิน')}`,
           `ได้รับการปัดนิ้วจริง ${DIAG.swipes} ครั้ง, แตะจริง ${DIAG.realTaps} ครั้ง, คลิกจากโปรแกรมอ่านหน้าจอบนพื้นที่ท่าทาง ${DIAG.srClicks} ครั้ง`,
           `หน่วยความจำเครื่อง ${navigator.deviceMemory ? navigator.deviceMemory + ' GB' : 'ไม่ทราบ'}, จอ ${screen.width} คูณ ${screen.height}`,
