@@ -162,11 +162,11 @@
   </div>
 
   <script>window.__lfLoad=function(p){var e=document.getElementById("sr1");if(!e)return;e.textContent="";setTimeout(function(){e.textContent=p>0?"กำลังโหลดเกม "+p+" เปอร์เซ็นต์":"กำลังโหลดเกม ไฟล์ใหญ่ประมาณ 20 เมกะไบต์ กรุณารอสักครู่"},30)};__lfLoad(0);</script>
-<script src="data-music.js?v=11"></script>
+<script src="data-music.js?v=12"></script>
 <script>__lfLoad(25)</script>
-<script src="data-music2.js?v=11"></script>
+<script src="data-music2.js?v=12"></script>
 <script>__lfLoad(50)</script>
-<script src="data-sfx.js?v=11"></script>
+<script src="data-sfx.js?v=12"></script>
 <script>__lfLoad(75)</script>
 <script>
     // ==================== CONSTANTS ====================
@@ -8523,7 +8523,7 @@
       };
     })();
 
-    const GAME_VERSION = {"build": 11, "name": "รุ่น 1.10", "date": "2026-11-24", "notes": ["iPhone บนเว็บ: หลังปิด VoiceOver แค่ปัดหรือแตะจอ 1 ครั้ง เกมจะเปลี่ยนเป็นโหมดท่าทางนิ้วและพูดเอง", "ถ้าได้ยินเสียงติ๊ง 2 ครั้งแต่เสียงพูดไม่ออก ให้แตะจออีก 1 ครั้ง"]};
+    const GAME_VERSION = {"build": 12, "name": "รุ่น 1.11", "date": "2026-11-24", "notes": ["iPhone บนเว็บ: แก้เสียงพูดของเกมไม่ออกหลังปิด VoiceOver (ลองพูดได้ทั้งจากการแตะและการคลิก)", "ผลตรวจเสียงมีบันทึกการทำงานของเสียงพูดเพิ่ม"]};
     // ==================== แจ้งเตือนเมื่อเกมมีรุ่นใหม่ (version.json บน GitHub) ====================
     // เช็กทุก 3 นาที (และทันทีเมื่อกลับมาที่หน้าเกม) เจอรุ่นใหม่ รอจังหวะปลอดภัยแล้วแจ้ง ผู้เล่นเลือกโหลดเอง เกมบันทึกให้ก่อน
     const Updater = (() => {
@@ -8662,7 +8662,7 @@
       const IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       // srWeb = เว็บเดาว่าโปรแกรมอ่านหน้าจอเปิดอยู่ (เริ่มต้น: เปิด) · ปัดนิ้วจริง = ปิดแล้ว · แตะ 2 ครั้งบนพื้นที่ท่าทาง (คลิกจากโปรแกรมอ่านหน้าจอ) = เปิดอยู่
       let srWeb = true, startVisible = false, lastActAt = 0, needWarm = false, pendingSay = null;
-      const DIAG = { swipes: 0, srClicks: 0, bell: null, voice: null, realTaps: 0 };
+      const DIAG = { swipes: 0, srClicks: 0, bell: null, voice: null, realTaps: 0, speech: [] };
       let srOn = platform === 'android';   // ผู้อ่านหน้าจอเปิดอยู่ไหม (รู้ได้เฉพาะในแอป) Android ถือว่าเปิดไว้ก่อนจนกว่าจะถามระบบเสร็จ
       const SWIPE_PX = { short: 20, mid: 30, long: 45 };
 
@@ -8708,7 +8708,9 @@
         if (cur) out.push(cur);
         return out;
       }
-      let speakGen = 0, speechStartAt = 0;
+      let speakGen = 0, speechStartAt = 0, speechOk = false;
+      // บันทึกเหตุการณ์เสียงพูด (ดูในผลตรวจ) ช่วยหาสาเหตุเมื่อ iPhone ไม่ยอมพูด
+      function slog(t) { DIAG.speech.push(((Date.now() / 1000) % 1000).toFixed(1) + ' ' + t); if (DIAG.speech.length > 12) DIAG.speech.shift(); }
       // now = เรียกจากในการแตะ/ปัดของผู้เล่น: พูดทันทีในจังหวะเดียวกัน (iPhone ยอมให้เริ่มพูดเฉพาะในจังหวะที่นิ้วแตะจอ)
       function webSpeak(text, now) {
         const ss = window.speechSynthesis; if (!ss) return;
@@ -8717,11 +8719,16 @@
           if (gen !== speakGen) return;
           try {
             webVoice = webVoice || pickWebVoice();
-            chunks(text).forEach(c => { const u = new SpeechSynthesisUtterance(c); u.lang = 'th-TH'; u.rate = S.rate; if (webVoice) u.voice = webVoice; u.onstart = () => { speechStartAt = Date.now(); }; ss.speak(u); });
+            chunks(text).forEach(c => { const u = new SpeechSynthesisUtterance(c); u.lang = 'th-TH'; u.rate = S.rate; if (webVoice) u.voice = webVoice; u.onstart = () => { speechStartAt = Date.now(); if (!speechOk) slog('เริ่มพูดได้'); speechOk = true; }; u.onerror = (ev) => slog('ผิดพลาด ' + (ev && ev.error)); ss.speak(u); });
             if (ss.paused) ss.resume();
           } catch {}
         };
-        if (now) { if (ss.speaking || ss.pending) { try { ss.cancel(); } catch {} } go(); return; }
+        if (now) {
+          slog('สั่งพูด ' + now + (ss.speaking ? ' กำลังพูดอยู่' : '') + (ss.pending ? ' มีคิว' : '') + (ss.paused ? ' หยุดชั่วคราว' : ''));
+          // iPhone: หยุดแล้วสั่งพูดทันทีในจังหวะเดียวกัน เสียงใหม่จะหาย → ถ้ายังไม่เคยพูดได้ ไม่ต้องหยุด ใส่คิวเลย
+          if ((ss.speaking || ss.pending) && speechOk) { try { ss.cancel(); } catch {} setTimeout(go, 110); return; }
+          go(); return;
+        }
         if (ss.speaking || ss.pending) { try { ss.cancel(); } catch {} setTimeout(go, 110); } else go();
       }
       // ข้อความถึงโปรแกรมอ่านหน้าจอ: รวมข้อความที่มาติดกัน และรอให้อ่านชื่อปุ่มจบก่อน (0.3 วินาทีหลังกดปุ่ม)
@@ -8884,8 +8891,9 @@
       function evNow(e) { return Date.now() - Math.max(0, performance.now() - e.timeStamp); }
       function centroid() { let x = 0, y = 0, k = 0; G.pts.forEach(p => { x += p.x - p.x0; y += p.y - p.y0; k++; }); return k ? [x / k, y / k] : [0, 0]; }
       function dirOf(dx, dy) { return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'); }
+      const allowClick = () => !native && !speechOk && !TTS && ttsOn();
       function tStart(e) {
-        e.preventDefault();
+        if (!allowClick() || e.touches.length > 1) e.preventDefault();
         const now = evNow(e);
         if (!G) {
           const t = e.changedTouches[0] || e.touches[0], W = window.innerWidth, H = window.innerHeight;
@@ -8930,7 +8938,7 @@
         }
       }
       function tEnd(e) {
-        e.preventDefault();
+        if (!allowClick()) e.preventDefault();
         if (!unlocked) {
           unlockAll(true); if (G) clearTimeout(G.hold); G = null;
           speak(state.screen === 'main_menu' ? `เปิดเสียงแล้ว, เมนูหลัก, ปัดขึ้นลงเพื่อเลือก แตะ 1 นิ้วเพื่อตกลง, ${mainOpts()[state.mainMenuIdx]}` : 'เปิดเสียงแล้ว');
@@ -8984,7 +8992,7 @@
         else {
           // เว็บ: ถ้าโปรแกรมอ่านหน้าจออ่านป้ายนี้ได้ แปลว่ายังเปิดอยู่ แตะ 2 ครั้ง = กลับไปใช้ปุ่มบนจอ
           layer.setAttribute('role', 'button'); layer.setAttribute('aria-label', 'พื้นที่ท่าทางนิ้ว ถ้าได้ยินข้อความนี้ แสดงว่าโปรแกรมอ่านหน้าจอยังเปิดอยู่ แตะ 2 ครั้งเพื่อกลับไปใช้ปุ่มบนจอ');
-          layer.addEventListener('click', () => { DIAG.srClicks++; srBack('โปรแกรมอ่านหน้าจอเปิดอยู่ เปลี่ยนเป็นปุ่มบนจอแล้ว ถ้าจะเล่นท่าทางนิ้ว ปิดโปรแกรมอ่านหน้าจอแล้วปัดหรือแตะจอ 1 ครั้ง'); });
+          layer.addEventListener('click', () => { if (!srWeb && clickRetry()) return; DIAG.srClicks++; srBack('โปรแกรมอ่านหน้าจอเปิดอยู่ เปลี่ยนเป็นปุ่มบนจอแล้ว ถ้าจะเล่นท่าทางนิ้ว ปิดโปรแกรมอ่านหน้าจอแล้วปัดหรือแตะจอ 1 ครั้ง'); });
         }
         ['touchstart', 'touchmove', 'touchend', 'touchcancel'].forEach(t => layer.addEventListener(t, t === 'touchstart' ? tStart : (t === 'touchmove' ? tMove : tEnd), { passive: false }));
         pad = document.createElement('div'); pad.id = 'mPad';
@@ -9038,9 +9046,9 @@
           if (!deferred) down();
         }, { passive: true });
         b.addEventListener('touchmove', (e) => { const t = e.touches[0]; if (t && Math.hypot(t.clientX - tx, t.clientY - ty) > 20) moved = true; }, { passive: true });
-        b.addEventListener('touchend', (e) => { if (e.cancelable) e.preventDefault(); if (Date.now() - switchedAt < 80) { deferred = false; release(); return; } if (deferred) { deferred = false; if (!moved) { down(); release(); } return; } release(); }, { passive: false });
+        b.addEventListener('touchend', (e) => { if (Date.now() - switchedAt < 80) { deferred = false; release(); return; } if (e.cancelable) e.preventDefault(); if (deferred) { deferred = false; if (!moved) { down(); release(); } return; } release(); }, { passive: false });
         b.addEventListener('touchcancel', () => { deferred = false; release(); });
-        b.addEventListener('click', () => { if (Date.now() - touchedAt < 900) return; unlockAll(); down(); release(); });   // TalkBack / VoiceOver แตะ 2 ครั้ง
+        b.addEventListener('click', () => { if (Date.now() - switchedAt < 1500 && clickRetry()) return; if (Date.now() - touchedAt < 900) return; unlockAll(); down(); release(); });   // TalkBack / VoiceOver แตะ 2 ครั้ง
       }
       function mk(label, act, cls) { const b = document.createElement('button'); b.type = 'button'; b.textContent = label; if (cls) b.className = cls; bindBtn(b, act); return b; }
       function renderPad() {
@@ -9360,9 +9368,10 @@
       }
       function firstUnlock() { unlockAll(true); }
       // พูดจากในการแตะ แล้วตรวจว่าเสียงพูดเริ่มจริงไหม ถ้าเงียบ (iPhone หลังปิด VoiceOver) เก็บไว้พูดใหม่ตอนแตะครั้งถัดไป พร้อมเสียงเตือน
-      function gestureSay(text) {
-        const t0 = Date.now(); speechStartAt = 0;
-        webSpeak(text, true);
+      let lastGText = '', lastGAt = 0;
+      function gestureSay(text, via) {
+        const t0 = Date.now(); speechStartAt = 0; lastGText = text; lastGAt = t0;
+        webSpeak(text, via || 'แตะ');
         setTimeout(() => {
           if (speechStartAt >= t0 || !ttsOn() || TTS) return;
           pendingSay = text; needWarm = true;
@@ -9377,7 +9386,14 @@
         setTimeout(() => srBack('วิธีเล่นกับโปรแกรมอ่านหน้าจอ ปุ่มบนจอ'), 2500);
       }
       // ได้รับการปัดนิ้วจริง = โปรแกรมอ่านหน้าจอปิดแล้ว (ตอนเปิดอยู่ หน้าเว็บจะไม่ได้รับการปัด)
-      let switchedAt = 0;
+      let switchedAt = 0, retries = 0;
+      // คลิกที่ตามหลังการแตะจริง: iPhone บางรุ่นยอมเริ่มเสียงพูดจากคลิกเท่านั้น ถ้ายังไม่เคยพูดได้ ลองพูดซ้ำจากคลิก
+      function clickRetry() {
+        if (speechOk || !lastGText || TTS || !ttsOn() || retries >= 2) return false;   // ลองซ้ำได้ 2 ครั้ง จากนั้นคลิก = โปรแกรมอ่านหน้าจอยังเปิดอยู่ (กลับไปปุ่มบนจอ)
+        retries++;
+        if (Date.now() - lastGAt < 1500 && speechStartAt >= lastGAt) return true;
+        pendingSay = null; gestureSay(lastGText, 'คลิก'); return true;
+      }
       function realSwipe() {
         DIAG.swipes++;
         if (native || startVisible || S.webStyle !== 'gesture' || !srWeb) return;
@@ -9427,7 +9443,7 @@
           add(sBtn('1. เล่นเสียงกริ่ง', () => { AudioSys.playSound('confirm'); AudioSys.mineSfx('bell', { gain: 1.2, delay: 0.2 }); }, 'main'));
           add(sBtn('ได้ยินเสียงกริ่ง', () => { DIAG.bell = true; srWrite('บันทึกแล้ว ได้ยินเสียงกริ่ง'); }));
           add(sBtn('ไม่ได้ยินเสียงกริ่ง', () => { DIAG.bell = false; srWrite('บันทึกแล้ว ไม่ได้ยินเสียงกริ่ง' + (IOS ? ' ลองปิดสวิตช์ปิดเสียงข้างเครื่อง เพิ่มเสียง แล้วกดเล่นใหม่' : ' ลองเพิ่มเสียงสื่อของเครื่อง แล้วกดเล่นใหม่')); }));
-          add(sBtn('2. ทดสอบเสียงพูดของเกม', () => { if (TTS) sayNow('ทดสอบเสียงพูด หนึ่ง สอง สาม'); else webSpeak('ทดสอบเสียงพูด หนึ่ง สอง สาม'); }, 'main'));
+          add(sBtn('2. ทดสอบเสียงพูดของเกม', () => { if (TTS) sayNow('ทดสอบเสียงพูด หนึ่ง สอง สาม'); else webSpeak('ทดสอบเสียงพูด หนึ่ง สอง สาม', 'ปุ่มทดสอบ'); }, 'main'));
           add(sBtn('ได้ยินเสียงพูด', () => { DIAG.voice = true; srWrite('บันทึกแล้ว ได้ยินเสียงพูด'); }));
           add(sBtn('ไม่ได้ยินเสียงพูด', () => { DIAG.voice = false; srWrite('บันทึกแล้ว ไม่ได้ยินเสียงพูด, ' + THAI_HELP); }));
           const rep = document.createElement('ul'); rep.setAttribute('aria-label', 'ผลตรวจ');
@@ -9454,7 +9470,8 @@
           `ได้ยินเสียงพูด ${DIAG.voice === null ? 'ยังไม่ทดสอบ' : (DIAG.voice ? 'ได้ยิน' : 'ไม่ได้ยิน')}`,
           `ได้รับการปัดนิ้วจริง ${DIAG.swipes} ครั้ง, แตะจริง ${DIAG.realTaps} ครั้ง, คลิกจากโปรแกรมอ่านหน้าจอบนพื้นที่ท่าทาง ${DIAG.srClicks} ครั้ง`,
           `หน่วยความจำเครื่อง ${navigator.deviceMemory ? navigator.deviceMemory + ' GB' : 'ไม่ทราบ'}, จอ ${screen.width} คูณ ${screen.height}`,
-          `ตัวควบคุมเสียงสื่อของ iPhone ${navigator.audioSession ? 'มี' : 'ไม่มี'}`
+          `ตัวควบคุมเสียงสื่อของ iPhone ${navigator.audioSession ? 'มี' : 'ไม่มี'}`,
+          `เสียงพูดเคยเริ่มได้ ${speechOk ? 'ใช่' : 'ไม่'}, บันทึกเสียงพูด: ${DIAG.speech.length ? DIAG.speech.join(' / ') : 'ไม่มี'}`
         ];
         if (DIAG.bell === false) L.push(IOS ? 'คำแนะนำ: ปิดสวิตช์ปิดเสียงข้างเครื่อง เพิ่มเสียงสื่อ แล้วโหลดหน้าเกมใหม่' : 'คำแนะนำ: เพิ่มเสียงสื่อ แล้วโหลดหน้าเกมใหม่');
         if (DIAG.voice === false || !th.length) L.push('คำแนะนำ: ' + THAI_HELP);
